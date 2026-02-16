@@ -1,52 +1,39 @@
 /**
- * constants/index.js — Application-wide constants
+ * constants/index.js - Application-wide constants and enums.
  *
- * All enums, status codes, and configuration values live here.
- * Keeps magic strings and numbers out of business logic.
- *
- * Why centralized: Prevents typos, makes refactoring easy,
- * ensures consistency across controllers/services.
- *
- * To extend: Add payment statuses, notification types, etc.
+ * Keeps magic values centralized for consistency, refactoring safety,
+ * and easier environment tuning.
  */
 
-/* ===================================================================
-   USER ROLES
-   =================================================================== */
 const ROLES = Object.freeze({
     STUDENT: 'student',
     ADMIN: 'admin',
 });
 
-/* ===================================================================
-   COURSE CATEGORIES
-   =================================================================== */
 const CATEGORIES = Object.freeze({
     SCHOOL: 'school',
     CODING: 'coding',
 });
 
-/* Sub-categories within each main category */
 const SUB_CATEGORIES = Object.freeze({
-    /* School */
     CLASS9: 'class9',
     CLASS10: 'class10',
-    /* Coding */
     CPP: 'cpp',
     JAVA: 'java',
     PYTHON: 'python',
     WEBDEV: 'webdev',
 });
 
-/* Valid sub-categories mapped to their parent category */
 const CATEGORY_SUB_MAP = Object.freeze({
     [CATEGORIES.SCHOOL]: [SUB_CATEGORIES.CLASS9, SUB_CATEGORIES.CLASS10],
-    [CATEGORIES.CODING]: [SUB_CATEGORIES.CPP, SUB_CATEGORIES.JAVA, SUB_CATEGORIES.PYTHON, SUB_CATEGORIES.WEBDEV],
+    [CATEGORIES.CODING]: [
+        SUB_CATEGORIES.CPP,
+        SUB_CATEGORIES.JAVA,
+        SUB_CATEGORIES.PYTHON,
+        SUB_CATEGORIES.WEBDEV,
+    ],
 });
 
-/* ===================================================================
-   HTTP STATUS CODES — named constants for readability
-   =================================================================== */
 const HTTP = Object.freeze({
     OK: 200,
     CREATED: 201,
@@ -60,51 +47,36 @@ const HTTP = Object.freeze({
     INTERNAL_ERROR: 500,
 });
 
-/* ===================================================================
-   RATE LIMITING CONFIG
-   =================================================================== */
 const RATE_LIMIT = Object.freeze({
-    /* General API — 100 requests per 15 minutes */
     GENERAL: { windowMs: 15 * 60 * 1000, max: 100 },
-    /* Auth endpoints — stricter to prevent brute force */
     AUTH: { windowMs: 15 * 60 * 1000, max: 20 },
-    /* Login specifically — very strict */
-    LOGIN: { windowMs: 15 * 60 * 1000, max: 10 },
+    LOGIN: { windowMs: 15 * 60 * 1000, max: 5 },
+    CONTACT: { windowMs: 15 * 60 * 1000, max: 8 },
+    NEWSLETTER: { windowMs: 60 * 60 * 1000, max: 20 },
 });
 
-/* ===================================================================
-   CACHE TTL (Time To Live) — in seconds
-   =================================================================== */
 const CACHE_TTL = Object.freeze({
-    COURSE_LIST: 300,       /* 5 minutes */
-    COURSE_DETAIL: 600,     /* 10 minutes */
-    DASHBOARD: 120,         /* 2 minutes */
+    COURSE_LIST: 300,
+    COURSE_DETAIL: 600,
+    DASHBOARD: 120,
 });
 
-/* Cache key prefixes for organized namespacing */
 const CACHE_KEYS = Object.freeze({
     COURSES: 'courses',
     COURSE_DETAIL: 'course',
     DASHBOARD: 'dashboard',
 });
 
-/* ===================================================================
-   AUTH CONFIG
-   =================================================================== */
 const AUTH = Object.freeze({
     BCRYPT_SALT_ROUNDS: 12,
     MAX_LOGIN_ATTEMPTS: 5,
-    LOCK_DURATION_MS: 30 * 60 * 1000, /* 30 minutes */
+    LOCK_DURATION_MS: 30 * 60 * 1000,
     COOKIE_NAME: 'refreshToken',
 });
 
-/* ===================================================================
-   WEAKNESS THRESHOLDS — for analytics engine
-   =================================================================== */
 const WEAKNESS = Object.freeze({
-    RED_THRESHOLD: 50,    /* Below 50% = weak (red) */
-    YELLOW_THRESHOLD: 70, /* 50-70% = needs improvement (yellow) */
-    /* Above 70% = strong (green) */
+    RED_THRESHOLD: 50,
+    YELLOW_THRESHOLD: 70,
 });
 
 module.exports = {

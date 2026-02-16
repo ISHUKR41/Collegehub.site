@@ -1,21 +1,15 @@
 /**
- * authValidator.js — Zod Validation Schemas for Auth Endpoints
+ * authValidator.js - Zod schemas for authentication routes.
  *
- * Validates request bodies BEFORE they reach controllers.
- * Catches malformed input early with clear error messages.
- *
- * Why Zod: TypeScript-first, composable, excellent error messages,
- * and much lighter than Joi. Perfect for modern Node.js APIs.
- *
- * Usage in routes:
- *   router.post('/register', validate(registerSchema), register);
- *
- * To extend: Add password strength rules, username validation.
+ * Why these validations exist:
+ * - Enforces strong password policy at the API boundary.
+ * - Normalizes emails before service/database checks.
+ * - Protects admin role creation behind invite code field validation.
  */
 
 const { z } = require('zod');
+const { ROLES } = require('../constants');
 
-/* Register — requires name, email, and strong password */
 const registerSchema = z.object({
     body: z.object({
         name: z
@@ -23,13 +17,11 @@ const registerSchema = z.object({
             .min(2, 'Name must be at least 2 characters')
             .max(100, 'Name cannot exceed 100 characters')
             .trim(),
-
         email: z
             .string({ required_error: 'Email is required' })
             .email('Please provide a valid email address')
-            .toLowerCase()
-            .trim(),
-
+            .trim()
+            .toLowerCase(),
         password: z
             .string({ required_error: 'Password is required' })
             .min(8, 'Password must be at least 8 characters')
@@ -38,41 +30,30 @@ const registerSchema = z.object({
                 /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
                 'Password must contain at least one uppercase letter, one lowercase letter, and one number'
             ),
+        role: z.enum([ROLES.STUDENT, ROLES.ADMIN]).optional().default(ROLES.STUDENT),
+        adminInviteCode: z.string().optional(),
     }),
 });
 
-/* Login — only email and password */
 const loginSchema = z.object({
     body: z.object({
         email: z
             .string({ required_error: 'Email is required' })
             .email('Please provide a valid email address')
-            .toLowerCase()
-            .trim(),
-
+            .trim()
+            .toLowerCase(),
         password: z
             .string({ required_error: 'Password is required' })
             .min(1, 'Password is required'),
     }),
 });
 
-/**
- * validate — Middleware factory that validates req against a Zod schema.
- * Parses req.body, req.query, and req.params as needed.
- */
-const validate = (schema) => (req, res, next) => {
-    try {
-        schema.parse({
-            body: req.body,
-            query: req.query,
-            params: req.params,
-        });
-        next();
-    } catch (error) {
-        /* Pass Zod error to centralized error handler */
-        error.name = 'ZodError';
-        next(error);
-    }
-};
+const refreshSchema = z.object({
+    body: z.object({}).optional(),
+});
 
-module.exports = { registerSchema, loginSchema, validate };
+module.exports = {
+    registerSchema,
+    loginSchema,
+    refreshSchema,
+};

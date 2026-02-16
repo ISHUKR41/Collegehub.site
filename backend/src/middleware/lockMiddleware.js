@@ -34,7 +34,9 @@ const checkLessonLock = async (req, res, next) => {
     try {
         const userId = req.user._id;
         const { courseId } = req.params;
-        const lessonIndex = parseInt(req.body.lessonIndex || req.query.lessonIndex, 10);
+        const rawLessonIndex =
+            req.body.lessonIndex ?? req.query.lessonIndex ?? req.params.lessonIndex;
+        const lessonIndex = Number.parseInt(rawLessonIndex, 10);
 
         /* If no lesson index provided, skip lock check (listing, not accessing) */
         if (isNaN(lessonIndex)) {
@@ -44,16 +46,12 @@ const checkLessonLock = async (req, res, next) => {
         /* Fetch user's progress for this course */
         const progress = await UserProgress.findOne({ userId, courseId }).lean();
 
-        /* No progress record = user not enrolled or first lesson */
+        /* No progress record means user is not enrolled in this course. */
         if (!progress) {
-            /* Allow access only to lesson 0 (first lesson) */
-            if (lessonIndex === 0) {
-                return next();
-            }
             return ApiResponse.error(
                 res,
                 HTTP.FORBIDDEN,
-                'Lesson locked. Complete previous lessons first.'
+                'Enrollment required. Enroll in this course before accessing lessons.'
             );
         }
 

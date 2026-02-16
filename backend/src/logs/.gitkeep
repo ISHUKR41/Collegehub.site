@@ -1,0 +1,1 @@
+# Keeps logs directory in git so Winston file transports always have a target path.

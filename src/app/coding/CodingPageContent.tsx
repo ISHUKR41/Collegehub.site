@@ -13,15 +13,18 @@
 
 'use client';
 
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import {
-    Code2, Coffee, Terminal, Globe, ArrowRight, Zap, BookOpen,
-    CheckCircle, Layers, Rocket, Star, Users
+    Code2, Coffee, Terminal, Globe, ArrowRight, Zap,
+    Layers, Rocket
 } from 'lucide-react';
 import SectionHeading from '@/components/ui/SectionHeading';
 import GlassCard from '@/components/ui/GlassCard';
 import { CODING_LANGUAGES } from '@/lib/constants';
+import { fetchPublicCourses } from '@/services/course-service';
 
 /* Icon mapping */
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = {
@@ -73,6 +76,24 @@ const ROADMAP = [
 ];
 
 export default function CodingPageContent() {
+    const { data: codingCourses = [], isLoading: isCoursesLoading } = useQuery({
+        queryKey: ['courses', 'coding', 'catalog'],
+        queryFn: () => fetchPublicCourses({ category: 'coding' }),
+    });
+
+    const courseBySubCategory = useMemo(() => {
+        return codingCourses.reduce<Record<string, (typeof codingCourses)[number]>>((acc, course) => {
+            acc[course.subCategory] = course;
+            return acc;
+        }, {});
+    }, [codingCourses]);
+
+    const resolveCourseHref = (slug: string) => {
+        const key = slug === 'webdev' ? 'webdev' : slug;
+        const liveCourse = courseBySubCategory[key];
+        return liveCourse ? `/courses/${liveCourse.id}` : `/courses/${slug}`;
+    };
+
     return (
         <>
             {/* Hero Section */}
@@ -113,6 +134,7 @@ export default function CodingPageContent() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {CODING_LANGUAGES.map((lang, index) => {
                             const Icon = ICON_MAP[lang.icon];
+                            const liveCourse = courseBySubCategory[lang.slug];
                             return (
                                 <GlassCard key={lang.slug} delay={index * 0.08} className="!p-8">
                                     <div className="flex items-start gap-4 mb-5">
@@ -143,16 +165,76 @@ export default function CodingPageContent() {
                                     </div>
 
                                     <Link
-                                        href={`/courses/${lang.slug}`}
+                                        href={resolveCourseHref(lang.slug)}
                                         className="inline-flex items-center gap-2 text-sm font-medium text-[#a5b4fc] hover:text-white transition-colors group"
                                     >
-                                        Start Learning
+                                        {liveCourse ? 'Open Live Course' : 'Start Learning'}
                                         <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                                     </Link>
                                 </GlassCard>
                             );
                         })}
                     </div>
+                </div>
+            </section>
+
+            <section className="section-padding pt-0">
+                <div className="container-custom">
+                    <SectionHeading
+                        label="Live Catalog"
+                        title="Published Coding Tracks"
+                        subtitle="These courses are fetched from backend and linked to real dynamic course detail routes."
+                    />
+
+                    {isCoursesLoading && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {Array.from({ length: 2 }).map((_, index) => (
+                                <div
+                                    key={index}
+                                    className="h-40 rounded-2xl bg-white/[0.04] border border-white/[0.06] animate-pulse"
+                                />
+                            ))}
+                        </div>
+                    )}
+
+                    {!isCoursesLoading && codingCourses.length === 0 && (
+                        <GlassCard className="!p-6" hover={false}>
+                            <p className="text-sm text-[#94a3b8]">
+                                No published coding course found yet. Publish courses from admin panel
+                                to make them visible on this page.
+                            </p>
+                        </GlassCard>
+                    )}
+
+                    {!isCoursesLoading && codingCourses.length > 0 && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {codingCourses.map((course, index) => (
+                                <GlassCard key={course.id} delay={index * 0.06}>
+                                    <div className="flex items-start justify-between gap-4 mb-3">
+                                        <h3 className="text-lg font-semibold text-white">{course.title}</h3>
+                                        <span className="text-[11px] px-2 py-1 rounded-full bg-[#22c55e]/15 text-[#22c55e] uppercase tracking-wide">
+                                            Published
+                                        </span>
+                                    </div>
+                                    <p className="text-sm text-[#94a3b8] line-clamp-2 mb-4">
+                                        {course.description || 'Coding path with lessons, practice, test evaluation, and weakness analytics.'}
+                                    </p>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-xs text-[#64748b]">
+                                            {course.totalLessons} lessons
+                                        </span>
+                                        <Link
+                                            href={`/courses/${course.id}`}
+                                            className="inline-flex items-center gap-2 text-sm text-[#a5b4fc] hover:text-white transition-colors"
+                                        >
+                                            View Course
+                                            <ArrowRight className="w-4 h-4" />
+                                        </Link>
+                                    </div>
+                                </GlassCard>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </section>
 
@@ -312,7 +394,7 @@ export default function CodingPageContent() {
                             {CODING_LANGUAGES.map((lang) => (
                                 <Link
                                     key={lang.slug}
-                                    href={`/courses/${lang.slug}`}
+                                    href={resolveCourseHref(lang.slug)}
                                     className="px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm font-medium hover:bg-white/10 hover:border-[#6366f1]/30 transition-all duration-200"
                                 >
                                     Learn {lang.name}

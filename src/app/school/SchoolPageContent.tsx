@@ -15,8 +15,9 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
+import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import {
     GraduationCap, BookOpen, Calculator, Atom, BookText, Globe, Languages,
@@ -26,6 +27,7 @@ import {
 import SectionHeading from '@/components/ui/SectionHeading';
 import GlassCard from '@/components/ui/GlassCard';
 import { SCHOOL_SUBJECTS } from '@/lib/constants';
+import { fetchPublicCourses } from '@/services/course-service';
 
 /* Map icon names to Lucide components */
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = {
@@ -54,6 +56,16 @@ export default function SchoolPageContent() {
     /* Track which class tab is active */
     const [activeClass, setActiveClass] = useState<'class9' | 'class10'>('class9');
     const subjects = SCHOOL_SUBJECTS[activeClass];
+    const { data: schoolCourses = [], isLoading: isCoursesLoading } = useQuery({
+        queryKey: ['courses', 'school', 'catalog'],
+        queryFn: () => fetchPublicCourses({ category: 'school' }),
+    });
+
+    const classCourses = useMemo(
+        () => schoolCourses.filter((course) => course.subCategory === activeClass),
+        [activeClass, schoolCourses]
+    );
+    const primaryClassCourseId = classCourses[0]?.id || null;
 
     return (
         <>
@@ -138,7 +150,10 @@ export default function SchoolPageContent() {
                                         </div>
                                     </div>
                                     <Link
-                                        href={`/courses/${activeClass}-${subject.name.toLowerCase().replace(/\s+/g, '-')}`}
+                                        href={primaryClassCourseId
+                                            ? `/courses/${primaryClassCourseId}`
+                                            : `/courses/${activeClass}-${subject.name.toLowerCase().replace(/\s+/g, '-')}`
+                                        }
                                         className="mt-4 inline-flex items-center gap-1 text-xs text-[#a5b4fc] hover:text-white transition-colors group"
                                     >
                                         Start Learning
@@ -147,6 +162,64 @@ export default function SchoolPageContent() {
                                 </GlassCard>
                             );
                         })}
+                    </div>
+
+                    <div className="mt-12">
+                        <SectionHeading
+                            label="Live Courses"
+                            title={`Published ${activeClass === 'class9' ? 'Class 9' : 'Class 10'} Course Catalog`}
+                            subtitle="These cards are fetched from the backend API and map directly to real course detail pages."
+                        />
+
+                        {isCoursesLoading && (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {Array.from({ length: 2 }).map((_, index) => (
+                                    <div
+                                        key={index}
+                                        className="h-40 rounded-2xl bg-white/[0.04] border border-white/[0.06] animate-pulse"
+                                    />
+                                ))}
+                            </div>
+                        )}
+
+                        {!isCoursesLoading && classCourses.length === 0 && (
+                            <GlassCard className="!p-6" hover={false}>
+                                <p className="text-sm text-[#94a3b8]">
+                                    No published courses found for this class yet. Create and publish
+                                    courses from the admin panel to show them here.
+                                </p>
+                            </GlassCard>
+                        )}
+
+                        {!isCoursesLoading && classCourses.length > 0 && (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {classCourses.map((course, index) => (
+                                    <GlassCard key={course.id} delay={index * 0.06}>
+                                        <div className="flex items-start justify-between gap-4 mb-3">
+                                            <h3 className="text-lg font-semibold text-white">{course.title}</h3>
+                                            <span className="text-[11px] px-2 py-1 rounded-full bg-[#6366f1]/15 text-[#a5b4fc] uppercase tracking-wide">
+                                                Live
+                                            </span>
+                                        </div>
+                                        <p className="text-sm text-[#94a3b8] line-clamp-2 mb-4">
+                                            {course.description || 'Structured school curriculum with chapter-level lessons and tests.'}
+                                        </p>
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-xs text-[#64748b]">
+                                                {course.totalLessons} lessons
+                                            </span>
+                                            <Link
+                                                href={`/courses/${course.id}`}
+                                                className="inline-flex items-center gap-2 text-sm text-[#a5b4fc] hover:text-white transition-colors"
+                                            >
+                                                View Course
+                                                <ArrowRight className="w-4 h-4" />
+                                            </Link>
+                                        </div>
+                                    </GlassCard>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
             </section>

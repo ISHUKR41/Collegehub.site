@@ -1,31 +1,77 @@
 /**
- * tokenUtils.js — JWT Token Utilities
+ * tokenUtils.js - JWT token helpers and secure refresh-cookie handling.
  *
- * Handles all token operations:
- * - Generate access token (short-lived, 15 min)
- * - Generate refresh token (long-lived, 7 days)
- * - Hash refresh token for secure DB storage
- * - Set refresh token as httpOnly cookie
- *
- * Why separate file: Token logic is critical security code. Isolating it
- * makes it easy to audit, test, and swap implementations if needed.
- *
- * Security decisions:
- * - Access tokens are short-lived to minimize damage if leaked
- * - Refresh tokens are hashed before DB storage (if DB leaks, tokens unusable)
- * - httpOnly cookies prevent XSS from accessing tokens
- * - Secure flag ensures cookies only sent over HTTPS in production
- *
- * To extend: Add token blacklisting, IP binding, or device fingerprinting.
+ * This module centralizes:
+ * - Access token generation
+ * - Refresh token generation
+ * - Refresh token hashing before DB storage
+ * - HTTP-only cookie set/clear for refresh token rotation
  */
 
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const { AUTH } = require('../constants');
 
-/**
- * Generate a short-lived access token.
- * Contains only userId and role — minimal claims for security.
- */
+const toBoolean = (value, fallback = false) => {
+    if (typeof value === 'undefined') return fallback;
+    return String(value).toLowerCase() === 'true';
+};
+
+const normalizeSameSite = (value, fallback) => {
+    const normalized = String(value || fallback).toLowerCase();
+    if (['lax', 'strict', 'none'].includes(normalized)) {
+        return normalized;
+    }
+    return fallback;
+};
+
+const parseDurationToMs = (durationValue, fallbackMs) => {
+    if (!durationValue) return fallbackMs;
+
+    if (typeof durationValue === 'number' && Number.isFinite(durationValue)) {
+        return durationValue;
+    }
+
+    const raw = String(durationValue).trim().toLowerCase();
+    const match = raw.match(/^(\d+)(ms|s|m|h|d)$/);
+    if (!match) return fallbackMs;
+
+    const amount = Number(match[1]);
+    const unit = match[2];
+
+    const multipliers = {
+        ms: 1,
+        s: 1000,
+        m: 60 * 1000,
+        h: 60 * 60 * 1000,
+        d: 24 * 60 * 60 * 1000,
+    };
+
+    return amount * multipliers[unit];
+};
+
+const buildRefreshCookieOptions = () => {
+    const isProduction = process.env.NODE_ENV === 'production';
+    const sameSite = normalizeSameSite(
+        process.env.REFRESH_COOKIE_SAME_SITE,
+        isProduction ? 'none' : 'lax'
+    );
+    const secure = toBoolean(process.env.REFRESH_COOKIE_SECURE, isProduction || sameSite === 'none');
+
+    const cookieOptions = {
+        httpOnly: true,
+        secure: sameSite === 'none' ? true : secure,
+        sameSite,
+        path: process.env.REFRESH_COOKIE_PATH || '/api/auth',
+    };
+
+    if (process.env.REFRESH_COOKIE_DOMAIN) {
+        cookieOptions.domain = process.env.REFRESH_COOKIE_DOMAIN;
+    }
+
+    return cookieOptions;
+};
+
 const generateAccessToken = (userId, role) => {
     return jwt.sign(
         { userId, role },
@@ -34,10 +80,6 @@ const generateAccessToken = (userId, role) => {
     );
 };
 
-/**
- * Generate a long-lived refresh token.
- * Contains only userId — used solely for token rotation.
- */
 const generateRefreshToken = (userId) => {
     return jwt.sign(
         { userId },
@@ -46,45 +88,25 @@ const generateRefreshToken = (userId) => {
     );
 };
 
-/**
- * Hash a refresh token using SHA-256.
- * We never store raw refresh tokens in the database.
- * If the database is compromised, attackers cannot reconstruct valid tokens.
- */
 const hashToken = (token) => {
     return crypto.createHash('sha256').update(token).digest('hex');
 };
 
-/**
- * Set refresh token as an httpOnly cookie on the response.
- * The cookie is:
- * - httpOnly: JS cannot read it (XSS protection)
- * - secure: only sent over HTTPS in production
- * - sameSite strict: CSRF protection
- * - 7 days expiry
- */
 const setRefreshCookie = (res, token) => {
-    const isProduction = process.env.NODE_ENV === 'production';
+    const cookieOptions = buildRefreshCookieOptions();
+    const refreshTokenMaxAge = parseDurationToMs(
+        process.env.JWT_REFRESH_EXPIRES_IN,
+        7 * 24 * 60 * 60 * 1000
+    );
 
-    res.cookie('refreshToken', token, {
-        httpOnly: true,
-        secure: isProduction,
-        sameSite: isProduction ? 'strict' : 'lax',
-        maxAge: 7 * 24 * 60 * 60 * 1000, /* 7 days in ms */
-        path: '/api/auth', /* Only sent to auth endpoints */
+    res.cookie(AUTH.COOKIE_NAME, token, {
+        ...cookieOptions,
+        maxAge: refreshTokenMaxAge,
     });
 };
 
-/**
- * Clear the refresh token cookie (used during logout).
- */
 const clearRefreshCookie = (res) => {
-    res.clearCookie('refreshToken', {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
-        path: '/api/auth',
-    });
+    res.clearCookie(AUTH.COOKIE_NAME, buildRefreshCookieOptions());
 };
 
 module.exports = {

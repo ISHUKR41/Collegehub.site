@@ -122,7 +122,7 @@ export default function CodingPreview() {
                                 <p><span className="code-keyword">using namespace</span> std;</p>
                                 <p>&nbsp;</p>
                                 <p><span className="code-type">int</span> <span className="code-function">main</span>() {'{'}</p>
-                                <p>    <span className="code-comment">// Your CollegeHub journey starts here</span></p>
+                                <p>    <span className="code-comment">CollegeHub journey starts here</span></p>
                                 <p>    cout &lt;&lt; <span className="code-string">&quot;Hello, CollegeHub!&quot;</span> &lt;&lt; endl;</p>
                                 <p>    cout &lt;&lt; <span className="code-string">&quot;Let&apos;s learn C++ together.&quot;</span> &lt;&lt; endl;</p>
                                 <p>&nbsp;</p>

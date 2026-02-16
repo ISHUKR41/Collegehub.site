@@ -1,19 +1,53 @@
 /**
- * Contact Page — Form, FAQ, Office info
+ * Contact page metadata and server wrapper.
+ *
+ * Why this file exists:
+ * - Adds route-level metadata for support/contact queries.
+ * - Injects ContactPage JSON-LD schema.
+ * - Renders the interactive contact client component.
  */
 
 import type { Metadata } from 'next';
+import JsonLd from '@/components/seo/JsonLd';
+import { SITE_CONFIG } from '@/lib/constants';
 import ContactPageContent from './ContactPageContent';
 
 export const metadata: Metadata = {
-    title: 'Contact Us — Get in Touch',
-    description: 'Have questions? Contact the CollegeHub team. We are here to help with your learning journey. Reach out via form, email, or social media.',
-    openGraph: {
-        title: 'Contact CollegeHub — Get in Touch',
-        description: 'We are here to help with your learning journey.',
-    },
+  title: 'Contact Us - Support, Partnerships, and Queries',
+  description:
+    'Contact CollegeHub for support, partnerships, feedback, and learning-related questions.',
+  openGraph: {
+    title: 'Contact CollegeHub - Support and Queries',
+    description:
+      'Reach the CollegeHub team for support requests, feature suggestions, and partnership discussions.',
+    url: `${SITE_CONFIG.url}/contact`,
+  },
 };
 
 export default function ContactPage() {
-    return <ContactPageContent />;
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'ContactPage',
+    name: 'Contact CollegeHub',
+    url: `${SITE_CONFIG.url}/contact`,
+    description: 'Contact page for CollegeHub support and collaboration requests.',
+    mainEntity: {
+      '@type': 'Organization',
+      name: SITE_CONFIG.name,
+      url: SITE_CONFIG.url,
+      contactPoint: {
+        '@type': 'ContactPoint',
+        contactType: 'customer support',
+        email: 'hello@collegehub.site',
+        availableLanguage: ['English', 'Hindi'],
+      },
+    },
+  };
+
+  return (
+    <>
+      <JsonLd data={schema} />
+      <ContactPageContent />
+    </>
+  );
 }

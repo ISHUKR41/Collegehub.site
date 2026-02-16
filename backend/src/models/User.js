@@ -1,25 +1,10 @@
 /**
- * User.js — User Schema (Mongoose)
+ * User.js - User identity and authentication schema.
  *
- * Defines the User model for authentication and profile management.
- *
- * Fields:
- * - name: Display name
- * - email: Unique, indexed for fast lookups during login
- * - password: Bcrypt hashed (never stored as plain text)
- * - role: student or admin (default: student)
- * - refreshTokenHash: SHA-256 hash of current refresh token
- * - loginAttempts: Counter for brute force protection
- * - lockUntil: Timestamp until which the account is locked
- *
- * Security:
- * - Password is hashed in pre-save hook (automatic)
- * - refreshTokenHash is stored instead of raw token
- * - Account locks after 5 failed login attempts
- *
- * Indexes: email (unique), role
- *
- * To extend: Add avatar URL, phone, address, subscription tier.
+ * Security design:
+ * - Password is hashed with bcrypt before save.
+ * - Refresh token is stored as SHA-256 hash only.
+ * - Login attempts and lockUntil protect against brute-force attacks.
  */
 
 const mongoose = require('mongoose');
@@ -35,62 +20,46 @@ const userSchema = new mongoose.Schema(
             minlength: [2, 'Name must be at least 2 characters'],
             maxlength: [100, 'Name cannot exceed 100 characters'],
         },
-
         email: {
             type: String,
             required: [true, 'Email is required'],
             unique: true,
+            index: true,
             lowercase: true,
             trim: true,
             match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email address'],
         },
-
         password: {
             type: String,
             required: [true, 'Password is required'],
             minlength: [8, 'Password must be at least 8 characters'],
-            select: false, /* Never returned in queries by default */
+            select: false,
         },
-
         role: {
             type: String,
             enum: Object.values(ROLES),
             default: ROLES.STUDENT,
+            index: true,
         },
-
-        /* Hashed refresh token — for secure token rotation */
         refreshTokenHash: {
             type: String,
-            select: false, /* Never returned in queries */
+            select: false,
         },
-
-        /* Brute force protection */
         loginAttempts: {
             type: Number,
             default: 0,
         },
-
         lockUntil: {
             type: Date,
             default: null,
         },
     },
     {
-        timestamps: true, /* Adds createdAt and updatedAt automatically */
+        timestamps: true,
     }
 );
 
-/* ===================================================================
-   INDEXES — Optimizes query performance
-   =================================================================== */
-userSchema.index({ email: 1 }, { unique: true });
-userSchema.index({ role: 1 });
-
-/* ===================================================================
-   PRE-SAVE HOOK — Hash password before saving to DB
-   Only runs when password is modified (not on every save).
-   =================================================================== */
-userSchema.pre('save', async function (next) {
+userSchema.pre('save', async function onSave(next) {
     if (!this.isModified('password')) return next();
 
     try {
@@ -102,55 +71,33 @@ userSchema.pre('save', async function (next) {
     }
 });
 
-/* ===================================================================
-   INSTANCE METHODS
-   =================================================================== */
-
-/**
- * Compare a plain-text password against the stored hash.
- * Used during login.
- */
-userSchema.methods.comparePassword = async function (candidatePassword) {
+userSchema.methods.comparePassword = async function comparePassword(candidatePassword) {
     return bcrypt.compare(candidatePassword, this.password);
 };
 
-/**
- * Check if the account is currently locked (brute force protection).
- */
-userSchema.methods.isLocked = function () {
+userSchema.methods.isLocked = function isLocked() {
     return this.lockUntil && this.lockUntil > Date.now();
 };
 
-/**
- * Increment login attempts. Lock account after MAX_LOGIN_ATTEMPTS.
- */
-userSchema.methods.incrementLoginAttempts = async function () {
-    /* If lock has expired, reset attempts */
+userSchema.methods.incrementLoginAttempts = async function incrementLoginAttempts() {
     if (this.lockUntil && this.lockUntil < Date.now()) {
-        return this.updateOne({
-            $set: { loginAttempts: 1 },
-            $unset: { lockUntil: 1 },
-        });
+        this.loginAttempts = 1;
+        this.lockUntil = undefined;
+        return this.save({ validateBeforeSave: false });
     }
 
-    const updates = { $inc: { loginAttempts: 1 } };
-
-    /* Lock the account if max attempts reached */
-    if (this.loginAttempts + 1 >= AUTH.MAX_LOGIN_ATTEMPTS) {
-        updates.$set = { lockUntil: Date.now() + AUTH.LOCK_DURATION_MS };
+    this.loginAttempts += 1;
+    if (this.loginAttempts >= AUTH.MAX_LOGIN_ATTEMPTS) {
+        this.lockUntil = new Date(Date.now() + AUTH.LOCK_DURATION_MS);
     }
 
-    return this.updateOne(updates);
+    return this.save({ validateBeforeSave: false });
 };
 
-/**
- * Reset login attempts after successful login.
- */
-userSchema.methods.resetLoginAttempts = async function () {
-    return this.updateOne({
-        $set: { loginAttempts: 0 },
-        $unset: { lockUntil: 1 },
-    });
+userSchema.methods.resetLoginAttempts = async function resetLoginAttempts() {
+    this.loginAttempts = 0;
+    this.lockUntil = undefined;
+    return this.save({ validateBeforeSave: false });
 };
 
 module.exports = mongoose.model('User', userSchema);

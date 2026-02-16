@@ -56,7 +56,7 @@ export default function ParticleBackground() {
             const rect = canvas.getBoundingClientRect();
             canvas.width = rect.width * dpr;
             canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         };
 
         /* Create particles with random positions and velocities */
@@ -127,15 +127,16 @@ export default function ParticleBackground() {
         animate();
 
         /* Handle window resize */
-        window.addEventListener('resize', () => {
+        const handleResize = () => {
             resize();
             createParticles();
-        });
+        };
+        window.addEventListener('resize', handleResize);
 
         /* Cleanup on unmount */
         return () => {
             cancelAnimationFrame(animationRef.current);
-            window.removeEventListener('resize', resize);
+            window.removeEventListener('resize', handleResize);
         };
     }, []);
 

@@ -12,7 +12,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Target, Eye, Heart, Rocket, Users, BookOpen, Award, Zap } from 'lucide-react';
+import { Target, Eye, Heart, Users, BookOpen, Award, Zap } from 'lucide-react';
 import SectionHeading from '@/components/ui/SectionHeading';
 import GlassCard from '@/components/ui/GlassCard';
 import AnimatedCounter from '@/components/ui/AnimatedCounter';

@@ -1,40 +1,90 @@
 /**
- * sitemap.ts — Dynamic sitemap for SEO
- * 
- * Generates a sitemap.xml with all public pages.
- * Search engines use this to discover and index pages.
- * 
- * To extend: Add dynamic routes from the database
- * (e.g., all course pages, blog posts).
+ * sitemap.ts - Dynamic sitemap generation from public course catalog.
+ *
+ * Fetches published courses from backend API to emit canonical
+ * /courses/:id routes for search engines.
  */
 
 import { MetadataRoute } from 'next';
+import { SITE_CONFIG } from '@/lib/constants';
 
-export default function sitemap(): MetadataRoute.Sitemap {
-    const baseUrl = 'https://collegehub.site';
+const SITE_URL = SITE_CONFIG.url;
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  process.env.BACKEND_PUBLIC_URL ||
+  'http://localhost:5000/api';
 
-    /* Static pages */
-    const staticPages = [
-        { url: baseUrl, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 1.0 },
-        { url: `${baseUrl}/school`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.9 },
-        { url: `${baseUrl}/coding`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.9 },
-        { url: `${baseUrl}/about`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.7 },
-        { url: `${baseUrl}/contact`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.6 },
-    ];
+interface CourseListItem {
+  id: string;
+  updatedAt: string;
+}
 
-    /* Course pages — in production, fetch slugs from database */
-    const courseSlugs = [
-        'cpp', 'java', 'python', 'web-development',
-        'class9-mathematics', 'class9-science', 'class9-english',
-        'class10-mathematics', 'class10-science', 'class10-english',
-    ];
+interface CourseListResponse {
+  success: boolean;
+  data?: {
+    courses?: CourseListItem[];
+  };
+}
 
-    const coursePages = courseSlugs.map((slug) => ({
-        url: `${baseUrl}/courses/${slug}`,
-        lastModified: new Date(),
-        changeFrequency: 'weekly' as const,
-        priority: 0.8,
-    }));
+const fetchPublishedCourses = async (): Promise<CourseListItem[]> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/courses`, {
+      next: { revalidate: 3600 },
+    });
 
-    return [...staticPages, ...coursePages];
+    if (!response.ok) {
+      return [];
+    }
+
+    const payload = (await response.json()) as CourseListResponse;
+    return payload.data?.courses || [];
+  } catch {
+    return [];
+  }
+};
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const staticPages: MetadataRoute.Sitemap = [
+    {
+      url: SITE_URL,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 1,
+    },
+    {
+      url: `${SITE_URL}/school`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+    {
+      url: `${SITE_URL}/coding`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+    {
+      url: `${SITE_URL}/about`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${SITE_URL}/contact`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+  ];
+
+  const courses = await fetchPublishedCourses();
+
+  const dynamicCoursePages: MetadataRoute.Sitemap = courses.map((course) => ({
+    url: `${SITE_URL}/courses/${course.id}`,
+    lastModified: new Date(course.updatedAt || Date.now()),
+    changeFrequency: 'weekly',
+    priority: 0.8,
+  }));
+
+  return [...staticPages, ...dynamicCoursePages];
 }

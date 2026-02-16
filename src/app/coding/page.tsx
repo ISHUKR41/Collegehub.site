@@ -1,30 +1,56 @@
 /**
- * Coding Page — Programming languages section
- * 
- * Server component entry that exports SEO metadata
- * and renders CodingPageContent client component.
+ * Coding page metadata and server wrapper.
+ *
+ * Why this file exists:
+ * - Exports route-level SEO metadata.
+ * - Adds JSON-LD schema for coding catalog indexing.
+ * - Renders interactive coding UI from a client component.
  */
 
 import type { Metadata } from 'next';
+import JsonLd from '@/components/seo/JsonLd';
+import { SITE_CONFIG } from '@/lib/constants';
 import CodingPageContent from './CodingPageContent';
 
 export const metadata: Metadata = {
-    title: 'Coding — Learn C++, Java, Python, Web Development',
-    description: 'Structured programming courses from beginner to advanced. Learn C++, Java, Python, and Web Development with practice problems, tests, and topic-wise analytics.',
-    keywords: [
-        'learn C++ online',
-        'Java programming course',
-        'Python for beginners',
-        'web development course India',
-        'coding for college students',
-        'programming tutorials',
-    ],
-    openGraph: {
-        title: 'Coding — Learn C++, Java, Python, Web Development | CollegeHub',
-        description: 'Structured programming courses with practice problems and analytics.',
-    },
+  title: 'Coding - Learn C++, Java, Python, and Web Development',
+  description:
+    'Structured programming tracks from beginner to advanced with lessons, practice, tests, and weakness analytics.',
+  keywords: [
+    'learn c++ online',
+    'java programming course',
+    'python for beginners',
+    'web development roadmap',
+    'coding practice platform India',
+  ],
+  openGraph: {
+    title: 'Coding - Learn C++, Java, Python, and Web Development | CollegeHub',
+    description:
+      'Practice-first coding tracks with progressive unlock, evaluation tests, and dashboard insights.',
+    url: `${SITE_CONFIG.url}/coding`,
+  },
 };
 
 export default function CodingPage() {
-    return <CodingPageContent />;
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'CollegeHub Coding Section',
+    url: `${SITE_CONFIG.url}/coding`,
+    description:
+      'Coding courses in C++, Java, Python, and Web Development with assessments and analytics.',
+    isPartOf: {
+      '@type': 'WebSite',
+      name: SITE_CONFIG.name,
+      url: SITE_CONFIG.url,
+    },
+    about: ['C++', 'Java', 'Python', 'Web Development'],
+  };
+
+  return (
+    <>
+      <JsonLd data={schema} />
+      <CodingPageContent />
+    </>
+  );
 }

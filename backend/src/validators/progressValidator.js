@@ -1,56 +1,66 @@
 /**
- * progressValidator.js — Zod Validation for Progress & Test Endpoints
+ * progressValidator.js - Zod schemas for enrollment/progress routes.
  *
- * Validates lesson completion, resume updates, and test submissions.
- *
- * To extend: Add validation for batch lesson completion,
- * or custom time-tracking payloads.
+ * Why these schemas matter:
+ * - Maintains strict lock/resume payload quality.
+ * - Ensures lesson indexes are non-negative integers.
+ * - Ensures all course identifiers are valid Mongo ObjectIds.
  */
 
 const { z } = require('zod');
+const { objectIdSchema } = require('./commonValidators');
 
-/* Mark a lesson as completed */
-const completeLessonSchema = z.object({
+const enrollSchema = z.object({
     body: z.object({
-        lessonIndex: z
+        courseId: objectIdSchema,
+    }),
+});
+
+const courseProgressParamSchema = z.object({
+    params: z.object({
+        courseId: objectIdSchema,
+    }),
+});
+
+const completeLessonSchema = z.object({
+    params: z.object({
+        courseId: objectIdSchema,
+    }),
+    body: z.object({
+        lessonIndex: z.coerce
             .number({ required_error: 'Lesson index is required' })
             .int('Lesson index must be an integer')
             .min(0, 'Lesson index cannot be negative'),
     }),
-    params: z.object({
-        courseId: z.string().min(1, 'Course ID is required'),
-    }),
 });
 
-/* Update last watched position */
 const updateLastWatchedSchema = z.object({
-    body: z.object({
-        lessonIndex: z
-            .number({ required_error: 'Lesson index is required' })
-            .int()
-            .min(0),
-        subjectId: z.string().optional().nullable(),
-        chapterId: z.string().optional().nullable(),
-    }),
     params: z.object({
-        courseId: z.string().min(1, 'Course ID is required'),
+        courseId: objectIdSchema,
+    }),
+    body: z.object({
+        lessonIndex: z.coerce
+            .number({ required_error: 'Lesson index is required' })
+            .int('Lesson index must be an integer')
+            .min(0, 'Lesson index cannot be negative'),
+        subjectId: objectIdSchema.optional().nullable(),
+        chapterId: objectIdSchema.optional().nullable(),
     }),
 });
 
-/* Submit test answers */
-const submitTestSchema = z.object({
-    body: z.object({
-        testId: z.string({ required_error: 'Test ID is required' }).min(1),
-        answers: z
-            .array(
-                z.number().int().min(0).max(3) /* Option index 0-3 */
-            )
-            .min(1, 'At least one answer is required'),
+const lessonAccessQuerySchema = z.object({
+    params: z.object({
+        courseId: objectIdSchema,
+    }),
+    query: z.object({
+        lessonIndex: z.coerce.number().int().min(0),
     }),
 });
 
 module.exports = {
+    enrollSchema,
+    courseProgressParamSchema,
     completeLessonSchema,
     updateLastWatchedSchema,
-    submitTestSchema,
+    lessonAccessQuerySchema,
 };

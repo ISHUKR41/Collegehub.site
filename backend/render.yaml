@@ -1,0 +1,53 @@
+# render.yaml - Render Blueprint for CollegeHub backend service.
+#
+# Why this file exists:
+# - Makes backend deployment reproducible and team-friendly.
+# - Documents required env vars directly beside the runtime config.
+# - Supports one-click deploy from repository root.
+#
+# To use:
+# 1. Push repository to GitHub.
+# 2. In Render, create a Blueprint and select this file.
+# 3. Fill secure env vars in Render dashboard.
+
+services:
+  - type: web
+    name: collegehub-backend
+    runtime: node
+    rootDir: backend
+    plan: starter
+    autoDeploy: true
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: BODY_LIMIT
+        value: 10kb
+      - key: MONGODB_URI
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        sync: false
+      - key: JWT_REFRESH_SECRET
+        sync: false
+      - key: JWT_ACCESS_EXPIRES_IN
+        value: 15m
+      - key: JWT_REFRESH_EXPIRES_IN
+        value: 7d
+      - key: REFRESH_COOKIE_SAME_SITE
+        value: none
+      - key: REFRESH_COOKIE_SECURE
+        value: true
+      - key: REFRESH_COOKIE_DOMAIN
+        sync: false
+      - key: REFRESH_COOKIE_PATH
+        value: /api/auth
+      - key: CORS_ORIGIN
+        sync: false
+      - key: ADMIN_INVITE_CODE
+        sync: false

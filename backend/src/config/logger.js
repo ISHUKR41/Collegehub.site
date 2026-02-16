@@ -16,9 +16,15 @@
 
 const winston = require('winston');
 const path = require('path');
+const fs = require('fs');
 
 /* Log directory */
 const LOG_DIR = path.join(__dirname, '..', 'logs');
+
+/* Ensure logs directory exists before Winston file transports initialize. */
+if (!fs.existsSync(LOG_DIR)) {
+    fs.mkdirSync(LOG_DIR, { recursive: true });
+}
 
 /* Custom format: timestamp + level + message */
 const logFormat = winston.format.combine(

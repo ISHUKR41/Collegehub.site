@@ -18,6 +18,11 @@ const logger = require('./logger');
  * Retries up to 5 times with 5-second intervals on failure.
  */
 const connectDB = async () => {
+    if (!process.env.MONGODB_URI) {
+        logger.error('MONGODB_URI is not configured.');
+        process.exit(1);
+    }
+
     const MAX_RETRIES = 5;
     const RETRY_DELAY_MS = 5000;
 

@@ -1,36 +1,84 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CollegeHub.site
 
-## Getting Started
+Production-focused learning platform with two tracks:
+- School (Class 9 and Class 10)
+- Coding (C++, Java, Python, Web Development)
 
-First, run the development server:
+This repository contains:
+- Frontend: Next.js App Router + TypeScript + Tailwind + React Query
+- Backend: Express + MongoDB + Redis + JWT auth (in `backend/`)
+
+## Included Product Flows
+
+- Authentication: register, login, refresh rotation, logout
+- Course catalog: public + admin endpoints
+- Enrollment: enroll, complete lesson, resume pointer, lock enforcement
+- Tests and analytics: weakness buckets + suggestions
+- Contact + newsletter: persistent form handling
+- Frontend auth screens: `/login` and `/register`
+
+## Monorepo Structure
+
+- `src/` - Next.js frontend
+- `backend/` - Express backend
+- `MCP_READY_PROMPT.md` - reusable enterprise implementation prompt
+- `MCP_READY_ULTRA_PROMPT.md` - expanded production execution prompt
+
+## Frontend Setup
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Frontend env (optional):
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+NEXT_PUBLIC_API_URL=http://localhost:5000/api
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Backend Setup
 
-## Learn More
+```bash
+cd backend
+npm install
+cp .env.example .env
+npm run dev
+npm run seed:production
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Validation Commands
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Frontend:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run lint
+npm run build
+npm run verify
+```
 
-## Deploy on Vercel
+Backend:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+cd backend
+npm run check
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Deployment Targets
+
+- Frontend: Vercel
+- Backend: Render
+- Database: MongoDB Atlas
+- Cache: Redis (recommended)
+
+Detailed deployment runbook:
+
+- `DEPLOYMENT.md`
+
+## Notes
+
+- Backend uses secure JWT access + refresh token rotation.
+- Contact and newsletter forms are backed by real APIs.
+- Dashboard page consumes real analytics endpoint.
+- Sitemap supports dynamic course URLs from backend catalog.
+- Route-level JSON-LD schemas are included for better technical SEO.

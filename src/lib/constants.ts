@@ -16,8 +16,10 @@ export const SITE_CONFIG = {
   domain: 'collegehub.site',
   url: 'https://collegehub.site',
   tagline: "India's Smart Learning Platform",
-  description: 'Master school subjects and coding skills with structured learning paths, progress tracking, and personalized analytics — all in one platform.',
+  description:
+    'Master school subjects and coding skills with structured learning paths, progress tracking, and personalized analytics in one platform.',
   keywords: [
+    'collegehub.site',
     'online learning platform',
     'class 9 study material',
     'class 10 CBSE notes',
@@ -30,10 +32,16 @@ export const SITE_CONFIG = {
     'school study platform',
     'programming courses India',
     'college coding platform',
+    'cbse chapter wise tests',
+    'coding roadmap for beginners',
+    'student progress analytics',
+    'resume learning platform',
+    'class 9 class 10 online courses',
   ],
   author: 'CollegeHub Team',
   social: {
-    twitter: '@collegehub',
+    twitterHandle: '@collegehub',
+    twitter: 'https://x.com/collegehub',
     github: 'https://github.com/collegehub',
     linkedin: 'https://linkedin.com/company/collegehub',
     instagram: 'https://instagram.com/collegehub',
@@ -49,6 +57,7 @@ export const NAV_LINKS = [
   { label: 'Home', href: '/' },
   { label: 'School', href: '/school' },
   { label: 'Coding', href: '/coding' },
+  { label: 'Dashboard', href: '/dashboard' },
   { label: 'About', href: '/about' },
   { label: 'Contact', href: '/contact' },
 ] as const;
@@ -265,13 +274,13 @@ export const FOOTER_LINKS = {
   company: [
     { label: 'About Us', href: '/about' },
     { label: 'Contact', href: '/contact' },
-    { label: 'Careers', href: '/careers' },
-    { label: 'Blog', href: '/blog' },
+    { label: 'School Section', href: '/school' },
+    { label: 'Coding Section', href: '/coding' },
   ],
   legal: [
-    { label: 'Privacy Policy', href: '/privacy' },
-    { label: 'Terms of Service', href: '/terms' },
-    { label: 'Refund Policy', href: '/refund' },
+    { label: 'Usage Terms', href: '/contact' },
+    { label: 'Privacy Requests', href: '/contact' },
+    { label: 'Support Policy', href: '/contact' },
   ],
   resources: [
     { label: 'Study Tips', href: '/school#tips' },
