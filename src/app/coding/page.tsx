@@ -13,9 +13,9 @@ import { SITE_CONFIG } from '@/lib/constants';
 import CodingPageContent from './CodingPageContent';
 
 export const metadata: Metadata = {
-  title: 'Coding - Learn C++, Java, Python & Web Development | Free Online Courses',
+  title: 'Coding - Learn C, C++, Java, Python & Web Development | Free Online Courses',
   description:
-    'Structured programming courses from beginner to advanced. Learn C++, Java, Python, and full-stack Web Development with practice problems, tests, and weakness analytics — all free on CollegeHub.',
+    'Structured programming courses from beginner to advanced. Learn C, C++, Java, Python, and full-stack Web Development with practice problems, tests, and weakness analytics — all free on CollegeHub.',
   keywords: [
     'learn C++ online',
     'learn C++ online India',
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     'best online coding platform India',
   ],
   openGraph: {
-    title: 'Coding - Learn C++, Java, Python & Web Development | CollegeHub',
+    title: 'Coding - Learn C, C++, Java, Python & Web Development | CollegeHub',
     description:
       'Practice-first coding tracks with progressive unlock, evaluation tests, and dashboard insights.',
     url: `${SITE_CONFIG.url}/coding`,
@@ -59,7 +59,7 @@ export default function CodingPage() {
       name: SITE_CONFIG.name,
       url: SITE_CONFIG.url,
     },
-    about: ['C++', 'Java', 'Python', 'Web Development', 'HTML', 'CSS', 'JavaScript', 'React', 'Node.js'],
+    about: ['C', 'C++', 'Java', 'Python', 'Web Development', 'HTML', 'CSS', 'JavaScript', 'React', 'Node.js'],
     audience: {
       '@type': 'EducationalAudience',
       educationalRole: 'student',

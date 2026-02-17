@@ -150,6 +150,16 @@ export const SCHOOL_SUBJECTS = {
    =================================================================== */
 export const CODING_LANGUAGES = [
   {
+    slug: 'c',
+    name: 'C Language',
+    icon: 'Code2',
+    color: '#A8B9CC',
+    level: 'Zero to Advanced',
+    modules: 40,
+    description: 'Master C in 40 days — from zero to system-level programmer. Pointers, memory, data structures, file handling, and interview-level problem solving.',
+    topics: ['Variables & Data Types', 'Loops & Patterns', 'Functions & Recursion', 'Arrays & Strings', 'Pointers & DMA', 'File Handling'],
+  },
+  {
     slug: 'cpp',
     name: 'C++',
     icon: 'Code2',

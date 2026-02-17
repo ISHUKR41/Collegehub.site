@@ -63,11 +63,11 @@ const SKILL_LEVELS = [
 
 /* Comparison table data */
 const COMPARISON = [
-    { feature: 'Difficulty', cpp: 'Medium-Hard', java: 'Medium', python: 'Easy', webdev: 'Easy-Medium' },
-    { feature: 'Job Demand', cpp: 'High', java: 'Very High', python: 'Very High', webdev: 'Very High' },
-    { feature: 'Use Cases', cpp: 'Systems, Games', java: 'Enterprise, Android', python: 'AI/ML, Scripting', webdev: 'Websites, Apps' },
-    { feature: 'Learning Curve', cpp: 'Steep', java: 'Moderate', python: 'Gentle', webdev: 'Moderate' },
-    { feature: 'Modules', cpp: '12', java: '14', python: '10', webdev: '16' },
+    { feature: 'Difficulty', c: 'Medium', cpp: 'Medium-Hard', java: 'Medium', python: 'Easy', webdev: 'Easy-Medium' },
+    { feature: 'Job Demand', c: 'High', cpp: 'High', java: 'Very High', python: 'Very High', webdev: 'Very High' },
+    { feature: 'Use Cases', c: 'Systems, Embedded', cpp: 'Systems, Games', java: 'Enterprise, Android', python: 'AI/ML, Scripting', webdev: 'Websites, Apps' },
+    { feature: 'Learning Curve', c: 'Moderate', cpp: 'Steep', java: 'Moderate', python: 'Gentle', webdev: 'Moderate' },
+    { feature: 'Modules', c: '40', cpp: '12', java: '14', python: '10', webdev: '16' },
 ];
 
 /* Roadmap steps */
@@ -94,6 +94,7 @@ export default function CodingPageContent() {
     }, [codingCourses]);
 
     const resolveCourseHref = (slug: string) => {
+        if (slug === 'c') return '/coding/c-language';
         const key = slug === 'webdev' ? 'webdev' : slug;
         const liveCourse = courseBySubCategory[key];
         return liveCourse ? `/courses/${liveCourse.id}` : `/courses/${slug}`;
@@ -120,7 +121,7 @@ export default function CodingPageContent() {
                             <span className="text-gradient">Learn to Code</span>
                         </h1>
                         <p className="text-lg text-[#94a3b8] max-w-2xl mx-auto">
-                            Structured courses in C++, Java, Python, and Web Development.
+                            Structured courses in C, C++, Java, Python, and Web Development.
                             From first line of code to building real-world projects.
                         </p>
                     </motion.div>
@@ -296,6 +297,7 @@ export default function CodingPageContent() {
                             <thead>
                                 <tr className="border-b border-white/10">
                                     <th className="py-4 px-4 text-sm font-semibold text-white">Feature</th>
+                                    <th className="py-4 px-4 text-sm font-semibold text-[#A8B9CC]">C</th>
                                     <th className="py-4 px-4 text-sm font-semibold text-[#00599C]">C++</th>
                                     <th className="py-4 px-4 text-sm font-semibold text-[#ED8B00]">Java</th>
                                     <th className="py-4 px-4 text-sm font-semibold text-[#3776AB]">Python</th>
@@ -313,6 +315,7 @@ export default function CodingPageContent() {
                                         transition={{ delay: index * 0.05 }}
                                     >
                                         <td className="py-4 px-4 text-sm font-medium text-white">{row.feature}</td>
+                                        <td className="py-4 px-4 text-sm text-[#94a3b8]">{row.c}</td>
                                         <td className="py-4 px-4 text-sm text-[#94a3b8]">{row.cpp}</td>
                                         <td className="py-4 px-4 text-sm text-[#94a3b8]">{row.java}</td>
                                         <td className="py-4 px-4 text-sm text-[#94a3b8]">{row.python}</td>
