@@ -53,10 +53,8 @@ export default function Navbar() {
       syncAuthState();
     };
 
-    window.addEventListener('storage', handleAuthStateUpdate);
     window.addEventListener(AUTH_STATE_EVENT, handleAuthStateUpdate);
     return () => {
-      window.removeEventListener('storage', handleAuthStateUpdate);
       window.removeEventListener(AUTH_STATE_EVENT, handleAuthStateUpdate);
     };
   }, []);

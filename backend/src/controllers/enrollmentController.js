@@ -60,6 +60,15 @@ const getLessonAccess = asyncHandler(async (req, res) => {
     return ApiResponse.success(res, HTTP.OK, 'Lesson access validated.', payload);
 });
 
+const getLessonContent = asyncHandler(async (req, res) => {
+    const lesson = await progressService.getLessonContent(
+        req.user._id,
+        req.params.courseId,
+        Number(req.params.lessonIndex)
+    );
+    return ApiResponse.success(res, HTTP.OK, 'Lesson content fetched successfully.', { lesson });
+});
+
 module.exports = {
     enroll,
     getMyEnrollments,
@@ -68,5 +77,5 @@ module.exports = {
     updateLastWatched,
     getResume,
     getLessonAccess,
+    getLessonContent,
 };
-

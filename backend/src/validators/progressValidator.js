@@ -57,10 +57,18 @@ const lessonAccessQuerySchema = z.object({
     }),
 });
 
+const lessonContentParamSchema = z.object({
+    params: z.object({
+        courseId: objectIdSchema,
+        lessonIndex: z.coerce.number().int().min(0),
+    }),
+});
+
 module.exports = {
     enrollSchema,
     courseProgressParamSchema,
     completeLessonSchema,
     updateLastWatchedSchema,
     lessonAccessQuerySchema,
+    lessonContentParamSchema,
 };

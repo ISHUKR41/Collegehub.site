@@ -13,6 +13,7 @@ This repository contains:
 - Authentication: register, login, refresh rotation, logout
 - Course catalog: public + admin endpoints
 - Enrollment: enroll, complete lesson, resume pointer, lock enforcement
+- Secure lesson delivery: locked lesson-content API (no forward bypass)
 - Tests and analytics: weakness buckets + suggestions
 - Contact + newsletter: persistent form handling
 - Frontend auth screens: `/login` and `/register`
@@ -80,5 +81,7 @@ Detailed deployment runbook:
 - Backend uses secure JWT access + refresh token rotation.
 - Contact and newsletter forms are backed by real APIs.
 - Dashboard page consumes real analytics endpoint.
+- Course detail page now integrates real enroll/progress APIs:
+  lesson locking, resume pointer save, and complete-lesson updates.
 - Sitemap supports dynamic course URLs from backend catalog.
 - Route-level JSON-LD schemas are included for better technical SEO.

@@ -43,6 +43,7 @@ Production-grade Node.js + Express backend for `collegehub.site`.
 - `PATCH /api/enrollments/:courseId/complete`
 - `PATCH /api/enrollments/:courseId/last-watched`
 - `GET /api/enrollments/:courseId/lesson-access?lessonIndex=...`
+- `GET /api/enrollments/:courseId/lessons/:lessonIndex` (locked lesson content)
 
 - `POST /api/tests/admin` (admin)
 - `GET /api/tests/course?courseId=...`

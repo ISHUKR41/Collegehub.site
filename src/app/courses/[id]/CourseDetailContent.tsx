@@ -7,7 +7,7 @@
 
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import Link from 'next/link';
@@ -27,21 +27,35 @@ import {
   Lock,
   ArrowLeft,
   CircleAlert,
+  CirclePlay,
 } from 'lucide-react';
 import GlassCard from '@/components/ui/GlassCard';
 import SectionHeading from '@/components/ui/SectionHeading';
 import { useCourseDetailQuery } from '@/hooks/use-course-detail-query';
 import { useEnrollMutation } from '@/hooks/use-enroll-mutation';
+import {
+  useCompleteLessonMutation,
+  useCourseProgressQuery,
+  useUpdateLastWatchedMutation,
+} from '@/hooks/use-course-progress';
+import { fetchLessonContent } from '@/services/enrollment-service';
 import { fetchPublicCourses } from '@/services/course-service';
+import { AUTH_STATE_EVENT, getAccessToken } from '@/lib/api-client';
 
 interface CourseDetailContentProps {
   courseId: string;
 }
 
+interface CurriculumLesson {
+  id: string;
+  index: number;
+  title: string;
+}
+
 interface CurriculumBlock {
   id: string;
   title: string;
-  lessons: string[];
+  lessons: CurriculumLesson[];
 }
 
 type GenericNode = Record<string, unknown>;
@@ -82,12 +96,28 @@ const extractLessons = (lessonNodes: unknown): string[] => {
     .filter(Boolean);
 };
 
+const withLessonIndexes = (
+  blocks: Array<{ id: string; title: string; lessons: string[] }>
+): CurriculumBlock[] => {
+  let lessonCursor = 0;
+
+  return blocks.map((block) => ({
+    id: block.id,
+    title: block.title,
+    lessons: block.lessons.map((lessonTitle, lessonOffset) => ({
+      id: `${block.id}-${lessonOffset}`,
+      index: lessonCursor++,
+      title: lessonTitle,
+    })),
+  }));
+};
+
 const buildSchoolCurriculum = (subjectsInput: unknown): CurriculumBlock[] => {
   if (!Array.isArray(subjectsInput)) {
     return [];
   }
 
-  const blocks: CurriculumBlock[] = [];
+  const blocks: Array<{ id: string; title: string; lessons: string[] }> = [];
 
   subjectsInput.forEach((subject, subjectIndex) => {
     if (!subject || typeof subject !== 'object') {
@@ -113,7 +143,7 @@ const buildSchoolCurriculum = (subjectsInput: unknown): CurriculumBlock[] => {
     });
   });
 
-  return blocks;
+  return withLessonIndexes(blocks);
 };
 
 const buildCodingCurriculum = (modulesInput: unknown): CurriculumBlock[] => {
@@ -121,7 +151,7 @@ const buildCodingCurriculum = (modulesInput: unknown): CurriculumBlock[] => {
     return [];
   }
 
-  const blocks: CurriculumBlock[] = [];
+  const blocks: Array<{ id: string; title: string; lessons: string[] }> = [];
 
   modulesInput.forEach((moduleNodeRaw, moduleIndex) => {
     if (!moduleNodeRaw || typeof moduleNodeRaw !== 'object') {
@@ -147,17 +177,46 @@ const buildCodingCurriculum = (modulesInput: unknown): CurriculumBlock[] => {
     });
   });
 
-  return blocks;
+  return withLessonIndexes(blocks);
 };
 
 export default function CourseDetailContent({ courseId }: CourseDetailContentProps) {
   const [openChapter, setOpenChapter] = useState<number>(0);
+  const [selectedLessonIndex, setSelectedLessonIndex] = useState<number | null>(null);
+  const [progressFeedback, setProgressFeedback] = useState<string | null>(null);
+  const [progressError, setProgressError] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(() =>
+    typeof window !== 'undefined' ? Boolean(getAccessToken()) : false
+  );
   const [enrollFeedback, setEnrollFeedback] = useState<string | null>(null);
   const [enrollError, setEnrollError] = useState<string | null>(null);
   const [requiresLogin, setRequiresLogin] = useState(false);
 
   const { data: course, isLoading, isError } = useCourseDetailQuery(courseId);
   const enrollMutation = useEnrollMutation();
+  const progressQuery = useCourseProgressQuery(
+    course?.id ?? null,
+    Boolean(course?.id && isAuthenticated)
+  );
+  const completeLessonMutation = useCompleteLessonMutation(course?.id ?? null);
+  const updateLastWatchedMutation = useUpdateLastWatchedMutation(course?.id ?? null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const syncAuthState = () => {
+      setIsAuthenticated(Boolean(getAccessToken()));
+    };
+
+    syncAuthState();
+    window.addEventListener(AUTH_STATE_EVENT, syncAuthState);
+
+    return () => {
+      window.removeEventListener(AUTH_STATE_EVENT, syncAuthState);
+    };
+  }, []);
 
   const curriculumBlocks = useMemo(() => {
     if (!course) {
@@ -171,6 +230,23 @@ export default function CourseDetailContent({ courseId }: CourseDetailContentPro
     return buildCodingCurriculum(course.modules);
   }, [course]);
 
+  const flatLessons = useMemo(
+    () =>
+      curriculumBlocks.flatMap((block) =>
+        block.lessons.map((lesson) => ({
+          ...lesson,
+          blockTitle: block.title,
+        }))
+      ),
+    [curriculumBlocks]
+  );
+
+  const progress = progressQuery.data ?? null;
+  const completedLessonSet = useMemo(
+    () => new Set(progress?.completedLessons || []),
+    [progress]
+  );
+
   const totalLessonsFromCurriculum = curriculumBlocks.reduce(
     (acc, chapter) => acc + chapter.lessons.length,
     0
@@ -182,6 +258,55 @@ export default function CourseDetailContent({ courseId }: CourseDetailContentPro
       : totalLessonsFromCurriculum;
 
   const estimatedWeeks = Math.max(2, Math.ceil(totalLessons / 8));
+  const lockedUntilLesson = progress?.lockedUntilLesson ?? -1;
+  const activeLessonIndex = useMemo(() => {
+    if (flatLessons.length === 0) {
+      return 0;
+    }
+
+    const baseIndex =
+      selectedLessonIndex !== null
+        ? selectedLessonIndex
+        : progress?.lastWatchedLesson ?? 0;
+
+    return Math.max(0, Math.min(baseIndex, flatLessons.length - 1));
+  }, [flatLessons.length, selectedLessonIndex, progress?.lastWatchedLesson]);
+  const activeLesson = flatLessons[activeLessonIndex] || null;
+  const isEnrolled = Boolean(progress);
+  const isActionBusy =
+    enrollMutation.isPending ||
+    completeLessonMutation.isPending ||
+    updateLastWatchedMutation.isPending;
+
+  const progressStatusCode =
+    progressQuery.error instanceof AxiosError
+      ? progressQuery.error.response?.status
+      : null;
+  const progressErrorMessage =
+    progressQuery.error instanceof AxiosError
+      ? ((progressQuery.error.response?.data as { message?: string } | undefined)
+          ?.message ?? null)
+      : null;
+
+  const activeLessonIdx = activeLesson?.index ?? null;
+
+  const lessonContentQuery = useQuery({
+    queryKey: ['enrollments', 'lesson-content', course?.id, activeLessonIdx],
+    queryFn: () => fetchLessonContent(course!.id, activeLessonIdx as number),
+    enabled:
+      Boolean(course?.id) &&
+      activeLessonIdx !== null &&
+      isAuthenticated &&
+      isEnrolled &&
+      activeLessonIdx <= lockedUntilLesson,
+    retry: false,
+  });
+
+  const lessonContentErrorMessage =
+    lessonContentQuery.error instanceof AxiosError
+      ? ((lessonContentQuery.error.response?.data as { message?: string } | undefined)
+          ?.message ?? null)
+      : null;
 
   const { data: relatedCourses = [] } = useQuery({
     queryKey: ['courses', 'related', course?.category],
@@ -198,13 +323,17 @@ export default function CourseDetailContent({ courseId }: CourseDetailContentPro
       return;
     }
 
+    setProgressError(null);
+    setProgressFeedback(null);
     setEnrollFeedback(null);
     setEnrollError(null);
     setRequiresLogin(false);
 
     enrollMutation.mutate(course.id, {
-      onSuccess: () => {
+      onSuccess: (enrolledProgress) => {
         setEnrollFeedback('Enrollment successful. Course progress has been initialized.');
+        setProgressFeedback('You can now continue with the unlocked lessons.');
+        setSelectedLessonIndex(Math.max(0, enrolledProgress.lastWatchedLesson));
       },
       onError: (error) => {
         if (error instanceof AxiosError) {
@@ -221,6 +350,121 @@ export default function CourseDetailContent({ courseId }: CourseDetailContentPro
         }
 
         setEnrollError('Unable to enroll right now. Please try again.');
+      },
+    });
+  };
+
+  const handleLessonSelect = (lessonIndex: number) => {
+    if (!isAuthenticated) {
+      setRequiresLogin(true);
+      setProgressError('Please login first to access locked lesson flow.');
+      return;
+    }
+
+    if (!isEnrolled) {
+      setProgressError('Enroll in this course to start lesson progression.');
+      return;
+    }
+
+    if (lessonIndex > lockedUntilLesson) {
+      setProgressError(
+        `Lesson ${lessonIndex + 1} is locked. Complete lesson ${lockedUntilLesson + 1} first.`
+      );
+      return;
+    }
+
+    setProgressError(null);
+    setProgressFeedback(null);
+    setSelectedLessonIndex(lessonIndex);
+
+    const chapterIndex = curriculumBlocks.findIndex((chapter) =>
+      chapter.lessons.some((lesson) => lesson.index === lessonIndex)
+    );
+    if (chapterIndex >= 0) {
+      setOpenChapter(chapterIndex);
+    }
+  };
+
+  const handleSaveResume = () => {
+    if (!course || !activeLesson) {
+      return;
+    }
+
+    if (!isAuthenticated) {
+      setRequiresLogin(true);
+      setProgressError('Login is required to save resume state.');
+      return;
+    }
+
+    if (!isEnrolled) {
+      setProgressError('Enroll before saving resume progress.');
+      return;
+    }
+
+    setProgressError(null);
+    setProgressFeedback(null);
+
+    updateLastWatchedMutation.mutate(activeLesson.index, {
+      onSuccess: () => {
+        setProgressFeedback(
+          `Resume point saved at lesson ${activeLesson.index + 1}.`
+        );
+      },
+      onError: (error) => {
+        const message =
+          error instanceof AxiosError
+            ? ((error.response?.data as { message?: string } | undefined)?.message ??
+              null)
+            : null;
+        setProgressError(message || 'Unable to save resume point right now.');
+      },
+    });
+  };
+
+  const handleCompleteCurrentLesson = () => {
+    if (!course || !activeLesson) {
+      return;
+    }
+
+    if (!isAuthenticated) {
+      setRequiresLogin(true);
+      setProgressError('Login is required to complete lessons.');
+      return;
+    }
+
+    if (!isEnrolled) {
+      setProgressError('Enroll before marking lessons as complete.');
+      return;
+    }
+
+    if (activeLesson.index > lockedUntilLesson) {
+      setProgressError(
+        `Lesson ${activeLesson.index + 1} is locked. Complete previous lessons first.`
+      );
+      return;
+    }
+
+    setProgressError(null);
+    setProgressFeedback(null);
+
+    completeLessonMutation.mutate(activeLesson.index, {
+      onSuccess: (updatedProgress) => {
+        const unlockedLesson = Math.min(
+          updatedProgress.lockedUntilLesson,
+          flatLessons.length - 1
+        );
+        setSelectedLessonIndex(Math.max(activeLesson.index, unlockedLesson));
+        setProgressFeedback(
+          `Lesson ${activeLesson.index + 1} marked complete. Lock window updated.`
+        );
+      },
+      onError: (error) => {
+        const message =
+          error instanceof AxiosError
+            ? ((error.response?.data as { message?: string } | undefined)?.message ??
+              null)
+            : null;
+        setProgressError(message || 'Unable to mark lesson complete right now.');
       },
     });
   };
@@ -332,6 +576,176 @@ export default function CourseDetailContent({ courseId }: CourseDetailContentPro
                 align="left"
               />
 
+              <GlassCard className="!p-5 mb-5" hover={false}>
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                  <div>
+                    <p className="text-xs text-[#64748b] mb-1">Learning Console</p>
+                    {activeLesson ? (
+                      <h3 className="text-base font-semibold text-white">
+                        Lesson {activeLesson.index + 1}: {activeLesson.title}
+                      </h3>
+                    ) : (
+                      <h3 className="text-base font-semibold text-white">
+                        No lessons published yet
+                      </h3>
+                    )}
+                    <p className="text-xs text-[#94a3b8] mt-1">
+                      {activeLesson?.blockTitle || 'Course structure will appear when lessons are added.'}
+                    </p>
+                  </div>
+                  <div className="text-xs text-[#94a3b8] space-y-1">
+                    <p>
+                      Locked until lesson:{' '}
+                      <span className="text-white font-medium">
+                        {isEnrolled ? lockedUntilLesson + 1 : 0}
+                      </span>
+                    </p>
+                    <p>
+                      Overall progress:{' '}
+                      <span className="text-white font-medium">
+                        {progress?.overallProgress || 0}%
+                      </span>
+                    </p>
+                  </div>
+                </div>
+
+                {!isAuthenticated && (
+                  <p className="text-xs text-[#f59e0b] mt-4">
+                    Login to use resume, lock, and lesson completion controls.
+                  </p>
+                )}
+
+                {isAuthenticated && progressQuery.isLoading && (
+                  <p className="text-xs text-[#94a3b8] mt-4">
+                    Loading your progress state...
+                  </p>
+                )}
+
+                {isAuthenticated && progressStatusCode === 404 && (
+                  <p className="text-xs text-[#94a3b8] mt-4">
+                    You are not enrolled yet. Enroll from the right panel to start lock-based progression.
+                  </p>
+                )}
+
+                {isAuthenticated && progressStatusCode && progressStatusCode !== 404 && (
+                  <p className="text-xs text-[#ef4444] mt-4">
+                    {progressErrorMessage || 'Unable to load course progress right now.'}
+                  </p>
+                )}
+
+                <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                  <p className="text-xs uppercase tracking-wide text-[#64748b] mb-2">
+                    Active Lesson Content
+                  </p>
+
+                  {!isAuthenticated && (
+                    <p className="text-sm text-[#94a3b8]">
+                      Login to access lesson content securely.
+                    </p>
+                  )}
+
+                  {isAuthenticated && !isEnrolled && (
+                    <p className="text-sm text-[#94a3b8]">
+                      Enroll to unlock lesson content and progression controls.
+                    </p>
+                  )}
+
+                  {isAuthenticated && isEnrolled && !activeLesson && (
+                    <p className="text-sm text-[#94a3b8]">
+                      No lesson selected.
+                    </p>
+                  )}
+
+                  {isAuthenticated &&
+                    isEnrolled &&
+                    activeLesson &&
+                    activeLesson.index > lockedUntilLesson && (
+                      <p className="text-sm text-[#f59e0b]">
+                        This lesson is locked. Complete previous lessons first.
+                      </p>
+                    )}
+
+                  {isAuthenticated &&
+                    isEnrolled &&
+                    activeLesson &&
+                    activeLesson.index <= lockedUntilLesson &&
+                    lessonContentQuery.isLoading && (
+                      <p className="text-sm text-[#94a3b8]">Loading lesson content...</p>
+                    )}
+
+                  {isAuthenticated &&
+                    isEnrolled &&
+                    activeLesson &&
+                    activeLesson.index <= lockedUntilLesson &&
+                    lessonContentQuery.isError && (
+                      <p className="text-sm text-[#ef4444]">
+                        {lessonContentErrorMessage || 'Unable to fetch lesson content.'}
+                      </p>
+                    )}
+
+                  {isAuthenticated &&
+                    isEnrolled &&
+                    activeLesson &&
+                    activeLesson.index <= lockedUntilLesson &&
+                    lessonContentQuery.data && (
+                      <div className="space-y-2">
+                        <p className="text-sm text-white font-medium">
+                          {lessonContentQuery.data.title}
+                        </p>
+                        <p className="text-xs text-[#94a3b8]">
+                          {lessonContentQuery.data.subject.name} - {lessonContentQuery.data.chapter.title}
+                        </p>
+                        <p className="text-xs text-[#94a3b8]">
+                          Type: {lessonContentQuery.data.contentType} | Duration:{' '}
+                          {lessonContentQuery.data.duration} min
+                        </p>
+                        {lessonContentQuery.data.description && (
+                          <p className="text-sm text-[#cbd5e1]">
+                            {lessonContentQuery.data.description}
+                          </p>
+                        )}
+                        {lessonContentQuery.data.contentUrl && (
+                          <a
+                            href={lessonContentQuery.data.contentUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 text-xs text-[#a5b4fc] hover:text-white transition-colors"
+                          >
+                            Open Lesson Resource
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </a>
+                        )}
+                      </div>
+                    )}
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3 mt-5">
+                  <button
+                    type="button"
+                    onClick={handleSaveResume}
+                    disabled={!activeLesson || isActionBusy || !isAuthenticated || !isEnrolled}
+                    className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-medium text-white hover:bg-white/10 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {updateLastWatchedMutation.isPending ? 'Saving...' : 'Save Resume Point'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleCompleteCurrentLesson}
+                    disabled={!activeLesson || isActionBusy || !isAuthenticated || !isEnrolled}
+                    className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#22c55e] to-[#14b8a6] text-xs font-semibold text-white hover:shadow-[0_0_20px_rgba(34,197,94,0.3)] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {completeLessonMutation.isPending ? 'Updating...' : 'Mark Lesson Complete'}
+                  </button>
+                </div>
+
+                {progressFeedback && (
+                  <p className="text-xs text-[#22c55e] mt-3">{progressFeedback}</p>
+                )}
+                {progressError && (
+                  <p className="text-xs text-[#ef4444] mt-3">{progressError}</p>
+                )}
+              </GlassCard>
+
               <div className="space-y-3">
                 {curriculumBlocks.length === 0 && (
                   <GlassCard className="!p-5" hover={false}>
@@ -382,19 +796,49 @@ export default function CourseDetailContent({ courseId }: CourseDetailContentPro
                         >
                           <div className="px-5 pb-5 border-t border-white/5">
                             <ul className="space-y-2 pt-4">
-                              {chapter.lessons.map((lesson, lessonIndex) => (
-                                <li
-                                  key={`${chapter.id}-${lessonIndex}`}
-                                  className="flex items-center gap-3 text-sm text-[#94a3b8]"
-                                >
-                                  {lessonIndex === 0 ? (
-                                    <CheckCircle className="w-4 h-4 text-[#22c55e] flex-shrink-0" />
-                                  ) : (
-                                    <Lock className="w-4 h-4 text-[#64748b] flex-shrink-0" />
-                                  )}
-                                  {lesson}
-                                </li>
-                              ))}
+                              {chapter.lessons.map((lesson) => {
+                                const isCompleted = completedLessonSet.has(lesson.index);
+                                const isUnlocked = isEnrolled
+                                  ? lesson.index <= lockedUntilLesson
+                                  : false;
+                                const isActive = lesson.index === activeLessonIndex;
+
+                                return (
+                                  <li key={lesson.id}>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleLessonSelect(lesson.index)}
+                                      className={`w-full flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-left transition-colors ${
+                                        isActive
+                                          ? 'bg-[#6366f1]/10 border border-[#6366f1]/30'
+                                          : 'hover:bg-white/[0.03]'
+                                      }`}
+                                    >
+                                      <span className="flex items-center gap-3 text-sm text-[#94a3b8]">
+                                        {isCompleted ? (
+                                          <CheckCircle className="w-4 h-4 text-[#22c55e] flex-shrink-0" />
+                                        ) : isUnlocked ? (
+                                          <CirclePlay className="w-4 h-4 text-[#a5b4fc] flex-shrink-0" />
+                                        ) : (
+                                          <Lock className="w-4 h-4 text-[#64748b] flex-shrink-0" />
+                                        )}
+                                        <span className="text-[#e2e8f0]">
+                                          Lesson {lesson.index + 1}: {lesson.title}
+                                        </span>
+                                      </span>
+                                      {!isCompleted && !isUnlocked && (
+                                        <span className="text-[11px] text-[#64748b]">Locked</span>
+                                      )}
+                                      {isCompleted && (
+                                        <span className="text-[11px] text-[#22c55e]">Completed</span>
+                                      )}
+                                      {!isCompleted && isUnlocked && (
+                                        <span className="text-[11px] text-[#a5b4fc]">Unlocked</span>
+                                      )}
+                                    </button>
+                                  </li>
+                                );
+                              })}
                             </ul>
                           </div>
                         </motion.div>
@@ -470,14 +914,37 @@ export default function CourseDetailContent({ courseId }: CourseDetailContentPro
 
                   <button
                     onClick={handleEnroll}
-                    disabled={enrollMutation.isPending}
+                    disabled={enrollMutation.isPending || isEnrolled}
                     className="w-full py-3 rounded-xl bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] text-white font-semibold text-sm hover:shadow-[0_0_24px_rgba(99,102,241,0.4)] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                   >
                     <span>
-                      {enrollMutation.isPending ? 'Enrolling...' : 'Enroll Now'}
+                      {enrollMutation.isPending
+                        ? 'Enrolling...'
+                        : isEnrolled
+                          ? 'Already Enrolled'
+                          : 'Enroll Now'}
                     </span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
+
+                  {isEnrolled && (
+                    <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.03] p-3">
+                      <p className="text-xs text-[#94a3b8] mb-1">
+                        Last watched lesson:{' '}
+                        <span className="text-white">{(progress?.lastWatchedLesson || 0) + 1}</span>
+                      </p>
+                      <p className="text-xs text-[#94a3b8] mb-2">
+                        Locked until lesson:{' '}
+                        <span className="text-white">{lockedUntilLesson + 1}</span>
+                      </p>
+                      <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-[#6366f1] to-[#8b5cf6]"
+                          style={{ width: `${Math.min(100, Math.max(0, progress?.overallProgress || 0))}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
 
                   {enrollFeedback && (
                     <p className="text-xs text-[#22c55e] mt-3">{enrollFeedback}</p>

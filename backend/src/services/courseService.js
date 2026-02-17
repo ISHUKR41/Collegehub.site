@@ -56,6 +56,43 @@ const normalizeListItem = (courseDoc) => ({
     updatedAt: courseDoc.updatedAt,
 });
 
+const sanitizeLessonForPublic = (lesson, lessonIndex) => ({
+    _id: lesson._id,
+    title: lesson.title,
+    contentType: lesson.contentType,
+    duration: lesson.duration,
+    order: lesson.order ?? lessonIndex,
+});
+
+const sanitizeSchoolSubjectsForPublic = (subjects = []) =>
+    subjects.map((subject, subjectIndex) => ({
+        _id: subject._id,
+        name: subject.name,
+        icon: subject.icon,
+        color: subject.color,
+        order: subject.order ?? subjectIndex,
+        chapters: (subject.chapters || []).map((chapter, chapterIndex) => ({
+            _id: chapter._id,
+            title: chapter.title,
+            order: chapter.order ?? chapterIndex,
+            lessons: (chapter.lessons || []).map(sanitizeLessonForPublic),
+        })),
+    }));
+
+const sanitizeCodingModulesForPublic = (modules = []) =>
+    modules.map((moduleItem, moduleIndex) => ({
+        _id: moduleItem._id,
+        title: moduleItem.title,
+        order: moduleItem.order ?? moduleIndex,
+        topics: (moduleItem.topics || []).map((topic, topicIndex) => ({
+            _id: topic._id,
+            title: topic.title,
+            difficulty: topic.difficulty,
+            order: topic.order ?? topicIndex,
+            lessons: (topic.lessons || []).map(sanitizeLessonForPublic),
+        })),
+    }));
+
 const listCourses = async ({ category, subCategory, search, includeUnpublished = false }) => {
     if (category && subCategory) {
         assertCategoryMapping(category, subCategory);
@@ -126,8 +163,12 @@ const getCourseById = async ({ courseId, includeUnpublished = false }) => {
         description: course.description,
         category: course.category,
         subCategory: course.subCategory,
-        subjects: course.subjects || [],
-        modules: course.modules || [],
+        subjects: includeUnpublished
+            ? course.subjects || []
+            : sanitizeSchoolSubjectsForPublic(course.subjects),
+        modules: includeUnpublished
+            ? course.modules || []
+            : sanitizeCodingModulesForPublic(course.modules),
         totalLessons: course.totalLessons,
         isPublished: course.isPublished,
         createdBy: course.createdBy || null,

@@ -13,6 +13,7 @@ const {
     completeLessonSchema,
     updateLastWatchedSchema,
     lessonAccessQuerySchema,
+    lessonContentParamSchema,
 } = require('../validators/progressValidator');
 
 const router = express.Router();
@@ -28,6 +29,12 @@ router.get(
     checkLessonLock,
     enrollmentController.getLessonAccess
 );
+router.get(
+    '/:courseId/lessons/:lessonIndex',
+    validate(lessonContentParamSchema),
+    checkLessonLock,
+    enrollmentController.getLessonContent
+);
 router.get('/:courseId', validate(courseProgressParamSchema), enrollmentController.getCourseProgress);
 router.patch('/:courseId/complete', validate(completeLessonSchema), enrollmentController.completeLesson);
 router.patch(
@@ -37,4 +44,3 @@ router.patch(
 );
 
 module.exports = router;
-

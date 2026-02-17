@@ -60,7 +60,7 @@ const checkLessonLock = async (req, res, next) => {
             return ApiResponse.error(
                 res,
                 HTTP.FORBIDDEN,
-                `Lesson ${lessonIndex} is locked. Complete lesson ${progress.lockedUntilLesson} first.`
+                `Lesson Locked. Complete lesson ${progress.lockedUntilLesson + 1} before accessing lesson ${lessonIndex + 1}.`
             );
         }
 

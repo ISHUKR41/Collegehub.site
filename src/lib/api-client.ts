@@ -15,14 +15,12 @@ import axios, {
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-const ACCESS_TOKEN_STORAGE_KEY = 'collegehub_access_token';
 export const AUTH_STATE_EVENT = 'collegehub:auth-state-changed';
 
 let accessTokenMemory: string | null = null;
 let isRefreshing = false;
+let bootstrapPromise: Promise<string | null> | null = null;
 let refreshQueue: Array<(token: string | null) => void> = [];
-
-const isBrowser = typeof window !== 'undefined';
 
 const runRefreshQueue = (token: string | null) => {
   refreshQueue.forEach((callback) => callback(token));
@@ -39,43 +37,52 @@ const normalizeAuthHeader = (
 };
 
 export const getAccessToken = (): string | null => {
-  if (accessTokenMemory) {
-    return accessTokenMemory;
-  }
-
-  if (!isBrowser) {
-    return null;
-  }
-
-  const fromStorage = window.localStorage.getItem(ACCESS_TOKEN_STORAGE_KEY);
-  if (fromStorage) {
-    accessTokenMemory = fromStorage;
-  }
-
   return accessTokenMemory;
 };
 
 export const setAccessToken = (token: string | null) => {
   accessTokenMemory = token;
 
-  if (!isBrowser) {
+  if (typeof window === 'undefined') {
     return;
   }
 
-  if (token) {
-    window.localStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, token);
-  } else {
-    window.localStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
-  }
-
   /*
-   * Same-tab localStorage updates do not fire the `storage` event.
-   * We emit a dedicated event so auth-aware UI can react immediately.
+   * Access tokens stay in memory only. A dedicated event keeps UI synchronized
+   * after login/logout/refresh without relying on localStorage.
    */
   window.dispatchEvent(new Event(AUTH_STATE_EVENT));
 };
 
 export const clearAccessToken = () => setAccessToken(null);
+
+export const bootstrapAccessToken = async (): Promise<string | null> => {
+  if (accessTokenMemory) {
+    return accessTokenMemory;
+  }
+
+  if (bootstrapPromise) {
+    return bootstrapPromise;
+  }
+
+  bootstrapPromise = publicApiClient
+    .post('/auth/refresh')
+    .then((response) => {
+      const token =
+        response.data?.data?.accessToken || response.data?.accessToken || null;
+      setAccessToken(token);
+      return token;
+    })
+    .catch(() => {
+      clearAccessToken();
+      return null;
+    })
+    .finally(() => {
+      bootstrapPromise = null;
+    });
+
+  return bootstrapPromise;
+};
 
 type RetryableRequest = InternalAxiosRequestConfig & {
   _retry?: boolean;

@@ -12,7 +12,7 @@ const UserProgress = require('../models/UserProgress');
 const AppError = require('../utils/AppError');
 const { flattenCourseLessons, buildProgressMaps } = require('../utils/courseStructureUtils');
 const { cacheInvalidatePattern } = require('../utils/cacheUtils');
-const { CACHE_KEYS, HTTP } = require('../constants');
+const { CACHE_KEYS, CATEGORIES, HTTP } = require('../constants');
 
 const serializeProgress = (progressDoc, courseDoc, flatLessons) => ({
     id: progressDoc._id.toString(),
@@ -78,6 +78,72 @@ const assertValidLessonIndex = (flatLessons, lessonIndex) => {
             `Invalid lesson index. Expected range 0 to ${flatLessons.length - 1}.`
         );
     }
+};
+
+const sortByOrder = (items = []) => [...items].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+const getLessonContentByIndex = (courseDoc, lessonIndex) => {
+    const safeIndex = Number(lessonIndex);
+    let cursor = 0;
+
+    if (courseDoc.category === CATEGORIES.SCHOOL) {
+        for (const subject of sortByOrder(courseDoc.subjects || [])) {
+            for (const chapter of sortByOrder(subject.chapters || [])) {
+                for (const lesson of sortByOrder(chapter.lessons || [])) {
+                    if (cursor === safeIndex) {
+                        return {
+                            lessonIndex: safeIndex,
+                            lessonId: lesson._id?.toString() || null,
+                            title: lesson.title,
+                            description: lesson.description || '',
+                            contentType: lesson.contentType,
+                            contentUrl: lesson.contentUrl || '',
+                            duration: lesson.duration || 0,
+                            subject: {
+                                id: subject._id?.toString() || null,
+                                name: subject.name,
+                            },
+                            chapter: {
+                                id: chapter._id?.toString() || null,
+                                title: chapter.title,
+                            },
+                        };
+                    }
+                    cursor += 1;
+                }
+            }
+        }
+        return null;
+    }
+
+    for (const moduleItem of sortByOrder(courseDoc.modules || [])) {
+        for (const topic of sortByOrder(moduleItem.topics || [])) {
+            for (const lesson of sortByOrder(topic.lessons || [])) {
+                if (cursor === safeIndex) {
+                    return {
+                        lessonIndex: safeIndex,
+                        lessonId: lesson._id?.toString() || null,
+                        title: lesson.title,
+                        description: lesson.description || '',
+                        contentType: lesson.contentType,
+                        contentUrl: lesson.contentUrl || '',
+                        duration: lesson.duration || 0,
+                        subject: {
+                            id: moduleItem._id?.toString() || null,
+                            name: moduleItem.title,
+                        },
+                        chapter: {
+                            id: topic._id?.toString() || null,
+                            title: topic.title,
+                        },
+                    };
+                }
+                cursor += 1;
+            }
+        }
+    }
+
+    return null;
 };
 
 const normalizeProgressPointers = (progressDoc, flatLessons) => {
@@ -349,6 +415,39 @@ const getLessonAccessPayload = async (userId, courseId, lessonIndex) => {
     };
 };
 
+const getLessonContent = async (userId, courseId, lessonIndex) => {
+    const [course, progress] = await Promise.all([
+        getCourseByIdOrThrow(courseId),
+        getProgressOrThrow(userId, courseId),
+    ]);
+
+    const flatLessons = flattenCourseLessons(course);
+    assertValidLessonIndex(flatLessons, lessonIndex);
+    const changed = normalizeProgressPointers(progress, flatLessons);
+    if (changed) {
+        await progress.save();
+    }
+
+    if (lessonIndex > progress.lockedUntilLesson) {
+        throw new AppError(
+            HTTP.FORBIDDEN,
+            `Lesson Locked. Complete lesson ${progress.lockedUntilLesson + 1} first.`
+        );
+    }
+
+    const lesson = getLessonContentByIndex(course, lessonIndex);
+    if (!lesson) {
+        throw new AppError(HTTP.NOT_FOUND, 'Lesson not found.');
+    }
+
+    return {
+        ...lesson,
+        lockedUntilLesson: progress.lockedUntilLesson,
+        lastWatchedLesson: progress.lastWatchedLesson,
+        completed: progress.completedLessons.includes(lessonIndex),
+    };
+};
+
 module.exports = {
     enrollInCourse,
     completeLesson,
@@ -357,5 +456,6 @@ module.exports = {
     getEnrolledCourses,
     getResumeFeed,
     getLessonAccessPayload,
+    getLessonContent,
     invalidateDashboardCache,
 };

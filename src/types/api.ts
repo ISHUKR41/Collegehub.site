@@ -45,6 +45,72 @@ export interface CourseDetail {
   updatedAt: string;
 }
 
+export interface CourseProgress {
+  id: string;
+  userId: string;
+  courseId: string;
+  courseTitle?: string;
+  category?: 'school' | 'coding';
+  subCategory?: 'class9' | 'class10' | 'cpp' | 'java' | 'python' | 'webdev';
+  subjectId: string | null;
+  chapterId: string | null;
+  lastWatchedLesson: number;
+  lockedUntilLesson: number;
+  totalLessons: number;
+  completedLessons: number[];
+  overallProgress: number;
+  subjectProgressMap: Record<string, number>;
+  chapterProgressMap: Record<string, number>;
+  weaknessAnalysis: Record<string, number>;
+  updatedAt: string;
+}
+
+export interface EnrollmentListItem {
+  id: string;
+  courseId: string;
+  courseTitle: string | null;
+  category: string | null;
+  subCategory: string | null;
+  totalLessons: number;
+  isPublished: boolean;
+  lastWatchedLesson: number;
+  lockedUntilLesson: number;
+  overallProgress: number;
+  completedCount: number;
+  updatedAt: string;
+}
+
+export interface ResumeFeed {
+  courseId: string;
+  courseTitle: string;
+  category: string;
+  subCategory: string;
+  lastWatchedLesson: number;
+  lockedUntilLesson: number;
+  updatedAt: string;
+}
+
+export interface LessonContent {
+  lessonIndex: number;
+  lessonId: string | null;
+  title: string;
+  description: string;
+  contentType: 'video' | 'text' | 'quiz' | 'practice';
+  contentUrl: string;
+  duration: number;
+  subject: {
+    id: string | null;
+    name: string;
+  };
+  chapter: {
+    id: string | null;
+    title: string;
+  };
+  lockedUntilLesson: number;
+  lastWatchedLesson: number;
+  completed: boolean;
+}
+
 export interface DashboardSummary {
   enrolledCourses: number;
   averageProgress: number;

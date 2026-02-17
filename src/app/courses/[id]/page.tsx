@@ -119,7 +119,7 @@ export default async function CourseDetailPage({
   return (
     <>
       <JsonLd data={courseSchema} />
-      <CourseDetailContent courseId={id} />
+      <CourseDetailContent key={id} courseId={id} />
     </>
   );
 }
