@@ -88,6 +88,11 @@ export default function RootLayout({
               name: SITE_CONFIG.name,
               url: SITE_CONFIG.url,
               description: SITE_CONFIG.description,
+              foundingDate: '2024',
+              areaServed: {
+                '@type': 'Country',
+                name: 'India',
+              },
               sameAs: [
                 SITE_CONFIG.social.github,
                 SITE_CONFIG.social.linkedin,
@@ -97,6 +102,51 @@ export default function RootLayout({
               offers: {
                 '@type': 'Offer',
                 category: 'Online Education',
+                price: '0',
+                priceCurrency: 'INR',
+                availability: 'https://schema.org/InStock',
+              },
+              hasOfferingCatalog: {
+                '@type': 'OfferingCatalog',
+                name: 'CollegeHub Courses',
+                itemListElement: [
+                  {
+                    '@type': 'Course',
+                    name: 'CBSE Class 9 Study Material',
+                    description: 'Complete CBSE Class 9 subjects with chapter-wise lessons and tests',
+                    provider: { '@type': 'Organization', name: SITE_CONFIG.name },
+                  },
+                  {
+                    '@type': 'Course',
+                    name: 'CBSE Class 10 Study Material',
+                    description: 'Complete CBSE Class 10 subjects with board exam preparation',
+                    provider: { '@type': 'Organization', name: SITE_CONFIG.name },
+                  },
+                  {
+                    '@type': 'Course',
+                    name: 'C++ Programming',
+                    description: 'Learn C++ from beginner to advanced with OOP, STL, and competitive programming',
+                    provider: { '@type': 'Organization', name: SITE_CONFIG.name },
+                  },
+                  {
+                    '@type': 'Course',
+                    name: 'Java Programming',
+                    description: 'Master Java with core concepts, collections, and Spring framework basics',
+                    provider: { '@type': 'Organization', name: SITE_CONFIG.name },
+                  },
+                  {
+                    '@type': 'Course',
+                    name: 'Python Programming',
+                    description: 'Learn Python from scripting to AI/ML with hands-on projects',
+                    provider: { '@type': 'Organization', name: SITE_CONFIG.name },
+                  },
+                  {
+                    '@type': 'Course',
+                    name: 'Full Stack Web Development',
+                    description: 'Master HTML, CSS, JavaScript, React, Node.js, and deployment',
+                    provider: { '@type': 'Organization', name: SITE_CONFIG.name },
+                  },
+                ],
               },
             }),
           }}

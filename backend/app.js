@@ -13,8 +13,10 @@ const cookieParser = require('cookie-parser');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const morgan = require('morgan');
+const passport = require('passport');
 
 const logger = require('./src/config/logger');
+const { initializePassport } = require('./src/config/passport');
 const apiRoutes = require('./src/routes');
 const { apiRateLimiter } = require('./src/middleware/rateLimiters');
 const { notFound } = require('./src/middleware/notFoundMiddleware');
@@ -67,6 +69,10 @@ app.use(compression());
 app.use(requestIdMiddleware);
 app.use(performanceMiddleware);
 app.use(sanitizeInput);
+
+/* Initialize Passport for Google OAuth (no sessions — we use JWT) */
+app.use(passport.initialize());
+initializePassport();
 
 if (process.env.NODE_ENV !== 'production') {
     app.use(

@@ -13,9 +13,18 @@ import { SITE_CONFIG } from '@/lib/constants';
 import AboutPageContent from './AboutPageContent';
 
 export const metadata: Metadata = {
-  title: 'About Us - Mission, Vision, and Team',
+  title: 'About Us - Our Mission, Vision & Team | CollegeHub',
   description:
-    'Learn the CollegeHub mission, platform journey, and team building a learning intelligence ecosystem for students.',
+    'Learn about the CollegeHub mission to make quality education accessible. Meet the team building a free, data-driven learning platform for school and coding students across India.',
+  keywords: [
+    'about CollegeHub',
+    'CollegeHub mission',
+    'education startup India',
+    'free learning platform',
+    'online education team',
+    'EdTech startup India',
+    'student learning platform',
+  ],
   openGraph: {
     title: 'About CollegeHub - Mission, Vision, and Team',
     description:
@@ -36,6 +45,8 @@ export default function AboutPage() {
       '@type': 'Organization',
       name: SITE_CONFIG.name,
       url: SITE_CONFIG.url,
+      foundingDate: '2024',
+      areaServed: 'India',
     },
   };
 

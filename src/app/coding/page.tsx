@@ -13,18 +13,33 @@ import { SITE_CONFIG } from '@/lib/constants';
 import CodingPageContent from './CodingPageContent';
 
 export const metadata: Metadata = {
-  title: 'Coding - Learn C++, Java, Python, and Web Development',
+  title: 'Coding - Learn C++, Java, Python & Web Development | Free Online Courses',
   description:
-    'Structured programming tracks from beginner to advanced with lessons, practice, tests, and weakness analytics.',
+    'Structured programming courses from beginner to advanced. Learn C++, Java, Python, and full-stack Web Development with practice problems, tests, and weakness analytics — all free on CollegeHub.',
   keywords: [
-    'learn c++ online',
+    'learn C++ online',
+    'learn C++ online India',
     'java programming course',
     'python for beginners',
     'web development roadmap',
     'coding practice platform India',
+    'best coding website for students',
+    'learn Java online free',
+    'Python tutorial for beginners India',
+    'full stack web development course free',
+    'C++ competitive programming',
+    'learn programming online India',
+    'coding roadmap for beginners',
+    'free coding courses for students',
+    'learn HTML CSS JavaScript free',
+    'React.js Node.js course',
+    'coding for college students',
+    'DSA online course free',
+    'programming languages for beginners',
+    'best online coding platform India',
   ],
   openGraph: {
-    title: 'Coding - Learn C++, Java, Python, and Web Development | CollegeHub',
+    title: 'Coding - Learn C++, Java, Python & Web Development | CollegeHub',
     description:
       'Practice-first coding tracks with progressive unlock, evaluation tests, and dashboard insights.',
     url: `${SITE_CONFIG.url}/coding`,
@@ -44,7 +59,14 @@ export default function CodingPage() {
       name: SITE_CONFIG.name,
       url: SITE_CONFIG.url,
     },
-    about: ['C++', 'Java', 'Python', 'Web Development'],
+    about: ['C++', 'Java', 'Python', 'Web Development', 'HTML', 'CSS', 'JavaScript', 'React', 'Node.js'],
+    audience: {
+      '@type': 'EducationalAudience',
+      educationalRole: 'student',
+      description: 'College students, coding beginners, and aspiring developers in India',
+    },
+    educationalLevel: 'Beginner to Advanced',
+    inLanguage: 'en',
   };
 
   return (

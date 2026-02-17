@@ -1,0 +1,12 @@
+
+> collegehub.site@0.1.0 dev
+> next dev
+
+▲ Next.js 16.1.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://10.115.166.32:3000
+
+✓ Starting...
+✓ Ready in 1465ms
+ GET /coding 200 in 1760ms (compile: 1266ms, render: 494ms)
+[?25h

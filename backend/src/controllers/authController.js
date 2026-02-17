@@ -57,10 +57,34 @@ const getMe = asyncHandler(async (req, res) => {
     return ApiResponse.success(res, HTTP.OK, 'User profile fetched successfully.', { user });
 });
 
+/**
+ * googleCallback - Handles the redirect back from Google OAuth.
+ *
+ * Passport has already validated the Google profile and created/found
+ * the user via googleAuthService. We just need to set cookies and redirect
+ * the user to the frontend with an access token.
+ */
+const googleCallback = asyncHandler(async (req, res) => {
+    const result = req.user;
+
+    if (!result || !result.accessToken) {
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+        return res.redirect(`${frontendUrl}/login?error=google_auth_failed`);
+    }
+
+    setRefreshCookie(res, result.refreshToken);
+
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const callbackPath = `/auth/callback?token=${encodeURIComponent(result.accessToken)}`;
+
+    return res.redirect(`${frontendUrl}${callbackPath}`);
+});
+
 module.exports = {
     register,
     login,
     refresh,
     logout,
     getMe,
+    googleCallback,
 };

@@ -13,9 +13,16 @@ import { SITE_CONFIG } from '@/lib/constants';
 import ContactPageContent from './ContactPageContent';
 
 export const metadata: Metadata = {
-  title: 'Contact Us - Support, Partnerships, and Queries',
+  title: 'Contact Us - Support, Partnerships & Queries | CollegeHub',
   description:
-    'Contact CollegeHub for support, partnerships, feedback, and learning-related questions.',
+    'Contact CollegeHub for support, partnerships, feedback, and learning-related questions. Get in touch with our team for technical help, suggestions, or collaborations.',
+  keywords: [
+    'contact CollegeHub',
+    'CollegeHub support',
+    'learning platform help',
+    'CollegeHub feedback',
+    'education platform contact India',
+  ],
   openGraph: {
     title: 'Contact CollegeHub - Support and Queries',
     description:

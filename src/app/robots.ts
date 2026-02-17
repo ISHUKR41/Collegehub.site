@@ -14,7 +14,12 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/api/', '/admin/', '/dashboard', '/login', '/register'],
+        disallow: ['/api/', '/admin/', '/dashboard', '/auth/callback'],
+      },
+      {
+        userAgent: 'Googlebot',
+        allow: '/',
+        disallow: ['/api/', '/admin/', '/auth/callback'],
       },
     ],
     sitemap: `${SITE_CONFIG.url}/sitemap.xml`,

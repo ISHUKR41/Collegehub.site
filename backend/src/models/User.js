@@ -5,6 +5,12 @@
  * - Password is hashed with bcrypt before save.
  * - Refresh token is stored as SHA-256 hash only.
  * - Login attempts and lockUntil protect against brute-force attacks.
+ *
+ * Auth providers:
+ * - 'local' — email + password (default)
+ * - 'google' — Google OAuth, password not required
+ *
+ * To extend: Add more OAuth providers (GitHub, Facebook) following the same pattern.
  */
 
 const mongoose = require('mongoose');
@@ -31,9 +37,32 @@ const userSchema = new mongoose.Schema(
         },
         password: {
             type: String,
-            required: [true, 'Password is required'],
+            required: [
+                function () {
+                    return this.authProvider === 'local';
+                },
+                'Password is required for email registration',
+            ],
             minlength: [8, 'Password must be at least 8 characters'],
             select: false,
+        },
+        /* Google OAuth unique identifier */
+        googleId: {
+            type: String,
+            unique: true,
+            sparse: true,
+            index: true,
+        },
+        /* Which provider the user signed up with */
+        authProvider: {
+            type: String,
+            enum: ['local', 'google'],
+            default: 'local',
+        },
+        /* Profile picture URL (populated from Google profile) */
+        avatar: {
+            type: String,
+            default: null,
         },
         role: {
             type: String,
