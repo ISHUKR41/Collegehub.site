@@ -20,7 +20,7 @@ import { useMutation } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import {
   ArrowRight,
   CircleAlert,
@@ -46,7 +46,7 @@ const normalizeNextPath = (value: string | null) => {
 };
 
 /* ── Animation Variants ────────────────────────────────── */
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -54,7 +54,7 @@ const containerVariants = {
   },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
@@ -63,15 +63,7 @@ const itemVariants = {
   },
 };
 
-const floatVariants = {
-  animate: {
-    y: [-8, 8, -8],
-    rotate: [0, 5, -5, 0],
-    transition: { duration: 6, repeat: Infinity, ease: 'easeInOut' },
-  },
-};
-
-const pulseVariants = {
+const pulseVariants: Variants = {
   animate: {
     scale: [1, 1.05, 1],
     opacity: [0.5, 0.8, 0.5],
