@@ -1,14 +1,18 @@
 /**
  * CodingPageContent.tsx — Client-side coding section content
- * 
+ *
  * Sections:
  * 1. Hero banner for coding
  * 2. Language cards (C++, Java, Python, Web Dev)
- * 3. Skill levels breakdown
- * 4. Language comparison table
- * 5. Code preview terminal
- * 6. Learning roadmap
- * 7. CTA
+ * 3. Live catalog (API-driven)
+ * 4. Skill levels breakdown
+ * 5. Language comparison table
+ * 6. Code preview terminal
+ * 7. Learning roadmap
+ * 8. CTA
+ *
+ * To extend: Add interview-prep section, coding challenges, or
+ * certificate-track cards below the roadmap.
  */
 
 'use client';
@@ -23,6 +27,7 @@ import {
 } from 'lucide-react';
 import SectionHeading from '@/components/ui/SectionHeading';
 import GlassCard from '@/components/ui/GlassCard';
+import RevealOnScroll from '@/components/ui/RevealOnScroll';
 import { CODING_LANGUAGES } from '@/lib/constants';
 import { fetchPublicCourses } from '@/services/course-service';
 
@@ -125,11 +130,13 @@ export default function CodingPageContent() {
             {/* Language Cards */}
             <section className="section-padding" id="languages">
                 <div className="container-custom">
-                    <SectionHeading
-                        label="Languages"
-                        title="Choose Your Language"
-                        subtitle="Each course includes structured lessons, practice problems, tests, and performance analytics."
-                    />
+                    <RevealOnScroll>
+                        <SectionHeading
+                            label="Languages"
+                            title="Choose Your Language"
+                            subtitle="Each course includes structured lessons, practice problems, tests, and performance analytics."
+                        />
+                    </RevealOnScroll>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {CODING_LANGUAGES.map((lang, index) => {
@@ -178,13 +185,16 @@ export default function CodingPageContent() {
                 </div>
             </section>
 
+            {/* Live Catalog */}
             <section className="section-padding pt-0">
                 <div className="container-custom">
-                    <SectionHeading
-                        label="Live Catalog"
-                        title="Published Coding Tracks"
-                        subtitle="These courses are fetched from backend and linked to real dynamic course detail routes."
-                    />
+                    <RevealOnScroll>
+                        <SectionHeading
+                            label="Live Catalog"
+                            title="Published Coding Tracks"
+                            subtitle="These courses are fetched from backend and linked to real dynamic course detail routes."
+                        />
+                    </RevealOnScroll>
 
                     {isCoursesLoading && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -241,11 +251,13 @@ export default function CodingPageContent() {
             {/* Skill Levels */}
             <section className="section-padding" id="skill-levels">
                 <div className="container-custom">
-                    <SectionHeading
-                        label="Skill Levels"
-                        title="From Beginner to Expert"
-                        subtitle="Every course is structured in three progressive stages."
-                    />
+                    <RevealOnScroll>
+                        <SectionHeading
+                            label="Skill Levels"
+                            title="From Beginner to Expert"
+                            subtitle="Every course is structured in three progressive stages."
+                        />
+                    </RevealOnScroll>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {SKILL_LEVELS.map((item, index) => {
@@ -271,11 +283,13 @@ export default function CodingPageContent() {
             {/* Comparison Table */}
             <section className="section-padding" id="comparison">
                 <div className="container-custom">
-                    <SectionHeading
-                        label="Compare"
-                        title="Language Comparison"
-                        subtitle="Choose the right language based on your goals."
-                    />
+                    <RevealOnScroll>
+                        <SectionHeading
+                            label="Compare"
+                            title="Language Comparison"
+                            subtitle="Choose the right language based on your goals."
+                        />
+                    </RevealOnScroll>
 
                     <div className="overflow-x-auto">
                         <table className="w-full min-w-[600px] text-left">
@@ -314,11 +328,13 @@ export default function CodingPageContent() {
             {/* Code Preview */}
             <section className="section-padding">
                 <div className="container-custom">
-                    <SectionHeading
-                        label="Preview"
-                        title="See What You'll Build"
-                        subtitle="Here's a taste of what your code will look like after the first few lessons."
-                    />
+                    <RevealOnScroll>
+                        <SectionHeading
+                            label="Preview"
+                            title="See What You'll Build"
+                            subtitle="Here's a taste of what your code will look like after the first few lessons."
+                        />
+                    </RevealOnScroll>
 
                     <div className="max-w-2xl mx-auto">
                         <div className="code-block">
@@ -353,11 +369,13 @@ export default function CodingPageContent() {
             {/* Learning Roadmap */}
             <section className="section-padding" id="roadmap">
                 <div className="container-custom">
-                    <SectionHeading
-                        label="Roadmap"
-                        title="Your Coding Journey"
-                        subtitle="A proven 6-step path from complete beginner to confident developer."
-                    />
+                    <RevealOnScroll>
+                        <SectionHeading
+                            label="Roadmap"
+                            title="Your Coding Journey"
+                            subtitle="A proven 6-step path from complete beginner to confident developer."
+                        />
+                    </RevealOnScroll>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {ROADMAP.map((item, index) => (

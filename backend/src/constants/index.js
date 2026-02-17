@@ -45,6 +45,7 @@ const HTTP = Object.freeze({
     CONFLICT: 409,
     TOO_MANY_REQUESTS: 429,
     INTERNAL_ERROR: 500,
+    SERVICE_UNAVAILABLE: 503,
 });
 
 const RATE_LIMIT = Object.freeze({

@@ -17,6 +17,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import SectionHeading from '@/components/ui/SectionHeading';
+import RevealOnScroll from '@/components/ui/RevealOnScroll';
 import { FAQ_ITEMS } from '@/lib/constants';
 
 export default function FAQ() {
@@ -30,11 +31,13 @@ export default function FAQ() {
     return (
         <section className="section-padding relative" id="faq" aria-label="Frequently asked questions">
             <div className="container-custom">
-                <SectionHeading
-                    label="FAQ"
-                    title="Frequently Asked Questions"
-                    subtitle="Got questions? We've got answers. If you still need help, reach out through our contact page."
-                />
+                <RevealOnScroll>
+                    <SectionHeading
+                        label="FAQ"
+                        title="Frequently Asked Questions"
+                        subtitle="Got questions? We've got answers. If you still need help, reach out through our contact page."
+                    />
+                </RevealOnScroll>
 
                 <div className="max-w-3xl mx-auto space-y-3">
                     {FAQ_ITEMS.map((item, index) => (

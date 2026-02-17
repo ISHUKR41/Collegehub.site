@@ -499,3 +499,219 @@ body {
   pointer-events: none;
   z-index: 0;
 }
+
+
+/* ===================================================================
+   RESPONSIVE TYPOGRAPHY — Scales headings down on small screens
+   =================================================================== */
+@media (max-width: 480px) {
+  html {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 360px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+
+/* ===================================================================
+   SCROLL PADDING — Offset anchors below sticky navbar (~ 80px)
+   =================================================================== */
+html {
+  scroll-padding-top: 5rem;
+}
+
+
+/* ===================================================================
+   TOUCH OPTIMIZATION — Removes 300ms tap delay on mobile devices
+   =================================================================== */
+a, button, [role="button"], input, select, textarea {
+  touch-action: manipulation;
+}
+
+
+/* ===================================================================
+   REDUCED MOTION — Respects user accessibility preferences
+   Disables all custom animations and transitions for users who
+   have "Reduce motion" enabled in their OS settings.
+   =================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+
+/* ===================================================================
+   RESPONSIVE GLASS CARD PADDING — Tighter padding on small screens
+   =================================================================== */
+@media (max-width: 640px) {
+  .glass {
+    padding: 1rem;
+  }
+
+  .section-padding {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+}
+
+
+/* ===================================================================
+   MICRO-INTERACTIONS — Professional hover and active states
+   =================================================================== */
+.interactive {
+  transition: all var(--duration-normal) ease;
+  cursor: pointer;
+  user-select: none;
+}
+
+.interactive:hover {
+  transform: translateY(-2px);
+}
+
+.interactive:active {
+  transform: translateY(0);
+}
+
+.card-interactive {
+  transition: all var(--duration-normal) ease;
+  cursor: pointer;
+}
+
+.card-interactive:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-elevated);
+}
+
+.card-interactive:active {
+  transform: translateY(-2px);
+}
+
+.glow-on-hover {
+  position: relative;
+  overflow: hidden;
+}
+
+.glow-on-hover::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(99, 102, 241, 0.1) 0%, transparent 50%);
+  opacity: 0;
+  transition: opacity var(--duration-normal) ease;
+  pointer-events: none;
+}
+
+.glow-on-hover:hover::before {
+  opacity: 1;
+}
+
+
+/* ===================================================================
+   RESPONSIVE UTILITIES — Show/hide at different breakpoints
+   =================================================================== */
+.mobile-only {
+  display: block;
+}
+
+.tablet-only {
+  display: none;
+}
+
+.desktop-only {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .mobile-only {
+    display: none;
+  }
+
+  .tablet-only {
+    display: block;
+  }
+}
+
+@media (min-width: 1024px) {
+  .tablet-only {
+    display: none;
+  }
+
+  .desktop-only {
+    display: block;
+  }
+}
+
+
+/* ===================================================================
+   FOCUS INDICATORS — Enhanced accessibility
+   =================================================================== */
+.focus-ring {
+  transition: box-shadow var(--duration-fast) ease;
+}
+
+.focus-ring:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5);
+}
+
+
+/* ===================================================================
+   LOADING STATES — Pulse and shimmer effects
+   =================================================================== */
+@keyframes shimmer-wave {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+  animation: shimmer-wave 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+
+/* ===================================================================
+   SMOOTH SCROLLING FOR MOBILE
+   =================================================================== */
+@supports (-webkit-overflow-scrolling: touch) {
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+}

@@ -16,6 +16,7 @@
 import { BookOpen, Brain, Lock, BarChart3, RotateCcw, Shield } from 'lucide-react';
 import SectionHeading from '@/components/ui/SectionHeading';
 import GlassCard from '@/components/ui/GlassCard';
+import RevealOnScroll from '@/components/ui/RevealOnScroll';
 import { FEATURES } from '@/lib/constants';
 
 /* Map icon name strings to actual Lucide components */
@@ -35,11 +36,13 @@ export default function FeaturesGrid() {
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[#6366f1]/[0.03] blur-[150px]" />
 
             <div className="container-custom relative z-10">
-                <SectionHeading
-                    label="Why Choose Us"
-                    title="Built for Serious Learners"
-                    subtitle="Every feature is designed to help you learn faster, track progress better, and never lose momentum."
-                />
+                <RevealOnScroll>
+                    <SectionHeading
+                        label="Why Choose Us"
+                        title="Built for Serious Learners"
+                        subtitle="Every feature is designed to help you learn faster, track progress better, and never lose momentum."
+                    />
+                </RevealOnScroll>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {FEATURES.map((feature, index) => {

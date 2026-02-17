@@ -18,6 +18,7 @@
 import { motion } from 'framer-motion';
 import { Compass, PlayCircle, ClipboardCheck, TrendingUp } from 'lucide-react';
 import SectionHeading from '@/components/ui/SectionHeading';
+import RevealOnScroll from '@/components/ui/RevealOnScroll';
 
 const STEPS = [
     {
@@ -50,11 +51,13 @@ export default function LearningPath() {
     return (
         <section className="section-padding relative" id="learning-path" aria-label="Learning path">
             <div className="container-custom">
-                <SectionHeading
-                    label="How It Works"
-                    title="Your Learning Journey"
-                    subtitle="From enrollment to mastery — here's how CollegeHub guides you every step of the way."
-                />
+                <RevealOnScroll>
+                    <SectionHeading
+                        label="How It Works"
+                        title="Your Learning Journey"
+                        subtitle="From enrollment to mastery — here's how CollegeHub guides you every step of the way."
+                    />
+                </RevealOnScroll>
 
                 <div className="relative max-w-4xl mx-auto">
                     {/* Vertical timeline line (desktop only) */}

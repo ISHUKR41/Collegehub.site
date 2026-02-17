@@ -18,17 +18,20 @@
 import { motion } from 'framer-motion';
 import { Star } from 'lucide-react';
 import SectionHeading from '@/components/ui/SectionHeading';
+import RevealOnScroll from '@/components/ui/RevealOnScroll';
 import { TESTIMONIALS } from '@/lib/constants';
 
 export default function Testimonials() {
     return (
         <section className="section-padding relative" id="testimonials" aria-label="Student testimonials">
             <div className="container-custom">
-                <SectionHeading
-                    label="Testimonials"
-                    title="What Students Say"
-                    subtitle="Real feedback from real students who've transformed their learning with CollegeHub."
-                />
+                <RevealOnScroll>
+                    <SectionHeading
+                        label="Testimonials"
+                        title="What Students Say"
+                        subtitle="Real feedback from real students who've transformed their learning with CollegeHub."
+                    />
+                </RevealOnScroll>
 
                 {/* Testimonial cards grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

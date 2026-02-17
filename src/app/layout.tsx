@@ -12,6 +12,7 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import ScrollProgress from '@/components/layout/ScrollProgress';
 import AppProviders from '@/components/providers/AppProviders';
+import { OfflineIndicator } from '@/components/ui/offline-indicator';
 import { SITE_CONFIG } from '@/lib/constants';
 
 const inter = Inter({
@@ -104,6 +105,7 @@ export default function RootLayout({
       <body className="min-h-screen bg-[#0a0a12] text-[#f1f5f9] antialiased">
         <AppProviders>
           <ScrollProgress />
+          <OfflineIndicator />
           <Navbar />
           <main>{children}</main>
           <Footer />

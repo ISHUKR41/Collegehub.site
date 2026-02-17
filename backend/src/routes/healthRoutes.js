@@ -1,13 +1,10 @@
-/**
- * healthRoutes.js - Service health checks.
- */
-
 const express = require('express');
-const { health } = require('../controllers/healthController');
+const { health, ready, live } = require('../controllers/healthController');
 
 const router = express.Router();
 
 router.get('/', health);
+router.get('/ready', ready);
+router.get('/live', live);
 
 module.exports = router;
-

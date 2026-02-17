@@ -1,12 +1,17 @@
 /**
  * AboutPageContent.tsx — Client-side About page content
- * 
+ *
  * Sections:
  * 1. Hero banner
  * 2. Mission & Vision cards
  * 3. Company timeline
  * 4. Team members grid
  * 5. Achievements stats
+ *
+ * Why: Builds trust and credibility with visitors. Shows the team,
+ * mission, and journey behind CollegeHub.
+ *
+ * To extend: Add press mentions, blog links, or career openings.
  */
 
 'use client';
@@ -16,6 +21,7 @@ import { Target, Eye, Heart, Users, BookOpen, Award, Zap } from 'lucide-react';
 import SectionHeading from '@/components/ui/SectionHeading';
 import GlassCard from '@/components/ui/GlassCard';
 import AnimatedCounter from '@/components/ui/AnimatedCounter';
+import RevealOnScroll from '@/components/ui/RevealOnScroll';
 import { TEAM_MEMBERS } from '@/lib/constants';
 
 /* Timeline milestones */
@@ -100,11 +106,13 @@ export default function AboutPageContent() {
             {/* Timeline */}
             <section className="section-padding">
                 <div className="container-custom">
-                    <SectionHeading
-                        label="Journey"
-                        title="Our Timeline"
-                        subtitle="From an idea to a growing platform — here's how CollegeHub evolved."
-                    />
+                    <RevealOnScroll>
+                        <SectionHeading
+                            label="Journey"
+                            title="Our Timeline"
+                            subtitle="From an idea to a growing platform — here's how CollegeHub evolved."
+                        />
+                    </RevealOnScroll>
 
                     <div className="max-w-3xl mx-auto relative">
                         {/* Vertical line */}
@@ -143,11 +151,13 @@ export default function AboutPageContent() {
             {/* Team Section */}
             <section className="section-padding">
                 <div className="container-custom">
-                    <SectionHeading
-                        label="Team"
-                        title="Meet the People Behind CollegeHub"
-                        subtitle="A passionate team dedicated to transforming education."
-                    />
+                    <RevealOnScroll>
+                        <SectionHeading
+                            label="Team"
+                            title="Meet the People Behind CollegeHub"
+                            subtitle="A passionate team dedicated to transforming education."
+                        />
+                    </RevealOnScroll>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                         {TEAM_MEMBERS.map((member, index) => (

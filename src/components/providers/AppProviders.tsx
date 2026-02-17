@@ -12,6 +12,8 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactNode, useEffect } from 'react';
 import { bootstrapAccessToken } from '@/lib/api-client';
 import { queryClient } from '@/lib/query-client';
+import { ToastProvider } from '@/components/ui/toast';
+import { ErrorBoundary } from '@/components/providers/ErrorBoundary';
 
 interface AppProvidersProps {
   children: ReactNode;
@@ -19,12 +21,16 @@ interface AppProvidersProps {
 
 export default function AppProviders({ children }: AppProvidersProps) {
   useEffect(() => {
-    /*
-     * Attempt silent session recovery from secure refresh cookie.
-     * Failure is expected for logged-out visitors and should stay silent.
-     */
     void bootstrapAccessToken();
   }, []);
 
-  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+  return (
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <ToastProvider>
+          {children}
+        </ToastProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
+  );
 }

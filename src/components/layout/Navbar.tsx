@@ -12,6 +12,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
 import { ArrowRight, GraduationCap, LogOut, Menu, X } from 'lucide-react';
 import { NAV_LINKS } from '@/lib/constants';
 import { AUTH_STATE_EVENT, getAccessToken } from '@/lib/api-client';
@@ -99,13 +100,21 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                     isActive
-                      ? 'text-white bg-white/10'
+                      ? 'text-white'
                       : 'text-[#94a3b8] hover:text-white hover:bg-white/5'
                   }`}
                 >
                   {link.label}
+                  {/* Animated active underline — slides between links using layoutId */}
+                  {isActive && (
+                    <motion.div
+                      layoutId="navbar-active-indicator"
+                      className="absolute bottom-0 left-2 right-2 h-0.5 rounded-full bg-gradient-to-r from-[#6366f1] to-[#8b5cf6]"
+                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                    />
+                  )}
                 </Link>
               );
             })}

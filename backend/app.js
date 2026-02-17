@@ -19,6 +19,9 @@ const apiRoutes = require('./src/routes');
 const { apiRateLimiter } = require('./src/middleware/rateLimiters');
 const { notFound } = require('./src/middleware/notFoundMiddleware');
 const { errorHandler } = require('./src/middleware/errorMiddleware');
+const { requestIdMiddleware } = require('./src/middleware/requestIdMiddleware');
+const { performanceMiddleware } = require('./src/middleware/performanceMiddleware');
+const { sanitizeInput } = require('./src/middleware/sanitizeMiddleware');
 
 const app = express();
 
@@ -60,6 +63,10 @@ app.use(cookieParser());
 app.use(mongoSanitize());
 app.use(xss());
 app.use(compression());
+
+app.use(requestIdMiddleware);
+app.use(performanceMiddleware);
+app.use(sanitizeInput);
 
 if (process.env.NODE_ENV !== 'production') {
     app.use(

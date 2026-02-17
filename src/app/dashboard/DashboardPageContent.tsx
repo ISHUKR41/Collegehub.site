@@ -160,7 +160,7 @@ export default function DashboardPageContent() {
                       </p>
                     </div>
                     <Link
-                      href={`/courses/${data.resume.courseId}`}
+                      href={`/courses/${data.resume.courseId}/learn`}
                       className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] text-white text-sm font-semibold hover:shadow-[0_0_24px_rgba(99,102,241,0.3)] transition-all"
                     >
                       Resume Learning

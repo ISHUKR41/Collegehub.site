@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import SectionHeading from '@/components/ui/SectionHeading';
 import GlassCard from '@/components/ui/GlassCard';
+import RevealOnScroll from '@/components/ui/RevealOnScroll';
 import { contactFormSchema, ContactFormValues } from '@/utils/form-schemas';
 import { useSubmitContactMutation } from '@/hooks/use-contact-mutations';
 
@@ -254,11 +255,13 @@ export default function ContactPageContent() {
 
       <section className="section-padding pt-0">
         <div className="container-custom">
-          <SectionHeading
-            label="Office Map"
-            title="Service Coverage"
-            subtitle="CollegeHub operates remotely and supports learners across India."
-          />
+          <RevealOnScroll>
+            <SectionHeading
+              label="Office Map"
+              title="Service Coverage"
+              subtitle="CollegeHub operates remotely and supports learners across India."
+            />
+          </RevealOnScroll>
 
           <GlassCard className="!p-0 overflow-hidden" hover={false}>
             <div className="relative h-72 md:h-80 bg-gradient-to-br from-[#0f172a] via-[#111827] to-[#0b1120]">
@@ -278,11 +281,13 @@ export default function ContactPageContent() {
 
       <section className="section-padding pt-0">
         <div className="container-custom">
-          <SectionHeading
-            label="Help"
-            title="Common Questions"
-            subtitle="Quick answers about support and communication."
-          />
+          <RevealOnScroll>
+            <SectionHeading
+              label="Help"
+              title="Common Questions"
+              subtitle="Quick answers about support and communication."
+            />
+          </RevealOnScroll>
 
           <div className="max-w-3xl mx-auto space-y-3">
             {CONTACT_FAQ.map((item, index) => (

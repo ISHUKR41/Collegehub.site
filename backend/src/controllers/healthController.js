@@ -1,43 +1,30 @@
-/**
- * healthController.js - Health and readiness endpoints.
- *
- * These endpoints are used by Render load balancer and monitoring systems.
- */
-
-const asyncHandler = require('../utils/asyncHandler');
 const ApiResponse = require('../utils/ApiResponse');
-const { HTTP } = require('../constants');
-const mongoose = require('mongoose');
-const { getRedis } = require('../config/redis');
+const { getSystemHealth } = require('../utils/healthCheck');
 
-const resolveMongoState = () => {
-    const stateMap = {
-        0: 'disconnected',
-        1: 'connected',
-        2: 'connecting',
-        3: 'disconnecting',
-    };
-    return stateMap[mongoose.connection.readyState] || 'unknown';
-};
-
-const resolveRedisState = () => {
-    const redis = getRedis();
-    if (!redis) return 'disabled';
-    return redis.status || 'unknown';
-};
-
-const health = asyncHandler(async (req, res) => {
-    return ApiResponse.success(res, HTTP.OK, 'Service is healthy.', {
-        uptimeSeconds: process.uptime(),
-        environment: process.env.NODE_ENV || 'development',
-        timestamp: new Date().toISOString(),
-        infrastructure: {
-            mongodb: resolveMongoState(),
-            redis: resolveRedisState(),
-        },
+const health = async (req, res) => {
+    const healthData = await getSystemHealth();
+    const statusCode = healthData.status === 'healthy' ? 200 : 503;
+    
+    return res.status(statusCode).json({
+        success: healthData.status === 'healthy',
+        data: healthData,
     });
-});
-
-module.exports = {
-    health,
 };
+
+const ready = (req, res) => {
+    return ApiResponse.success(res, {
+        status: 'ready',
+        message: 'Backend is ready to accept requests.',
+        timestamp: new Date().toISOString(),
+    });
+};
+
+const live = (req, res) => {
+    return ApiResponse.success(res, {
+        status: 'alive',
+        uptime: `${Math.floor(process.uptime())}s`,
+        timestamp: new Date().toISOString(),
+    });
+};
+
+module.exports = { health, ready, live };

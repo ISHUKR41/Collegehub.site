@@ -937,12 +937,19 @@ export default function CourseDetailContent({ courseId }: CourseDetailContentPro
                         Locked until lesson:{' '}
                         <span className="text-white">{lockedUntilLesson + 1}</span>
                       </p>
-                      <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
+                      <div className="h-1.5 rounded-full bg-white/10 overflow-hidden mb-3">
                         <div
                           className="h-full bg-gradient-to-r from-[#6366f1] to-[#8b5cf6]"
                           style={{ width: `${Math.min(100, Math.max(0, progress?.overallProgress || 0))}%` }}
                         />
                       </div>
+                      <Link
+                        href={`/courses/${course.id}/learn`}
+                        className="w-full py-2.5 rounded-xl bg-gradient-to-r from-[#22c55e] to-[#14b8a6] text-white text-sm font-semibold hover:shadow-[0_0_20px_rgba(34,197,94,0.3)] transition-all flex items-center justify-center gap-2"
+                      >
+                        <PlayCircle className="w-4 h-4" />
+                        Continue Learning
+                      </Link>
                     </div>
                   )}
 

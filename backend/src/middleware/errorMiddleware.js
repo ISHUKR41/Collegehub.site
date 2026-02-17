@@ -61,14 +61,19 @@ const errorHandler = (err, req, res, next) => {
         statusCode = HTTP.FORBIDDEN;
     }
 
-    logger.error(`${statusCode} ${req.method} ${req.originalUrl} - ${message}`);
-    if (process.env.NODE_ENV !== 'production' && err.stack) {
-        logger.debug(err.stack);
-    }
+    logger.error({
+        message,
+        statusCode,
+        requestId: req.requestId,
+        method: req.method,
+        path: req.originalUrl,
+        stack: process.env.NODE_ENV !== 'production' ? err.stack : undefined,
+    });
 
     const payload = {
         success: false,
         message,
+        requestId: req.requestId,
     };
 
     if (errors) payload.errors = errors;

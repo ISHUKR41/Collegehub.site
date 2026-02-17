@@ -1,16 +1,20 @@
 /**
  * SchoolPageContent.tsx — Client-side school section content
- * 
+ *
  * Separated from page.tsx so we can use 'use client' for interactivity
  * while keeping the metadata export in a server component.
- * 
+ *
  * Sections:
  * 1. Hero banner
  * 2. Class tabs (9 & 10)
  * 3. Subject cards grid
- * 4. Exam pattern info
- * 5. Study roadmap timeline
+ * 4. Live course catalog (API-driven)
+ * 5. Exam pattern info
  * 6. Study tips
+ * 7. CTA
+ *
+ * To extend: Add more class options, extra study-material sections,
+ * or past-paper download links in new sections below the CTA.
  */
 
 'use client';
@@ -26,6 +30,7 @@ import {
 } from 'lucide-react';
 import SectionHeading from '@/components/ui/SectionHeading';
 import GlassCard from '@/components/ui/GlassCard';
+import RevealOnScroll from '@/components/ui/RevealOnScroll';
 import { SCHOOL_SUBJECTS } from '@/lib/constants';
 import { fetchPublicCourses } from '@/services/course-service';
 
@@ -98,11 +103,13 @@ export default function SchoolPageContent() {
             {/* Class Tabs + Subjects */}
             <section className="section-padding" id="subjects">
                 <div className="container-custom">
-                    <SectionHeading
-                        label="Subjects"
-                        title="Choose Your Class"
-                        subtitle="Select your class to see all available subjects with their chapter breakdowns."
-                    />
+                    <RevealOnScroll>
+                        <SectionHeading
+                            label="Subjects"
+                            title="Choose Your Class"
+                            subtitle="Select your class to see all available subjects with their chapter breakdowns."
+                        />
+                    </RevealOnScroll>
 
                     {/* Class tabs */}
                     <div className="flex items-center justify-center gap-4 mb-10">
@@ -165,11 +172,13 @@ export default function SchoolPageContent() {
                     </div>
 
                     <div className="mt-12">
-                        <SectionHeading
-                            label="Live Courses"
-                            title={`Published ${activeClass === 'class9' ? 'Class 9' : 'Class 10'} Course Catalog`}
-                            subtitle="These cards are fetched from the backend API and map directly to real course detail pages."
-                        />
+                        <RevealOnScroll>
+                            <SectionHeading
+                                label="Live Courses"
+                                title={`Published ${activeClass === 'class9' ? 'Class 9' : 'Class 10'} Course Catalog`}
+                                subtitle="These cards are fetched from the backend API and map directly to real course detail pages."
+                            />
+                        </RevealOnScroll>
 
                         {isCoursesLoading && (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -227,11 +236,13 @@ export default function SchoolPageContent() {
             {/* Exam Pattern Section */}
             <section className="section-padding" id="exam-pattern">
                 <div className="container-custom">
-                    <SectionHeading
-                        label="Exam Pattern"
-                        title="CBSE Board Exam Format"
-                        subtitle="Understand the marking scheme and question types to prepare strategically."
-                    />
+                    <RevealOnScroll>
+                        <SectionHeading
+                            label="Exam Pattern"
+                            title="CBSE Board Exam Format"
+                            subtitle="Understand the marking scheme and question types to prepare strategically."
+                        />
+                    </RevealOnScroll>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                         {EXAM_PATTERN.map((item, index) => {
@@ -252,11 +263,13 @@ export default function SchoolPageContent() {
             {/* Study Tips Section */}
             <section className="section-padding" id="tips">
                 <div className="container-custom">
-                    <SectionHeading
-                        label="Study Tips"
-                        title="Study Smarter, Not Harder"
-                        subtitle="Science-backed techniques to maximize your learning efficiency."
-                    />
+                    <RevealOnScroll>
+                        <SectionHeading
+                            label="Study Tips"
+                            title="Study Smarter, Not Harder"
+                            subtitle="Science-backed techniques to maximize your learning efficiency."
+                        />
+                    </RevealOnScroll>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {STUDY_TIPS.map((tip, index) => {
