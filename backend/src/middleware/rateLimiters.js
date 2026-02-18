@@ -35,6 +35,11 @@ const loginRateLimiter = buildLimiter({
     message: 'Too many login attempts. Please wait before retrying.',
 });
 
+const codeExecutionRateLimiter = buildLimiter({
+    ...RATE_LIMIT.CODE_EXECUTION,
+    message: 'Code execution rate limit reached. Please wait a moment and retry.',
+});
+
 const contactRateLimiter = buildLimiter({
     ...RATE_LIMIT.CONTACT,
     message: 'Too many contact requests. Please try again later.',
@@ -49,6 +54,7 @@ module.exports = {
     apiRateLimiter,
     authRateLimiter,
     loginRateLimiter,
+    codeExecutionRateLimiter,
     contactRateLimiter,
     newsletterRateLimiter,
 };

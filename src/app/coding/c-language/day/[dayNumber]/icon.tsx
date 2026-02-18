@@ -13,25 +13,25 @@ export default function Icon() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'linear-gradient(145deg, #0f172a 0%, #312e81 55%, #6366f1 100%)',
+          background: 'linear-gradient(145deg, #0f172a 0%, #14532d 55%, #22c55e 100%)',
           borderRadius: '8px',
           boxSizing: 'border-box',
-          border: '1px solid rgba(255,255,255,0.24)',
+          border: '1px solid rgba(255,255,255,0.22)',
         }}
       >
         <span
           style={{
-            fontSize: '13px',
+            fontSize: '14px',
             fontWeight: 900,
-            color: '#e2e8f0',
-            letterSpacing: '-0.2px',
+            color: '#dcfce7',
             fontFamily: 'ui-monospace',
           }}
         >
-          {'</>'}
+          D
         </span>
       </div>
     ),
     { ...size }
   );
 }
+

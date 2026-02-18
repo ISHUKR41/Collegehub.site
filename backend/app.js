@@ -30,10 +30,19 @@ const app = express();
 app.disable('x-powered-by');
 app.set('trust proxy', 1);
 
-const allowedOrigins = (process.env.CORS_ORIGIN || '')
+const normalizeOrigin = (origin) => String(origin || '').trim().replace(/\/$/, '');
+const configuredOrigins = (process.env.CORS_ORIGIN || '')
     .split(',')
-    .map((origin) => origin.trim())
+    .map((origin) => normalizeOrigin(origin))
     .filter(Boolean);
+const frontendOrigin = normalizeOrigin(process.env.FRONTEND_URL);
+const allowAllOrigins = String(process.env.CORS_ALLOW_ALL || '').toLowerCase() === 'true';
+
+if (frontendOrigin) {
+    configuredOrigins.push(frontendOrigin);
+}
+
+const allowedOrigins = new Set(configuredOrigins);
 
 app.use(
     helmet({
@@ -48,9 +57,22 @@ app.use(
              * Allow requests with no Origin (CLI/mobile apps/Postman) and
              * explicitly allow configured frontend origins.
              */
-            if (!origin || allowedOrigins.includes(origin)) {
+            if (!origin) {
                 return callback(null, true);
             }
+
+            if (allowAllOrigins) {
+                return callback(null, true);
+            }
+
+            if (process.env.NODE_ENV !== 'production' && allowedOrigins.size === 0) {
+                return callback(null, true);
+            }
+
+            if (allowedOrigins.has(normalizeOrigin(origin))) {
+                return callback(null, true);
+            }
+
             return callback(new Error('CORS policy violation: origin not allowed.'));
         },
         credentials: true,
@@ -90,4 +112,3 @@ app.use(notFound);
 app.use(errorHandler);
 
 module.exports = app;
-

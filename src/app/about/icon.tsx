@@ -13,22 +13,14 @@ export default function Icon() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'linear-gradient(145deg, #0f172a 0%, #312e81 55%, #6366f1 100%)',
+          background: 'linear-gradient(145deg, #111827 0%, #2563eb 45%, #22d3ee 100%)',
           borderRadius: '8px',
+          border: '1px solid rgba(255,255,255,0.22)',
           boxSizing: 'border-box',
-          border: '1px solid rgba(255,255,255,0.24)',
         }}
       >
-        <span
-          style={{
-            fontSize: '13px',
-            fontWeight: 900,
-            color: '#e2e8f0',
-            letterSpacing: '-0.2px',
-            fontFamily: 'ui-monospace',
-          }}
-        >
-          {'</>'}
+        <span style={{ fontSize: '14px', fontWeight: 900, color: '#e0f2fe', fontFamily: 'ui-sans-serif' }}>
+          A
         </span>
       </div>
     ),

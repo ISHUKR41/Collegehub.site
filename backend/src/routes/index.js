@@ -13,6 +13,7 @@ const testRoutes = require('./testRoutes');
 const dashboardRoutes = require('./dashboardRoutes');
 const healthRoutes = require('./healthRoutes');
 const contactRoutes = require('./contactRoutes');
+const codeRoutes = require('./codeRoutes');
 const { authRateLimiter } = require('../middleware/rateLimiters');
 
 const router = express.Router();
@@ -24,5 +25,6 @@ router.use('/enrollments', enrollmentRoutes);
 router.use('/tests', testRoutes);
 router.use('/dashboard', dashboardRoutes);
 router.use('/contact', contactRoutes);
+router.use('/code', codeRoutes);
 
 module.exports = router;

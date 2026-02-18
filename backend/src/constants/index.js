@@ -52,6 +52,7 @@ const RATE_LIMIT = Object.freeze({
     GENERAL: { windowMs: 15 * 60 * 1000, max: 100 },
     AUTH: { windowMs: 15 * 60 * 1000, max: 20 },
     LOGIN: { windowMs: 15 * 60 * 1000, max: 5 },
+    CODE_EXECUTION: { windowMs: 60 * 1000, max: 30 },
     CONTACT: { windowMs: 15 * 60 * 1000, max: 8 },
     NEWSLETTER: { windowMs: 60 * 60 * 1000, max: 20 },
 });

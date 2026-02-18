@@ -13,9 +13,29 @@ import axios, {
   InternalAxiosRequestConfig,
 } from 'axios';
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const resolveApiBaseUrl = () => {
+  const serverConfigured = (
+    process.env.BACKEND_PUBLIC_URL ||
+    process.env.NEXT_PUBLIC_API_URL ||
+    ''
+  ).trim();
+
+  /*
+   * Browser should always hit same-origin /api.
+   * next.config rewrites /api/* to backend, so frontend never needs
+   * environment-specific absolute API URLs.
+   */
+  if (typeof window !== 'undefined') {
+    return '/api';
+  }
+
+  return serverConfigured || 'http://localhost:5000/api';
+};
+
+const API_BASE_URL = resolveApiBaseUrl().replace(/\/$/, '');
 export const AUTH_STATE_EVENT = 'collegehub:auth-state-changed';
+
+export const getPublicApiBaseUrl = () => API_BASE_URL;
 
 let accessTokenMemory: string | null = null;
 let isRefreshing = false;
