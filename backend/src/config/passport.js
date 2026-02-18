@@ -13,6 +13,22 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const { findOrCreateGoogleUser } = require('../services/googleAuthService');
 const logger = require('./logger');
 
+const hasPlaceholderValue = (value = '') => {
+    const normalized = String(value).trim().toLowerCase();
+    return (
+        !normalized ||
+        normalized.includes('<your_') ||
+        normalized.includes('your-google-client-id') ||
+        normalized.includes('your-google-client-secret')
+    );
+};
+
+const isGoogleOAuthConfigured = () => {
+    const clientID = process.env.GOOGLE_CLIENT_ID;
+    const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+    return !hasPlaceholderValue(clientID) && !hasPlaceholderValue(clientSecret);
+};
+
 /**
  * Initialize Passport with Google Strategy.
  *
@@ -26,7 +42,7 @@ const initializePassport = () => {
         process.env.GOOGLE_CALLBACK_URL ||
         'http://localhost:5000/api/auth/google/callback';
 
-    if (!clientID || !clientSecret) {
+    if (!isGoogleOAuthConfigured()) {
         logger.warn(
             'Google OAuth credentials not configured. Google login will be unavailable. ' +
             'Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in .env to enable.'
@@ -57,4 +73,7 @@ const initializePassport = () => {
     logger.info('Google OAuth strategy initialized successfully.');
 };
 
-module.exports = { initializePassport };
+module.exports = {
+    initializePassport,
+    isGoogleOAuthConfigured,
+};

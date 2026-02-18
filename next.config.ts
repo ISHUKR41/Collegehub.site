@@ -33,6 +33,15 @@ const securityHeaders = [
   },
 ];
 
+const normalizeExternalApiUrl = (value: string | undefined) => {
+  const normalized = (value || '').trim().replace(/\/$/, '');
+  return /^https?:\/\//i.test(normalized) ? normalized : '';
+};
+
+const externalApiBaseUrl = normalizeExternalApiUrl(
+  process.env.BACKEND_PUBLIC_URL || process.env.NEXT_PUBLIC_API_URL
+);
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
@@ -45,6 +54,18 @@ const nextConfig: NextConfig = {
       {
         source: '/(.*)',
         headers: securityHeaders,
+      },
+    ];
+  },
+  async rewrites() {
+    if (!externalApiBaseUrl) {
+      return [];
+    }
+
+    return [
+      {
+        source: '/api/:path*',
+        destination: `${externalApiBaseUrl}/:path*`,
       },
     ];
   },

@@ -14,7 +14,7 @@ import { useRouter } from 'next/navigation';
 import { useMutation } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import {
   ArrowRight,
@@ -63,7 +63,7 @@ export default function RegisterPageContent() {
   const {
     register,
     handleSubmit,
-    watch,
+    control,
     formState: { errors, isValid },
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerFormSchema),
@@ -71,7 +71,7 @@ export default function RegisterPageContent() {
     defaultValues: { name: '', email: '', password: '', confirmPassword: '' },
   });
 
-  const passwordValue = watch('password') || '';
+  const passwordValue = useWatch({ control, name: 'password' }) || '';
   const strength = getPasswordStrength(passwordValue);
 
   const registerMutation = useMutation({
