@@ -6,6 +6,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { C_MASTERY_PHASES } from '@/lib/c-mastery-data';
 import DayPageContent from './DayPageContent';
+import Day1Content from './Day1Content';
 
 function findDay(dayNumber: number) {
   for (const phase of C_MASTERY_PHASES) {
@@ -61,6 +62,10 @@ export default async function DayPage({
   }
 
   const totalDays = C_MASTERY_PHASES.reduce((sum, phase) => sum + phase.days.length, 0);
+
+  if (numericDay === 1) {
+    return <Day1Content />;
+  }
 
   return <DayPageContent day={result.day} phase={result.phase} totalDays={totalDays} />;
 }
