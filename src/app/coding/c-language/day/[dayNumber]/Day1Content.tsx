@@ -1,7 +1,16 @@
 'use client';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { ChevronRight, ChevronLeft, ArrowLeft, Cpu, HardDrive, MemoryStick, Monitor, Brain, Cog, Play, Target, Server, Code2, BookOpen, Lightbulb, AlertTriangle, Shield } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  ChevronRight, ChevronLeft, ArrowLeft, Cpu, HardDrive, MemoryStick, Monitor,
+  Brain, Cog, Play, Target, Server, Code2, BookOpen, Lightbulb, AlertTriangle,
+  Shield, Layers, Clock, HelpCircle, FlaskConical, Calculator, Zap, Crosshair,
+  Bot, Hash, Globe2, Binary, FileCode, FolderOpen, FileText, Rocket, ScrollText,
+  TriangleAlert, XCircle, CheckCircle2, Search, MapPin, Package, Smartphone,
+  CreditCard, Pen, PlugZap, Terminal, Braces, Menu, X, Home, GraduationCap,
+  ChevronDown,
+} from 'lucide-react';
 import RevealOnScroll from '@/components/ui/RevealOnScroll';
 import {
   PHASE_COLOR, FloatingParticles, BinaryStream, SectionBadge, InfoCard, Collapsible, KeyPoint,
@@ -16,78 +25,367 @@ import {
   IPOSRealWorldSimulator, BinaryMathAnimator, MemoryAllocationSim,
   EscapeSequencePlayground, LogicalSequencingDrill,
 } from './day1-components';
+import { QuizSection } from './day1-quiz-components';
+import { DAY1_QUIZ_DATA } from './day1-quiz-data';
+import {
+  StackHeapVisualizer, BitManipulationPlayground, ASCIITableExplorer,
+  CPUPipelineSimulator, CompilerOutputSimulator, NumberSystemConverter,
+  FunFactCard, WhereCRunsToday, MemoryLeakDemo,
+} from './day1-advanced-components';
 
 /* ─── PARTS NAV ─── */
 const PARTS = ['What Is a Machine?','Computer Anatomy','How Computer Understands','What Is Programming?','Why C Language?','Memory Architecture','Variables','C Program Structure','Compilation Process','First Safe Code'];
 
 export default function Day1Content() {
+  /* ── Scroll Progress ── */
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState(0);
+
+  const handleScroll = useCallback(() => {
+    const docEl = document.documentElement;
+    const scrollTop = window.scrollY || docEl.scrollTop;
+    const totalHeight = docEl.scrollHeight - docEl.clientHeight;
+    if (totalHeight > 0) {
+      const progress = Math.min(Math.round((scrollTop / totalHeight) * 100), 100);
+      setScrollProgress(progress);
+    }
+    // detect active section
+    let found = false;
+    for (let i = PARTS.length - 1; i >= 0; i--) {
+      const el = document.getElementById(`part-${i + 1}`);
+      if (el) {
+        const rect = el.getBoundingClientRect();
+        if (rect.top <= 150) { setActiveSection(i); found = true; break; }
+      }
+    }
+    if (!found) setActiveSection(0);
+  }, []);
+
+  useEffect(() => {
+    let rafId: number;
+    const onScroll = () => {
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(handleScroll);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    // Run after layout settles
+    const t = setTimeout(handleScroll, 100);
+    handleScroll();
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      cancelAnimationFrame(rafId);
+      clearTimeout(t);
+    };
+  }, [handleScroll]);
+
+
   return (
-    <div className="min-h-screen bg-[#0a0a12]">
+    <div className="min-h-screen bg-[#0a0a12]" style={{ fontFamily: 'var(--font-jetbrains), "JetBrains Mono", "Fira Code", "Source Code Pro", monospace' }}>
       <FloatingParticles />
 
       <div className="relative z-10">
-        {/* ─── Top Bar ─── */}
-        <div className="border-b border-white/[0.06] sticky top-0 z-50 bg-[#0a0a12]/80 backdrop-blur-xl">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3 text-sm">
-                <Link href="/coding/c-language" className="flex items-center gap-1.5 text-[#64748b] hover:text-white transition-colors">
-                  <ArrowLeft className="w-4 h-4" /><span className="hidden sm:inline">C Mastery Blueprint</span><span className="sm:hidden">Back</span>
+        {/* ═══ ULTRA-PREMIUM NAVBAR ═══ */}
+        <nav className="sticky top-0 z-50" role="navigation" aria-label="Day 1 Navigation" style={{
+          background: 'linear-gradient(180deg, rgba(2,2,8,0.98) 0%, rgba(5,5,12,0.96) 100%)',
+          backdropFilter: 'blur(48px) saturate(250%)',
+          WebkitBackdropFilter: 'blur(48px) saturate(250%)',
+        }}>
+          <div className="max-w-7xl mx-auto px-3 sm:px-5 lg:px-8">
+            <div className="flex items-center justify-between h-[56px] sm:h-[64px]">
+
+              {/* ── Left: Premium Breadcrumb Path ── */}
+              <div className="flex items-center gap-0 min-w-0">
+                {/* Back Arrow */}
+                <Link href="/coding/c-language" className="group flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl hover:bg-white/[0.06] border border-transparent hover:border-white/[0.06] transition-all duration-300 mr-2 sm:mr-3" aria-label="Back to C Mastery Blueprint">
+                  <motion.div whileHover={{ x: -3 }} transition={{ type: 'spring', stiffness: 400 }}>
+                    <ArrowLeft className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-[#3e4a5c] group-hover:text-[#22c55e] transition-colors duration-300" />
+                  </motion.div>
                 </Link>
-                <span className="text-[#334155]">/</span>
-                <span className="text-xs font-medium px-2 py-0.5 rounded-md" style={{ backgroundColor: `${PHASE_COLOR}15`, color: PHASE_COLOR }}>Brain Reset</span>
-                <span className="text-[#334155]">/</span>
-                <span className="text-[#94a3b8] font-medium">Day 1</span>
-              </div>
-              <div className="hidden sm:flex items-center gap-3">
-                <span className="text-xs text-[#475569]">3% complete</span>
-                <div className="w-24 h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
-                  <motion.div className="h-full rounded-full" style={{ backgroundColor: PHASE_COLOR }}
-                    initial={{ width: 0 }} animate={{ width: '3%' }} transition={{ duration: 0.8 }} />
+
+                {/* Breadcrumb Segments */}
+                <div className="flex items-center gap-1 sm:gap-1.5">
+                  <Link href="/coding/c-language" className="group hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-white/[0.05] transition-all duration-300">
+                    <div className="w-6 h-6 rounded-lg flex items-center justify-center bg-white/[0.03] group-hover:bg-[#22c55e]/[0.08] transition-all duration-300">
+                      <Code2 className="w-3 h-3 text-[#4a5568] group-hover:text-[#22c55e] transition-colors duration-300" />
+                    </div>
+                    <span className="text-[11px] font-bold tracking-[0.1em] uppercase text-[#536378] group-hover:text-[#94a3b8] transition-colors duration-300" style={{ fontFamily: 'inherit' }}>C_Mastery</span>
+                  </Link>
+
+                  <span className="text-[#1e293b] select-none text-sm font-thin hidden sm:inline">/</span>
+
+                  <motion.div
+                    whileHover={{ scale: 1.04, y: -1 }}
+                    transition={{ type: 'spring', stiffness: 400 }}
+                    className="flex items-center gap-2 px-3 py-2 rounded-xl cursor-default"
+                    style={{
+                      background: `linear-gradient(135deg, ${PHASE_COLOR}0c, ${PHASE_COLOR}04)`,
+                      border: `1px solid ${PHASE_COLOR}15`,
+                      boxShadow: `0 0 20px ${PHASE_COLOR}06`,
+                    }}
+                  >
+                    <Brain className="w-3.5 h-3.5 sm:w-4 sm:h-4" style={{ color: PHASE_COLOR }} />
+                    <span className="text-[10px] sm:text-[11px] font-bold tracking-[0.12em] uppercase" style={{ color: PHASE_COLOR, fontFamily: 'inherit' }}>Brain_Reset</span>
+                  </motion.div>
+
+                  <span className="text-[#1e293b] select-none text-sm font-thin">/</span>
+
+                  <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[0.06] border border-white/[0.08]" style={{ boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)' }}>
+                    <Terminal className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white/90" />
+                    <span className="text-[10px] sm:text-[11px] font-bold tracking-[0.12em] uppercase text-white/90" style={{ fontFamily: 'inherit' }}>Day_01</span>
+                  </div>
                 </div>
+              </div>
+
+              {/* ── Right: Navigation + Progress ── */}
+              <div className="flex items-center gap-2 sm:gap-3">
+                {/* Desktop Nav Links */}
+                <div className="hidden lg:flex items-center gap-1">
+                  <Link href="/" className="group flex items-center gap-2 px-3.5 py-2 rounded-xl text-[#4a5568] hover:text-[#e2e8f0] hover:bg-white/[0.05] transition-all duration-300">
+                    <Home className="w-4 h-4 group-hover:text-[#22c55e] transition-colors duration-300" />
+                    <span className="text-[11px] font-bold tracking-[0.08em] uppercase" style={{ fontFamily: 'inherit' }}>Home</span>
+                  </Link>
+                  <Link href="/coding" className="group flex items-center gap-2 px-3.5 py-2 rounded-xl text-[#4a5568] hover:text-[#e2e8f0] hover:bg-white/[0.05] transition-all duration-300">
+                    <GraduationCap className="w-4 h-4 group-hover:text-[#3b82f6] transition-colors duration-300" />
+                    <span className="text-[11px] font-bold tracking-[0.08em] uppercase" style={{ fontFamily: 'inherit' }}>School</span>
+                  </Link>
+                </div>
+
+                {/* Divider */}
+                <div className="hidden lg:block w-px h-8 bg-gradient-to-b from-transparent via-white/[0.08] to-transparent" />
+
+                {/* Parts Dropdown (Desktop) */}
+                <div className="hidden md:block relative group">
+                  <button className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-[#5a6577] hover:text-[#e2e8f0] hover:bg-white/[0.05] transition-all duration-300">
+                    <Layers className="w-4 h-4" />
+                    <span className="text-[11px] font-bold tracking-[0.08em] uppercase" style={{ fontFamily: 'inherit' }}>Part_{String(activeSection + 1).padStart(2, '0')}</span>
+                    <ChevronDown className="w-3 h-3 opacity-50 group-hover:opacity-80 transition-opacity" />
+                  </button>
+                  <div className="absolute right-0 top-full mt-2 w-72 rounded-2xl overflow-hidden opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-250 z-50"
+                    style={{
+                      background: 'linear-gradient(180deg, rgba(8,8,18,0.99), rgba(5,5,12,0.99))',
+                      border: '1px solid rgba(255,255,255,0.08)',
+                      boxShadow: '0 24px 80px rgba(0,0,0,0.7), 0 0 1px rgba(255,255,255,0.1)',
+                      backdropFilter: 'blur(40px)',
+                    }}>
+                    <div className="p-2 max-h-[55vh] overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: `${PHASE_COLOR}30 transparent` }}>
+                      <p className="px-3 py-2 text-[9px] font-bold tracking-[0.2em] uppercase text-[#3e4a5c]" style={{ fontFamily: 'inherit' }}>Jump_to_Section</p>
+                      {PARTS.map((p, i) => (
+                        <a key={i} href={`#part-${i + 1}`}
+                          className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-[12px] transition-all duration-200 ${activeSection === i ? 'bg-white/[0.07] text-white' : 'text-[#6b7588] hover:text-[#e2e8f0] hover:bg-white/[0.04]'}`}
+                          style={{ fontFamily: 'inherit' }}>
+                          <span className={`w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black flex-shrink-0 transition-all ${activeSection === i ? 'text-black' : 'text-[#5a6577]'}`}
+                            style={activeSection === i ? { background: PHASE_COLOR, boxShadow: `0 0 12px ${PHASE_COLOR}60` } : { background: 'rgba(255,255,255,0.05)' }}>
+                            {String(i + 1).padStart(2, '0')}
+                          </span>
+                          <span className="font-semibold truncate">{p}</span>
+                          {activeSection === i && <span className="ml-auto w-2 h-2 rounded-full animate-pulse" style={{ background: PHASE_COLOR, boxShadow: `0 0 8px ${PHASE_COLOR}80` }} />}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Divider */}
+                <div className="hidden md:block w-px h-8 bg-gradient-to-b from-transparent via-white/[0.08] to-transparent" />
+
+                {/* Progress Ring — Enhanced */}
+                <motion.div
+                  className="flex items-center gap-2.5 px-2 py-1 rounded-xl cursor-default"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                  title={`${scrollProgress}% completed`}
+                  style={{
+                    background: scrollProgress > 0 ? `linear-gradient(135deg, ${PHASE_COLOR}06, transparent)` : 'transparent',
+                    border: scrollProgress > 5 ? `1px solid ${PHASE_COLOR}10` : '1px solid transparent',
+                  }}
+                >
+                  <div className="relative w-11 h-11 sm:w-12 sm:h-12 flex-shrink-0">
+                    <svg className="w-full h-full -rotate-90" viewBox="0 0 44 44">
+                      <circle cx="22" cy="22" r="19" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="2.5" />
+                      <circle cx="22" cy="22" r="19" fill="none"
+                        stroke="url(#navProgressGrad)"
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                        strokeDasharray={2 * Math.PI * 19}
+                        strokeDashoffset={2 * Math.PI * 19 - (2 * Math.PI * 19 * scrollProgress / 100)}
+                        style={{
+                          transition: 'stroke-dashoffset 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                          filter: scrollProgress > 0 ? `drop-shadow(0 0 ${5 + scrollProgress / 12}px ${PHASE_COLOR}${scrollProgress > 60 ? 'b0' : '70'})` : 'none',
+                        }}
+                      />
+                      <defs>
+                        <linearGradient id="navProgressGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stopColor={PHASE_COLOR} />
+                          <stop offset="40%" stopColor="#3b82f6" />
+                          <stop offset="100%" stopColor="#a855f7" />
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                    <span className="absolute inset-0 flex items-center justify-center text-[11px] sm:text-[12px] font-black tabular-nums" style={{ fontFamily: 'inherit', color: scrollProgress > 0 ? '#fff' : '#64748b' }}>
+                      {scrollProgress}<span className="text-[8px] opacity-40 ml-px">%</span>
+                    </span>
+                  </div>
+                  <div className="hidden sm:flex flex-col gap-0.5">
+                    <span className="text-[9px] tracking-[0.15em] uppercase font-bold leading-none transition-colors duration-500" style={{ fontFamily: 'inherit', color: scrollProgress >= 75 ? PHASE_COLOR : scrollProgress >= 50 ? '#3b82f6' : '#475569' }}>
+                      {scrollProgress < 10 ? 'Start_' : scrollProgress < 35 ? 'Reading_' : scrollProgress < 60 ? 'Deep_Dive' : scrollProgress < 90 ? 'Almost_' : scrollProgress < 100 ? 'Finishing' : 'Complete!'}
+                    </span>
+                    <span className="text-[8px] text-[#334155] tracking-[0.12em] uppercase font-semibold leading-none" style={{ fontFamily: 'inherit' }}>
+                      {scrollProgress < 100 ? 'progress' : 'mastered'}
+                    </span>
+                  </div>
+                </motion.div>
+
+                {/* Mobile Menu Toggle */}
+                <motion.button
+                  whileTap={{ scale: 0.88, rotate: 90 }}
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="md:hidden flex items-center justify-center w-10 h-10 rounded-xl bg-white/[0.05] border border-white/[0.08] text-[#94a3b8] hover:text-white hover:bg-white/[0.08] transition-all duration-300"
+                  aria-label="Toggle mobile menu"
+                >
+                  <AnimatePresence mode="wait">
+                    {mobileMenuOpen ? (
+                      <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.15 }}>
+                        <X className="w-4.5 h-4.5" />
+                      </motion.div>
+                    ) : (
+                      <motion.div key="menu" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.15 }}>
+                        <Menu className="w-4.5 h-4.5" />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.button>
               </div>
             </div>
           </div>
-        </div>
+
+          {/* Mobile Dropdown Menu — Premium */}
+          <AnimatePresence>
+            {mobileMenuOpen && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+                className="md:hidden overflow-hidden"
+                style={{ background: 'linear-gradient(180deg, rgba(2,2,8,0.99), rgba(5,5,12,0.99))', borderTop: '1px solid rgba(255,255,255,0.05)' }}
+              >
+                <div className="px-3 py-4 space-y-1">
+                  {/* Nav links */}
+                  {[
+                    { href: '/', label: 'Home', icon: Home, color: '#22c55e' },
+                    { href: '/coding', label: 'Coding_School', icon: GraduationCap, color: '#3b82f6' },
+                    { href: '/coding/c-language', label: 'C_Mastery_Blueprint', icon: BookOpen, color: PHASE_COLOR },
+                  ].map((item, idx) => (
+                    <motion.div key={item.href} initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: idx * 0.05 }}>
+                      <Link href={item.href} onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-xl text-[#8b95a8] hover:text-white hover:bg-white/[0.05] transition-all duration-300 border border-transparent hover:border-white/[0.06]">
+                        <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${item.color}0c`, border: `1px solid ${item.color}18` }}>
+                          <item.icon className="w-4 h-4" style={{ color: item.color }} />
+                        </div>
+                        <span className="text-[12px] font-bold tracking-[0.08em] uppercase" style={{ fontFamily: 'inherit' }}>{item.label}</span>
+                      </Link>
+                    </motion.div>
+                  ))}
+
+                  {/* Divider */}
+                  <div className="h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent my-3 mx-3" />
+
+                  {/* Parts Navigation */}
+                  <p className="px-4 pt-1 pb-2 text-[9px] font-bold tracking-[0.2em] uppercase text-[#3e4a5c]" style={{ fontFamily: 'inherit' }}>Jump_to_Section</p>
+                  <div className="max-h-[40vh] overflow-y-auto rounded-xl space-y-0.5" style={{ scrollbarWidth: 'thin', scrollbarColor: `${PHASE_COLOR}30 transparent` }}>
+                    {PARTS.map((p, i) => (
+                      <motion.a key={i} href={`#part-${i + 1}`} onClick={() => setMobileMenuOpen(false)}
+                        initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.15 + i * 0.03 }}
+                        className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-[12px] transition-all duration-200 ${activeSection === i ? 'bg-white/[0.07] text-white' : 'text-[#6b7588] hover:text-[#e2e8f0] hover:bg-white/[0.04]'}`}
+                        style={{ fontFamily: 'inherit' }}>
+                        <span className={`w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black flex-shrink-0 ${activeSection === i ? 'text-black' : 'text-[#5a6577]'}`}
+                          style={activeSection === i ? { background: PHASE_COLOR, boxShadow: `0 0 10px ${PHASE_COLOR}50` } : { background: 'rgba(255,255,255,0.05)' }}>
+                          {String(i + 1).padStart(2, '0')}
+                        </span>
+                        <span className="font-semibold truncate">{p}</span>
+                        {activeSection === i && <span className="ml-auto w-2 h-2 rounded-full animate-pulse" style={{ background: PHASE_COLOR }} />}
+                      </motion.a>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Animated sweep border */}
+          <div className="h-[1px] relative overflow-hidden">
+            <motion.div
+              className="h-full absolute inset-0"
+              style={{ background: `linear-gradient(90deg, transparent, ${PHASE_COLOR}35, #3b82f640, #a855f735, transparent)` }}
+              animate={{ x: ['-100%', '100%'] }}
+              transition={{ duration: 4.5, repeat: Infinity, ease: 'linear' }}
+            />
+          </div>
+
+          {/* Progress bar — thicker and more vibrant */}
+          <div className="h-[3px] bg-[#06060e] relative overflow-hidden">
+            <motion.div
+              className="h-full absolute left-0 top-0 rounded-r-full"
+              style={{
+                width: `${scrollProgress}%`,
+                background: `linear-gradient(90deg, ${PHASE_COLOR}, #3b82f6, #8b5cf6, #a855f7)`,
+                boxShadow: scrollProgress > 0 ? `0 0 18px ${PHASE_COLOR}80, 0 0 6px #3b82f680, 0 2px 8px rgba(0,0,0,0.4)` : 'none',
+                transition: 'width 0.2s ease-out',
+              }}
+            />
+          </div>
+        </nav>
 
         {/* ─── Hero Section ─── */}
-        <section className="pt-10 sm:pt-16 pb-10 relative overflow-hidden">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6">
-            <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, type: 'spring' }}>
-              <div className="flex flex-col sm:flex-row items-start gap-6">
-                <motion.div whileHover={{ rotateY: 15, scale: 1.05 }} style={{ perspective: 600 }}
-                  className="w-24 h-24 rounded-2xl flex items-center justify-center flex-shrink-0 relative"
-                  initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', delay: 0.2 }}>
-                  <div className="absolute inset-0 rounded-2xl" style={{ background: `${PHASE_COLOR}12`, border: `1px solid ${PHASE_COLOR}25` }} />
+        <section className="pt-12 sm:pt-20 pb-12 relative overflow-hidden">
+          {/* Background gradient orbs */}
+          <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full blur-[120px] opacity-[0.03]" style={{ background: PHASE_COLOR }} />
+          <div className="absolute bottom-0 right-1/4 w-80 h-80 rounded-full blur-[100px] opacity-[0.02]" style={{ background: '#3b82f6' }} />
+
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 relative">
+            <motion.div initial={{ opacity: 0, y: 40, filter: 'blur(12px)' }} animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }} transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}>
+              <div className="flex flex-col sm:flex-row items-start gap-6 sm:gap-8">
+                <motion.div whileHover={{ rotateY: 15, scale: 1.05 }} style={{ perspective: 800 }}
+                  className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl flex items-center justify-center flex-shrink-0 relative"
+                  initial={{ scale: 0, rotate: -15 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: 'spring', delay: 0.2, damping: 12 }}>
+                  <div className="absolute inset-0 rounded-2xl" style={{ background: `linear-gradient(135deg, ${PHASE_COLOR}14, ${PHASE_COLOR}06)`, border: `1px solid ${PHASE_COLOR}25`, boxShadow: `0 0 40px ${PHASE_COLOR}10` }} />
                   <motion.div className="absolute inset-0 rounded-2xl" style={{ border: `2px solid ${PHASE_COLOR}` }}
-                    animate={{ opacity: [0.5, 0, 0.5], scale: [1, 1.15, 1] }} transition={{ duration: 3, repeat: Infinity }} />
-                  <span className="text-4xl font-bold relative z-10" style={{ color: PHASE_COLOR }}>D1</span>
+                    animate={{ opacity: [0.5, 0, 0.5], scale: [1, 1.2, 1] }} transition={{ duration: 3, repeat: Infinity }} />
+                  <motion.div className="absolute -inset-2 rounded-3xl" style={{ background: `radial-gradient(circle, ${PHASE_COLOR}08, transparent 70%)` }}
+                    animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }} transition={{ duration: 4, repeat: Infinity }} />
+                  <span className="text-4xl sm:text-5xl font-black relative z-10" style={{ color: PHASE_COLOR, fontFamily: 'inherit', textShadow: `0 0 30px ${PHASE_COLOR}40` }}>D1</span>
                 </motion.div>
-                <div>
-                  <div className="flex items-center gap-3 mb-2 flex-wrap">
-                    <span className="text-xs font-semibold uppercase tracking-wider px-2.5 py-1 rounded-md" style={{ backgroundColor: `${PHASE_COLOR}15`, color: PHASE_COLOR }}>Phase 1 - Brain Reset</span>
-                    <span className="text-xs text-[#475569]">Day 1 of 40</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-3 mb-3 flex-wrap">
+                    <span className="text-[11px] font-black uppercase tracking-[0.15em] px-3 py-1.5 rounded-lg" style={{ backgroundColor: `${PHASE_COLOR}12`, color: PHASE_COLOR, border: `1px solid ${PHASE_COLOR}20`, fontFamily: 'inherit' }}>Phase_01 — Brain_Reset</span>
+                    <span className="text-[11px] text-[#475569] tracking-[0.1em] font-semibold" style={{ fontFamily: 'inherit' }}>Day 1 of 40</span>
                   </div>
-                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-3 leading-tight">
-                    How Computer Thinks
+                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white mb-4 leading-[1.1] tracking-tight" style={{ fontFamily: 'inherit' }}>
+                    How Computer <span style={{ color: PHASE_COLOR, textShadow: `0 0 40px ${PHASE_COLOR}30` }}>Thinks</span>
                   </h1>
-                  <p className="text-[#94a3b8] text-sm sm:text-base max-w-2xl leading-relaxed">
+                  <p className="text-[#94a3b8] text-sm sm:text-[15px] max-w-2xl leading-[1.8] tracking-wide" style={{ fontFamily: 'inherit' }}>
                     Building a FAANG-Ready Mental Model of Computing — from the nature of machines to memory architecture,
                     binary systems to C programming. This is the foundation that separates elite engineers from average coders.
                   </p>
-                  <div className="mt-2"><BinaryStream /></div>
-                  <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <div className="mt-3"><BinaryStream /></div>
+                  <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
                     {[
-                      { label: 'Parts', value: '10', icon: '📚' },
-                      { label: 'Read Time', value: '45 min', icon: '⏱️' },
-                      { label: 'Concepts', value: '50+', icon: '🧠' },
-                      { label: 'Level', value: 'Foundation', icon: '🏗️' },
-                    ].map(s => (
-                      <motion.div key={s.label} whileHover={{ scale: 1.05, y: -2 }}
-                        className="rounded-xl border border-white/[0.08] bg-[#0f172a]/65 px-3 py-3 backdrop-blur-sm">
-                        <span className="text-lg mr-1">{s.icon}</span>
-                        <p className="text-lg font-bold text-white leading-none inline">{s.value}</p>
-                        <p className="text-[11px] uppercase tracking-wide text-[#64748b] mt-1">{s.label}</p>
+                      { label: 'Parts', value: '10', Icon: Layers, color: '#22c55e' },
+                      { label: 'Read Time', value: '90m', Icon: Clock, color: '#3b82f6' },
+                      { label: 'Questions', value: '100+', Icon: HelpCircle, color: '#a855f7' },
+                      { label: 'Simulations', value: '15+', Icon: FlaskConical, color: '#f59e0b' },
+                    ].map((s, idx) => (
+                      <motion.div key={s.label} whileHover={{ scale: 1.06, y: -3 }}
+                        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 + idx * 0.08 }}
+                        className="rounded-xl border border-white/[0.08] bg-[#0f172a]/65 px-3.5 py-3.5 backdrop-blur-sm"
+                        style={{ boxShadow: `0 0 20px ${s.color}06` }}>
+                        <div className="flex items-center gap-2">
+                          <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: `${s.color}12` }}>
+                            <s.Icon className="w-3.5 h-3.5" style={{ color: s.color }} />
+                          </div>
+                          <p className="text-lg font-black text-white leading-none" style={{ fontFamily: 'inherit' }}>{s.value}</p>
+                        </div>
+                        <p className="text-[10px] uppercase tracking-[0.12em] text-[#64748b] mt-2 font-bold" style={{ fontFamily: 'inherit' }}>{s.label}</p>
                       </motion.div>
                     ))}
                   </div>
@@ -95,13 +393,15 @@ export default function Day1Content() {
               </div>
             </motion.div>
             {/* Part quick nav */}
-            <div className="mt-8 flex flex-wrap gap-2">
+            <div className="mt-10 flex flex-wrap gap-2">
               {PARTS.map((p, i) => (
-                <a key={i} href={`#part-${i + 1}`}
-                  className="px-3 py-1.5 rounded-lg border text-[11px] font-semibold transition-all hover:scale-105"
-                  style={{ borderColor: `${PHASE_COLOR}25`, color: `${PHASE_COLOR}cc`, background: `${PHASE_COLOR}08` }}>
-                  {i + 1}. {p}
-                </a>
+                <motion.a key={i} href={`#part-${i + 1}`}
+                  initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 + i * 0.04 }}
+                  whileHover={{ scale: 1.06, y: -2 }} whileTap={{ scale: 0.97 }}
+                  className="px-3.5 py-2 rounded-xl border text-[11px] font-bold transition-all tracking-[0.06em]"
+                  style={{ borderColor: `${PHASE_COLOR}18`, color: `${PHASE_COLOR}cc`, background: `${PHASE_COLOR}06`, fontFamily: 'inherit' }}>
+                  <span className="opacity-40 mr-1 font-black">{String(i + 1).padStart(2, '0')}.</span>{p}
+                </motion.a>
               ))}
             </div>
           </div>
@@ -113,7 +413,7 @@ export default function Day1Content() {
 {/* ════════════════════ PART 1 ════════════════════ */}
 <RevealOnScroll><section id="part-1">
   <SectionBadge number={1} title="Deconstructing the Machine" />
-  <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">What Is a Machine?</h2>
+  <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2 font-[family-name:var(--font-jetbrains)] tracking-tight">What Is a Machine?</h2>
   <p className="text-[#64748b] text-sm mb-6 italic">The journey toward becoming a top-tier software engineer does not begin with syntax — it begins with understanding what a machine actually is.</p>
 
   <p className="text-[#b0bec5] leading-[1.9] mb-4">
@@ -141,7 +441,7 @@ export default function Day1Content() {
     <UniversalTuringMachine />
   </div>
 
-  <Collapsible title="🔬 Deep Dive: Deterministic Behavior — The Domino Effect" defaultOpen>
+  <Collapsible title="Deep Dive: Deterministic Behavior — The Domino Effect" defaultOpen>
     <p className="mb-3">This incredible flexibility is governed by a rigid principle known as <strong className="text-white">deterministic behavior</strong>. Determinism dictates that a system, given the exact same initial conditions and the exact same inputs, will <strong className="text-white">unconditionally and endlessly produce the exact same output</strong>, passing through the identical sequence of internal states every single time.</p>
     <p className="mb-3">A deterministic system is one where the behavior is entirely predictable. Deterministic algorithms provide precise solutions and possess a well-defined worst-case time complexity, making them entirely predictable. Non-deterministic behavior in computing only occurs when external, unpredictable variables (like network latency, random number generators, or hardware degradation) are introduced.</p>
     <KeyPoint>If a computer is programmed to add 2 + 3, it will output 5. If it is asked to perform this calculation ten billion times, it will output 5 ten billion times — without a single deviation, hesitation, or spontaneous error. Computers possess no intuition, mood, subconscious thought, or fatigue.</KeyPoint>
@@ -156,7 +456,7 @@ export default function Day1Content() {
   </Collapsible>
 
   <div className="mt-4">
-    <Collapsible title="🧠 The Human Assumption Gap — Why Beginners Struggle" defaultOpen>
+    <Collapsible title="The Human Assumption Gap — Why Beginners Struggle" defaultOpen>
       <p className="mb-3">This introduces the <strong className="text-white">single greatest difference between humans and machines</strong>, and the primary hurdle for beginners learning to program. Beginners often struggle because they <strong className="text-white">project human cognitive traits onto the computer</strong>.</p>
       <p className="mb-3">Humans navigate the world relying heavily on <strong className="text-white">context, assumption, inference, and implicit knowledge</strong>. If a human asks a friend to &quot;make a peanut butter and jelly sandwich,&quot; the friend inherently knows to walk to the pantry, open the plastic bag holding the bread, unscrew the lid of the peanut butter jar, and use a knife to spread it. The human brain <strong className="text-white">automatically fills in the missing instructional gaps</strong>.</p>
       <KeyPoint>A machine possesses absolutely no contextual awareness. If given the command &quot;make a PB&amp;J sandwich&quot; without explicitly programmed intermediate steps, it will likely attempt to smash an unopened glass jar of peanut butter directly through a sealed plastic bag of bread.</KeyPoint>
@@ -168,12 +468,27 @@ export default function Day1Content() {
       </p>
     </Collapsible>
   </div>
+
+  {/* Fun Facts — Part 1 */}
+  <div className="mt-6">
+    <FunFactCard facts={[
+      { icon: '{ }', title: 'The First "Computer" Was a Human', text: 'Before electronic machines, the word "computer" referred to a person — usually a woman — whose job was to perform mathematical calculations by hand. During WWII, rooms full of human computers calculated artillery trajectories.', color: '#3b82f6' },
+      { icon: '< >', title: 'Transistors Are Microscopic', text: 'A modern CPU contains over 50 BILLION transistors, each smaller than a virus (5 nanometers). If a transistor were the size of a grain of sand, the CPU would be the size of a football stadium.', color: '#22c55e' },
+      { icon: '[ ]', title: 'Computers Execute 5 Billion Operations Per Second', text: 'A 5GHz CPU completes 5,000,000,000 instruction cycles every second. That\'s faster than the speed at which light travels one meter — meaning your CPU processes instructions faster than a photon crosses your desk.', color: '#a855f7' },
+      { icon: '0x1', title: 'Alan Turing Predicted All This in 1936', text: 'Alan Turing mathematically proved that a single machine could simulate any other machine, long before the first electronic computer existed. His "Universal Turing Machine" concept is the theoretical foundation of every computer today.', color: '#f59e0b' },
+    ]} />
+  </div>
+
+  {/* Quiz Section for Part 1 */}
+  <div className="mt-8">
+    <QuizSection data={DAY1_QUIZ_DATA[0]} />
+  </div>
 </section></RevealOnScroll>
 
 {/* ════════════════════ PART 2 ════════════════════ */}
 <RevealOnScroll><section id="part-2">
   <SectionBadge number={2} title="The Anatomy of a Computer" />
-  <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">The Anatomy of a Computer — IPOS Model</h2>
+  <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2 font-[family-name:var(--font-jetbrains)] tracking-tight">The Anatomy of a Computer — IPOS Model</h2>
   <p className="text-[#64748b] text-sm mb-6 italic">Regardless of whether you are looking at a smart thermostat or a massive server farm powering Google — every computer operates on this framework.</p>
 
   <p className="text-[#b0bec5] leading-[1.9] mb-4">
@@ -204,7 +519,7 @@ export default function Day1Content() {
     </Card3D>
   </div>
 
-  <h3 className="text-xl font-bold text-white mb-4 mt-8">🍳 Core Hardware — The Restaurant Kitchen Analogy</h3>
+  <h3 className="text-xl font-bold text-white mb-4 mt-8 font-[family-name:var(--font-jetbrains)]"><Cpu className="w-5 h-5 inline mr-2 text-[#f59e0b]" />Core Hardware — The Restaurant Kitchen Analogy</h3>
   <p className="text-[#b0bec5] leading-[1.9] mb-4">To physically execute the IPOS cycle, the computer relies on a <strong className="text-white">trinity of core hardware components</strong>. The most effective analogy is a commercial restaurant kitchen:</p>
 
   <div className="grid md:grid-cols-3 gap-4 mb-6">
@@ -225,8 +540,8 @@ export default function Day1Content() {
     </InfoCard>
   </div>
 
-  <h3 className="text-xl font-bold text-white mb-4">📌 Real-Life IPOS Examples</h3>
-  <Collapsible title="🏧 ATM Machine — Complete IPOS Breakdown" defaultOpen>
+  <h3 className="text-xl font-bold text-white mb-4 font-[family-name:var(--font-jetbrains)]"><MapPin className="w-5 h-5 inline mr-2 text-[#22c55e]" />Real-Life IPOS Examples</h3>
+  <Collapsible title="ATM Machine — Complete IPOS Breakdown" defaultOpen>
     <DataTable headers={['Phase', 'What Happens', 'Technical Detail']} rows={[
       ['Input', 'User inserts debit card + enters PIN on keypad', 'Magnetic card reader detects data, keypad generates electrical signals for each digit pressed'],
       ['Process', 'ATM encrypts data, communicates with bank servers', 'CPU encrypts PIN, sends encrypted packet to bank central servers via secure network, verifies credentials, checks account balance'],
@@ -234,7 +549,7 @@ export default function Day1Content() {
       ['Storage', 'Bank updates account ledger in database', 'Transaction details (time, location, amount, ATM ID) permanently recorded in distributed database'],
     ]} />
   </Collapsible>
-  <div className="mt-3"><Collapsible title="📱 Mobile Phone — Opening a Social Media App">
+  <div className="mt-3"><Collapsible title="Mobile Phone — Opening a Social Media App">
     <DataTable headers={['Phase', 'What Happens', 'Technical Detail']} rows={[
       ['Input', 'Tapping app icon on touch-sensitive screen', 'Screen generates electrical coordinates (X, Y position) of the touch point'],
       ['Process', 'CPU calculates which app is at those coordinates', 'OS maps coordinates to app icon, commands Storage to load application binary into RAM'],
@@ -250,7 +565,7 @@ export default function Day1Content() {
       ['Storage', 'Image file compressed and saved permanently', 'JPEG/HEIF compression applied, written to NAND flash memory with EXIF metadata'],
     ]} />
   </Collapsible></div>
-  <div className="mt-3"><Collapsible title="�🔢 Calculator — Simple Arithmetic Example">
+  <div className="mt-3"><Collapsible title="Calculator — Simple Arithmetic Example">
     <DataTable headers={['Phase', 'What Happens']} rows={[
       ['Input', "Pressing '5', '+', '5' — each keypress generates a specific electrical signal"],
       ['Process', 'Internal circuitry receives signals, converts to binary, performs binary addition (0101 + 0101 = 1010)'],
@@ -263,12 +578,17 @@ export default function Day1Content() {
   <div className="mt-4">
     <ImportantNote>The IPOS cycle is universally inescapable — there is no computing device on Earth that does not follow this exact sequence. Even the most complex AI systems, autonomous vehicles, and space station computers follow this same fundamental Input → Process → Output → Storage pattern.</ImportantNote>
   </div>
+
+  {/* Quiz Section for Part 2 */}
+  <div className="mt-8">
+    <QuizSection data={DAY1_QUIZ_DATA[1]} />
+  </div>
 </section></RevealOnScroll>
 
 {/* ════════════════════ PART 3 ════════════════════ */}
 <RevealOnScroll><section id="part-3">
   <SectionBadge number={3} title="Binary, ASCII & Abstraction" />
-  <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">How the Computer Understands the World</h2>
+  <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2 font-[family-name:var(--font-jetbrains)] tracking-tight">How the Computer Understands the World</h2>
   <p className="text-[#64748b] text-sm mb-6 italic">To truly master programming, one must descend below the user interface and confront the physical reality of the machine.</p>
 
   <p className="text-[#b0bec5] leading-[1.9] mb-4">
@@ -293,7 +613,7 @@ export default function Day1Content() {
 
   <div className="mb-6"><VoltageThresholdDiagram /></div>
 
-  <h3 className="text-xl font-bold text-white mb-3">🔤 ASCII — The Translation Bridge</h3>
+  <h3 className="text-xl font-bold text-white mb-3 font-[family-name:var(--font-jetbrains)]"><Binary className="w-5 h-5 inline mr-2 text-[#f59e0b]" />ASCII — The Translation Bridge</h3>
   <p className="text-[#b0bec5] leading-[1.9] mb-4">
     Since hardware only understands 1s and 0s, <strong className="text-white">ASCII</strong> (American Standard Code for Information Interchange) acts as a standardized translation dictionary — essentially a massive lookup table that maps numeric values to human-readable characters. When a programmer types the capital letter &apos;A&apos; on a keyboard, the keyboard hardware sends the decimal number 65 to the CPU. The computer converts 65 into the binary byte <code className="text-[#22c55e] bg-white/[0.05] px-1 rounded">01000001</code> and stores it in memory. There are <strong className="text-white">128 standard ASCII characters</strong>. The computer has no concept of the alphabet — it merely processes integers.
   </p>
@@ -313,8 +633,22 @@ export default function Day1Content() {
 
   <div className="mt-6"><BinaryMathAnimator /></div>
 
+  <div className="mt-6"><NumberSystemConverter /></div>
+
+  <div className="mt-6"><ASCIITableExplorer /></div>
+
+  <div className="mt-6"><BitManipulationPlayground /></div>
+
+  <div className="mt-6">
+    <FunFactCard facts={[
+      { icon: '#0', title: 'Why Computers Count From Zero', text: 'Array indexing starts at 0 because the index represents an OFFSET from the base address. The first element is at offset 0 from the start — no distance to travel. This directly reflects how memory addressing works in hardware.', color: '#06b6d4' },
+      { icon: 'U+', title: 'Unicode Has 149,186 Characters', text: 'While ASCII only covers 128 characters, Unicode (the modern standard) supports emojis, Chinese, Arabic, and even ancient Egyptian hieroglyphs. Your phone uses UTF-8 encoding, which is backwards-compatible with ASCII.', color: '#a855f7' },
+      { icon: '2^', title: 'A Kilobyte Isn\'t Exactly 1000 Bytes', text: 'In computing, 1 KB = 1024 bytes (2\u00B9\u2070). This is because binary powers of 2 are more natural for hardware. However, hard drive manufacturers use 1 KB = 1000 bytes, which is why your "500 GB" drive shows as ~465 GB in your OS.', color: '#f59e0b' },
+    ]} />
+  </div>
+
   <div className="mt-8">
-    <h3 className="text-xl font-bold text-white mb-3">🏗️ The Concept of Abstraction — The Most Critical Pillar</h3>
+    <h3 className="text-xl font-bold text-white mb-3 font-[family-name:var(--font-jetbrains)]"><Layers className="w-5 h-5 inline mr-2 text-[#a855f7]" />The Concept of Abstraction — The Most Critical Pillar</h3>
     <p className="text-[#b0bec5] leading-[1.9] mb-4">
       <strong className="text-white">Abstraction</strong> is arguably the single most critical conceptual pillar in all of computer science. It is the fundamental process of hiding incredibly complex underlying physical and mathematical details behind a simple, easy-to-use interface. Consider the analogy of driving a car. A human driver interacts with a highly abstracted interface: a steering wheel, a gas pedal, and a brake. The driver does <strong className="text-white">not need to understand</strong> the thermodynamic combustion cycle of the engine, the fluid dynamics of the transmission, or the electrical routing of the spark plugs to successfully drive to a destination. The steering wheel completely <strong className="text-white">shields the user from the underlying mechanical complexity</strong>.
     </p>
@@ -326,12 +660,17 @@ export default function Day1Content() {
       Abstraction allows a programmer to type a simple command like <code className="text-[#22c55e] bg-white/[0.05] px-1.5 py-0.5 rounded">printf(&quot;Hello&quot;)</code> without manually mapping ASCII codes, managing RAM addresses, or flipping billions of microscopic electrical switches inside the CPU. Without abstraction, every programmer would need to be a simultaneous expert in quantum physics, electrical engineering, circuit design, and device driver programming just to display a single character on screen.
     </KeyPoint>
   </div>
+
+  {/* Quiz Section for Part 3 */}
+  <div className="mt-8">
+    <QuizSection data={DAY1_QUIZ_DATA[2]} />
+  </div>
 </section></RevealOnScroll>
 
 {/* ════════════════════ PART 4 ════════════════════ */}
 <RevealOnScroll><section id="part-4">
   <SectionBadge number={4} title="The Art of Algorithmic Thinking" />
-  <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">What Is Programming?</h2>
+  <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2 font-[family-name:var(--font-jetbrains)] tracking-tight">What Is Programming?</h2>
   <p className="text-[#64748b] text-sm mb-6 italic">Programming is not merely typing code — it is the precise art of providing contextual logic that machines inherently lack.</p>
 
   <p className="text-[#b0bec5] leading-[1.9] mb-6">
@@ -343,7 +682,7 @@ export default function Day1Content() {
     <p>Thinking in algorithms requires a <strong className="text-white">fundamental rewiring of the brain</strong>. It requires stripping away all human assumptions, emotions, and leaps of logic.</p>
   </InfoCard>
 
-  <div className="mt-6"><Collapsible title="🥪 The PB&J Robot Experiment — Classic CS Drill" defaultOpen>
+  <div className="mt-6"><Collapsible title="The PB&J Robot Experiment — Classic CS Drill" defaultOpen>
     <p className="mb-3">In this famous university computer science exercise, the instructor acts as a <strong className="text-white">deterministic robot</strong>, and students act as programmers. The students must instruct the robot to make a peanut butter and jelly sandwich using only explicit, unambiguous commands.</p>
     <p className="mb-3">If a student says <em>&quot;Put the peanut butter on the bread,&quot;</em> the instructor might place the <strong className="text-white">unopened glass jar directly on top of the sealed loaf of bread</strong>. The students quickly realize that <strong className="text-white">precision is everything</strong> — the robot has zero contextual understanding.</p>
     <p className="mb-3">A true algorithmic sequence must be <strong className="text-white">agonizingly, painfully specific</strong>:</p>
@@ -367,7 +706,7 @@ export default function Day1Content() {
   <div className="mt-6"><LogicalSequencingDrill /></div>
 
   <div className="mt-6">
-    <Collapsible title="📝 Why You Should Practice Unplugged Before Coding" defaultOpen>
+    <Collapsible title="Why You Should Practice Unplugged Before Coding" defaultOpen>
       <p className="mb-3">To bridge the gap between human thinking and computational thinking, beginners should practice <strong className="text-white">unplugged logic drills</strong> before ever touching a keyboard. This involves attempting to write down the algorithm for mundane tasks — like crossing a street, making lemon juice, or navigating a physical maze — <strong className="text-white">without missing a single step</strong>.</p>
       <p className="mb-3">Solving Sudoku puzzles, playing Tic-Tac-Toe perfectly, or completing logic grid problems trains the brain to recognize <strong className="text-white">strict patterns, dependencies, and conditional constraints</strong>, which translates directly to writing high-quality code. The best programmers are not those who type fastest — they are those who <strong className="text-white">think most precisely</strong> before writing a single line.</p>
       <KeyPoint>Every line of code is an instruction in an algorithm. If your algorithm has gaps, ambiguities, or incorrect ordering — your program will fail. The gap between &quot;this should work&quot; and &quot;this will work&quot; is entirely filled by algorithmic precision.</KeyPoint>
@@ -388,12 +727,17 @@ export default function Day1Content() {
       <p className="text-xs text-[#64748b] italic mt-2">FAANG companies test candidates heavily on the ability to foresee edge cases, eliminate assumptions, and architect bulletproof logical sequences.</p>
     </InfoCard>
   </div>
+
+  {/* Quiz Section for Part 4 */}
+  <div className="mt-8">
+    <QuizSection data={DAY1_QUIZ_DATA[3]} />
+  </div>
 </section></RevealOnScroll>
 
 {/* ════════════════════ PART 5 ════════════════════ */}
 <RevealOnScroll><section id="part-5">
   <SectionBadge number={5} title="The Mid-Level Powerhouse" />
-  <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">Why the C Language?</h2>
+  <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2 font-[family-name:var(--font-jetbrains)] tracking-tight">Why the C Language?</h2>
   <p className="text-[#64748b] text-sm mb-6 italic">Created in 1972 by Dennis Ritchie at Bell Labs to rewrite the legendary UNIX operating system.</p>
 
   <p className="text-[#b0bec5] leading-[1.9] mb-4">
@@ -407,7 +751,7 @@ export default function Day1Content() {
   <LanguageSpectrum />
 
   <div className="mb-6">
-    <Collapsible title="💡 Why Top Companies Revere C Knowledge" defaultOpen>
+    <Collapsible title="Why Top Companies Revere C Knowledge" defaultOpen>
       <p className="mb-3">Top-tier technology companies (FAANG) operate at an <strong className="text-white">unfathomable scale</strong>. When a backend system handles <strong className="text-white">billions of user requests per second</strong>, micro-inefficiencies in memory utilization or processing speed result in massive financial costs, latency, and server overloads. Modern high-level languages automatically handle memory allocation, which creates a <strong className="text-white">&quot;black box&quot;</strong> for developers — a developer who only knows Python might inadvertently write code that wastes massive amounts of memory because they do not fundamentally understand how data structures work underneath the abstraction layer.</p>
       <p className="mb-3">In Python, if a developer needs a list for 10,000 records, they simply type a command. Python silently requests memory, tracks usage, and <strong className="text-white">automatically deletes it when no longer needed</strong>. The developer learns nothing about the hardware cost.</p>
       <p className="mb-3">In C, there is <strong className="text-white">no safety net, no background automation, no automatic cleanup</strong> (Garbage Collection). The developer must:</p>
@@ -439,12 +783,19 @@ export default function Day1Content() {
   </ImportantNote></div>
 
   <div className="mt-6"><CLanguageTimeline /></div>
+
+  <div className="mt-6"><WhereCRunsToday /></div>
+
+  {/* Quiz Section for Part 5 */}
+  <div className="mt-8">
+    <QuizSection data={DAY1_QUIZ_DATA[4]} />
+  </div>
 </section></RevealOnScroll>
 
 {/* ════════════════════ PART 6 ════════════════════ */}
 <RevealOnScroll><section id="part-6">
   <SectionBadge number={6} title="The Foundation of Performance" />
-  <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">Memory Architecture — Very Important</h2>
+  <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2 font-[family-name:var(--font-jetbrains)] tracking-tight">Memory Architecture — Very Important</h2>
   <p className="text-[#64748b] text-sm mb-6 italic">To truly master programming and excel in FAANG interviews, an engineer must achieve absolute clarity regarding memory architecture.</p>
 
   <p className="text-[#b0bec5] leading-[1.9] mb-6">
@@ -476,7 +827,11 @@ export default function Day1Content() {
 
   <div className="mt-6"><MemorySegmentDiagram /></div>
 
-  <div className="mt-6"><Collapsible title="⚡ Contiguous Memory & CPU Cache — Critical Performance Concept" defaultOpen>
+  <div className="mt-6"><StackHeapVisualizer /></div>
+
+  <div className="mt-6"><MemoryLeakDemo /></div>
+
+  <div className="mt-6"><Collapsible title="Contiguous Memory & CPU Cache — Critical Performance Concept" defaultOpen>
     <p className="mb-3"><strong className="text-white">Contiguous memory</strong> means that related pieces of data are stored in adjacent memory addresses, placed perfectly side-by-side in a continuous block without any gaps. In high-performance systems — the kind built by Apple or Google — contiguous memory is a <strong className="text-white">paramount concern</strong> for execution speed.</p>
     <p className="mb-3">Modern CPUs operate so rapidly that physically waiting for data electrical signals to travel from the RAM sticks to the CPU chip is considered a <strong className="text-white">massive bottleneck</strong>. To solve this, CPU manufacturers build tiny, ultra-fast internal memory banks directly onto the CPU silicon, known as <strong className="text-white">Caches</strong>.</p>
     <p className="mb-3">When a CPU requests data from address 100, it doesn&apos;t just grab box 100 — the CPU hardware assumes that if the programmer is reading box 100, they will likely need boxes 101, 102, and 103 very soon. Therefore, it automatically grabs <strong className="text-white">a large chunk of contiguous memory (say, boxes 100 through 164)</strong> and pulls the entire block into the ultra-fast Cache. This behavior principle is called <strong className="text-white">spatial locality</strong>.</p>
@@ -486,7 +841,7 @@ export default function Day1Content() {
     <ImportantNote>System design interviews at top tech companies consistently test a candidate&apos;s understanding of this exact caching principle. If a programmer organizes data contiguously (like in an Array), the CPU continuously finds exactly what it needs right there in the cache, resulting in <strong className="text-white">blazing fast O(1) access performance</strong>. This is why arrays are the single most important data structure in all of computer science.</ImportantNote>
   </Collapsible></div>
 
-  <div className="mt-4"><Collapsible title="🔌 RAM vs. Storage: Volatility Deep Dive">
+  <div className="mt-4"><Collapsible title="RAM vs. Storage: Volatility Deep Dive">
     <DataTable headers={['Property', 'RAM', 'Storage (SSD/HDD)']}
       rows={[
         ['Technology', 'Microscopic capacitors holding electrical charges', 'Magnetic polarity (HDD) or non-volatile flash gates (SSD)'],
@@ -497,12 +852,17 @@ export default function Day1Content() {
         ['Typical Size', '8-64 GB in modern machines', '256 GB - 4 TB in modern machines'],
       ]} />
   </Collapsible></div>
+
+  {/* Quiz Section for Part 6 */}
+  <div className="mt-8">
+    <QuizSection data={DAY1_QUIZ_DATA[5]} />
+  </div>
 </section></RevealOnScroll>
 
 {/* ════════════════════ PART 7 ════════════════════ */}
 <RevealOnScroll><section id="part-7">
   <SectionBadge number={7} title="Abstraction of Memory" />
-  <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">Variables — Conceptual Mechanics</h2>
+  <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2 font-[family-name:var(--font-jetbrains)] tracking-tight">Variables — Conceptual Mechanics</h2>
   <p className="text-[#64748b] text-sm mb-6 italic">Attempting to program by memorizing hex addresses like 0x7FFFC00 is impossible for the human brain. Variables solve this.</p>
 
   <p className="text-[#b0bec5] leading-[1.9] mb-6">
@@ -525,15 +885,15 @@ export default function Day1Content() {
     ))}
   </div>
 
-  <Collapsible title="🔍 Identity vs Value — The Physical Locker vs Its Contents" defaultOpen>
+  <Collapsible title="Identity vs Value — The Physical Locker vs Its Contents" defaultOpen>
     <p className="mb-3">A critical distinction that <strong className="text-white">FAANG-level engineers</strong> maintain is the difference between the <strong className="text-white">Identity</strong> of a variable and its <strong className="text-white">Value</strong>.</p>
     <div className="grid md:grid-cols-2 gap-3 mb-3">
       <div className="p-4 rounded-xl border border-[#3b82f6]/20 bg-[#3b82f6]/[0.04]">
-        <h5 className="text-[#3b82f6] font-bold text-sm mb-1">🏠 Identity (Address)</h5>
+        <h5 className="text-[#3b82f6] font-bold text-sm mb-1 font-[family-name:var(--font-jetbrains)]"><Hash className="w-3.5 h-3.5 inline mr-1" /> Identity (Address)</h5>
         <p className="text-xs text-[#94a3b8] leading-relaxed">The physical, <strong className="text-white">immovable location</strong> in RAM. Think of it as the locker number on the post office street. The locker number <strong className="text-white">never changes</strong> — box #1024 is always box #1024, regardless of what&apos;s stored inside.</p>
       </div>
       <div className="p-4 rounded-xl border border-[#f59e0b]/20 bg-[#f59e0b]/[0.04]">
-        <h5 className="text-[#f59e0b] font-bold text-sm mb-1">📦 Value (Contents)</h5>
+        <h5 className="text-[#f59e0b] font-bold text-sm mb-1 font-[family-name:var(--font-jetbrains)]"><Package className="w-3.5 h-3.5 inline mr-1" /> Value (Contents)</h5>
         <p className="text-xs text-[#94a3b8] leading-relaxed">The <strong className="text-white">transient data</strong> currently occupying that space. It can be wiped, overwritten, and replaced <strong className="text-white">billions of times</strong> during a single second of execution. The value is temporary; the address is permanent.</p>
       </div>
     </div>
@@ -541,7 +901,7 @@ export default function Day1Content() {
   </Collapsible>
 
   <div className="mt-4">
-  <Collapsible title="🎯 L-value vs R-value — FAANG Interview Critical Concept" defaultOpen>
+  <Collapsible title="L-value vs R-value — FAANG Interview Critical Concept" defaultOpen>
     <p className="mb-3"><strong className="text-white">L-value (Locator Value)</strong> = an object occupying an identifiable, specific location in memory. It is the <strong className="text-white">physical locker itself</strong> — capable of holding data.</p>
     <p className="mb-3"><strong className="text-white">R-value (Read Value)</strong> = the raw data value or a temporary mathematical result. It does <strong className="text-white">not possess a permanent address</strong>.</p>
     <CodeBlock title="Understanding Assignment Direction" code={`// In this statement:
@@ -566,7 +926,7 @@ playerAge = 25;
 
   <div className="mt-6"><VariableAnatomyVisualizer /></div>
 
-  <div className="mt-4"><Collapsible title="📝 Variable Naming Conventions — Professional Standards">
+  <div className="mt-4"><Collapsible title="Variable Naming Conventions — Professional Standards">
     <p className="mb-3">In C, variable names must adhere to strict rules. Understanding these conventions is essential for writing professional, maintainable code:</p>
     <DataTable headers={['Rule', 'Valid Examples', 'Invalid Examples', 'Why']}
       rows={[
@@ -578,12 +938,17 @@ playerAge = 25;
       ]} />
     <KeyPoint>Professional C code uses either <strong className="text-white">snake_case</strong> (player_score) or <strong className="text-white">camelCase</strong> (playerScore). Pick one convention and maintain it consistently throughout your entire codebase. Inconsistency signals amateur code to FAANG interviewers.</KeyPoint>
   </Collapsible></div>
+
+  {/* Quiz Section for Part 7 */}
+  <div className="mt-8">
+    <QuizSection data={DAY1_QUIZ_DATA[6]} />
+  </div>
 </section></RevealOnScroll>
 
 {/* ════════════════════ PART 8 ════════════════════ */}
 <RevealOnScroll><section id="part-8">
   <SectionBadge number={8} title="Architectural Elements" />
-  <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">The Strict Structure of a C Program</h2>
+  <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2 font-[family-name:var(--font-jetbrains)] tracking-tight">The Strict Structure of a C Program</h2>
   <p className="text-[#64748b] text-sm mb-6 italic">Source code is the raw, human-readable text saved in a .c file — a signal that it follows C&apos;s grammatical rules.</p>
 
   <CodeBlock title="Complete Anatomy — Every Element Explained" code={`#include <stdio.h>       // Preprocessor directive
@@ -613,16 +978,16 @@ int main(void) {         // Entry point function
   </div>
 
   <div className="mt-6">
-    <Collapsible title="📂 Header Files (.h) vs Source Files (.c) — The Blueprint System" defaultOpen>
+    <Collapsible title="Header Files (.h) vs Source Files (.c) — The Blueprint System" defaultOpen>
       <p className="mb-3">C uses a two-file system to organize code. Understanding this distinction is critical:</p>
       <div className="grid md:grid-cols-2 gap-3 mb-3">
         <div className="p-4 rounded-xl border border-[#3b82f6]/20 bg-[#3b82f6]/[0.04]">
-          <h5 className="text-[#3b82f6] font-bold text-sm mb-2">📋 Header Files (.h)</h5>
+          <h5 className="text-[#3b82f6] font-bold text-sm mb-2 font-[family-name:var(--font-jetbrains)]"><FileText className="w-3.5 h-3.5 inline mr-1" /> Header Files (.h)</h5>
           <p className="text-xs text-[#94a3b8] leading-relaxed">Contain <strong className="text-white">declarations and prototypes</strong> — the structural blueprints. They tell the compiler &quot;these functions exist and here is what they look like&quot; without providing the actual code. Think of them as a <strong className="text-white">restaurant menu</strong>: it tells you what dishes exist, but doesn&apos;t contain the recipe.</p>
           <p className="text-xs text-[#64748b] italic mt-2">Example: stdio.h declares that printf() exists and takes specific parameters.</p>
         </div>
         <div className="p-4 rounded-xl border border-[#22c55e]/20 bg-[#22c55e]/[0.04]">
-          <h5 className="text-[#22c55e] font-bold text-sm mb-2">📝 Source Files (.c)</h5>
+          <h5 className="text-[#22c55e] font-bold text-sm mb-2 font-[family-name:var(--font-jetbrains)]"><FileCode className="w-3.5 h-3.5 inline mr-1" /> Source Files (.c)</h5>
           <p className="text-xs text-[#94a3b8] leading-relaxed">Contain the <strong className="text-white">actual implementation code</strong> — the real logic, algorithms, and instructions. This is where the compiler finds the runnable code. Think of them as the <strong className="text-white">kitchen where the actual cooking happens</strong>.</p>
           <p className="text-xs text-[#64748b] italic mt-2">Example: The actual C code that makes printf() work lives in pre-compiled library files.</p>
         </div>
@@ -630,12 +995,17 @@ int main(void) {         // Entry point function
       <KeyPoint>The <code className="text-[#22c55e] bg-white/[0.05] px-1 rounded">#include &lt;stdio.h&gt;</code> directive tells the preprocessor to locate stdio.h and literally copy-paste its entire textual contents directly into the top of your source code. Without importing these blueprints, the compiler would not recognize commands meant to interact with the screen or keyboard.</KeyPoint>
     </Collapsible>
   </div>
+
+  {/* Quiz Section for Part 8 */}
+  <div className="mt-8">
+    <QuizSection data={DAY1_QUIZ_DATA[7]} />
+  </div>
 </section></RevealOnScroll>
 
 {/* ════════════════════ PART 9 ════════════════════ */}
 <RevealOnScroll><section id="part-9">
   <SectionBadge number={9} title="From Source Code to Machine Code" />
-  <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">The Compilation Process</h2>
+  <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2 font-[family-name:var(--font-jetbrains)] tracking-tight">The Compilation Process</h2>
   <p className="text-[#64748b] text-sm mb-6 italic">The CPU cannot read English or ASCII — it only reads binary machine code. The compiler (GCC) orchestrates this massive translation.</p>
 
   <CompilationPipeline />
@@ -649,7 +1019,7 @@ int main(void) {         // Entry point function
       ['4. Linking', '.o object file(s)', 'The Linker merges the newly minted object file with pre-compiled binary code of external libraries (e.g., the actual binary that runs printf). Resolves all memory addresses into a cohesive unit', '.exe/.out executable'],
     ]} />
 
-  <div className="mt-6"><Collapsible title="🚀 The Loader — Breathing Life into Static Binary" defaultOpen>
+  <div className="mt-6"><Collapsible title="The Loader — Breathing Life into Static Binary" defaultOpen>
     <p className="mb-3">Once the Linker finishes, the executable file sits passively on the slow Storage drive — a lifeless collection of binary instructions. When the user runs it, a <strong className="text-white">highly complex orchestration</strong> occurs within milliseconds:</p>
     <div className="space-y-3">
       {[
@@ -678,13 +1048,22 @@ int main(void) {         // Entry point function
 
   <div className="mt-6"><CompilationLiveDemo /></div>
 
+  <div className="mt-6"><CompilerOutputSimulator /></div>
+
+  <div className="mt-6"><CPUPipelineSimulator /></div>
+
   <div className="mt-6"><ExecutionFlowAnimator /></div>
+
+  {/* Quiz Section for Part 9 */}
+  <div className="mt-8">
+    <QuizSection data={DAY1_QUIZ_DATA[8]} />
+  </div>
 </section></RevealOnScroll>
 
 {/* ════════════════════ PART 10 ════════════════════ */}
 <RevealOnScroll><section id="part-10">
   <SectionBadge number={10} title="Hello World & Error Types" />
-  <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">Writing Your First Safe Code</h2>
+  <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2 font-[family-name:var(--font-jetbrains)] tracking-tight">Writing Your First Safe Code</h2>
   <p className="text-[#64748b] text-sm mb-6 italic">This tiny 5-line program leverages every single concept discussed in this entire lesson.</p>
 
   <CodeBlock title="Hello, World! — The Complete Foundation" code={`#include <stdio.h>    // Borrow standard I/O library (printf lives here)
@@ -699,7 +1078,7 @@ int main(void) {      // THE entry point - OS starts execution here
 // → returns success code to operating system`} />
 
   <div className="mt-6">
-    <h3 className="text-lg font-bold text-white mb-3">📜 Escape Sequences — Hidden Control Codes</h3>
+    <h3 className="text-lg font-bold text-white mb-3 font-[family-name:var(--font-jetbrains)]"><ScrollText className="w-4 h-4 inline mr-2 text-[#22c55e]" />Escape Sequences — Hidden Control Codes</h3>
     <p className="text-[#b0bec5] text-sm mb-3 leading-[1.8]">
       The backslash <code className="text-[#22c55e]">\</code> warns the compiler: <em>&quot;Do not print the next letter literally. The next letter is a secret code.&quot;</em> This dates back to when output was physically printed on paper via mechanical teletype machines — pressing Enter required two actions: Carriage Return (head back to left edge) and Line Feed (roll paper up one line).
     </p>
@@ -716,7 +1095,7 @@ int main(void) {      // THE entry point - OS starts execution here
   </div>
 
   <div className="mt-6">
-    <h3 className="text-lg font-bold text-white mb-4">⚠️ Error Types — Critical Distinction</h3>
+    <h3 className="text-lg font-bold text-white mb-4" style={{ fontFamily: 'inherit' }}><TriangleAlert className="w-4 h-4 inline mr-2 text-[#ef4444]" />Error Types — The Complete 4-Type Classification</h3>
     <div className="grid md:grid-cols-2 gap-4">
       <InfoCard icon={Code2} title="Compilation Error (Syntax Error)" color="#f59e0b">
         <p>Occurs entirely during <strong className="text-white">Stage 2 of the Compilation Process</strong>. The programmer has violated C&apos;s strict grammatical and structural rules.</p>
@@ -730,6 +1109,18 @@ int main(void) {      // THE entry point - OS starts execution here
         <p>The compiler <strong className="text-white">cannot catch these</strong> because it only checks grammar. The <strong className="text-white">CPU catches them when it attempts the physically impossible task</strong>, causing an immediate crash.</p>
         <p className="text-xs text-[#64748b] italic mt-2">Caught DURING execution. Fix by adding logic guards.</p>
       </InfoCard>
+      <InfoCard icon={PlugZap} title="Linker Error" color="#3b82f6">
+        <p>Occurs during <strong className="text-white">Stage 4 (Linking)</strong>. The code compiles successfully into an object file, but the Linker <strong className="text-white">cannot find the actual implementation</strong> of a function or variable that was declared but never defined.</p>
+        <p><strong className="text-white">Examples:</strong> Calling a function that was declared in a header but never implemented, misspelling <code className="text-[#3b82f6]">main()</code> as <code className="text-[#3b82f6]">Main()</code>, forgetting to link a library.</p>
+        <p>The compiler is happy because the grammar is perfect. But the linker <strong className="text-white">cannot resolve the promise</strong> — the function&apos;s binary implementation simply doesn&apos;t exist anywhere.</p>
+        <p className="text-xs text-[#64748b] italic mt-2">Caught AFTER compilation, BEFORE execution. Fix by providing missing definitions.</p>
+      </InfoCard>
+      <InfoCard icon={Search} title="Logical Error (Semantic Error)" color="#a855f7">
+        <p>The <strong className="text-white">most dangerous and stealthy</strong> of all errors. The code compiles perfectly, runs without crashing, produces output — but the <strong className="text-white">output is incorrect</strong>. The program does exactly what you told it to do, but what you told it is wrong.</p>
+        <p><strong className="text-white">Examples:</strong> Using <code className="text-[#a855f7]">+</code> instead of <code className="text-[#a855f7]">-</code>, wrong loop boundary (<code className="text-[#a855f7]">i &lt; 10</code> instead of <code className="text-[#a855f7]">i &lt;= 10</code>), incorrect formula.</p>
+        <p>Neither the compiler nor the CPU can detect these — they only follow instructions. <strong className="text-white">Only the human programmer</strong> can identify logical errors through testing and careful reasoning.</p>
+        <p className="text-xs text-[#64748b] italic mt-2">NEVER caught automatically. Fix by testing rigorously and thinking critically.</p>
+      </InfoCard>
     </div>
   </div>
 
@@ -741,11 +1132,11 @@ int main(void) {      // THE entry point - OS starts execution here
 
   <div className="mt-6 grid md:grid-cols-2 gap-4">
     <div>
-      <h4 className="text-sm font-bold text-[#f59e0b] mb-2">❌ Compilation Error Example</h4>
+      <h4 className="text-sm font-bold text-[#f59e0b] mb-2 font-[family-name:var(--font-jetbrains)]"><XCircle className="w-3.5 h-3.5 inline mr-1" /> Compilation Error Example</h4>
       <CodeBlock title="Missing Semicolon — Syntax Error" code={`#include <stdio.h>\n\nint main(void) {\n    printf("Hello")  // ❌ MISSING SEMICOLON!\n    return 0;        // Compiler halts HERE\n}\n// Error: expected ';' before 'return'\n// Compiler refuses to create executable`} />
     </div>
     <div>
-      <h4 className="text-sm font-bold text-[#ef4444] mb-2">❌ Runtime Error Example</h4>
+      <h4 className="text-sm font-bold text-[#ef4444] mb-2 font-[family-name:var(--font-jetbrains)]"><XCircle className="w-3.5 h-3.5 inline mr-1" /> Runtime Error Example</h4>
       <CodeBlock title="Division by Zero — Runtime Crash" code={`#include <stdio.h>\n\nint main(void) {\n    int x = 10;\n    int y = 0;\n    int result = x / y;  // 💥 CPU CRASH!\n    // Syntax is perfect - compiler says OK\n    // But CPU cannot divide by zero\n    // Program crashes at runtime\n    printf("%d", result);\n    return 0;\n}`} />
     </div>
   </div>
@@ -756,7 +1147,7 @@ int main(void) {      // THE entry point - OS starts execution here
     <div className="absolute inset-0 bg-gradient-to-br from-[#22c55e]/[0.08] via-[#3b82f6]/[0.05] to-[#a855f7]/[0.05] rounded-2xl" />
     <div className="absolute inset-0 border border-[#22c55e]/[0.15] rounded-2xl" />
     <div className="relative z-10">
-      <h3 className="text-xl font-bold text-white mb-3">🎯 The Paradigm Shift — Day 1 Complete</h3>
+      <h3 className="text-xl font-bold text-white mb-3 font-[family-name:var(--font-jetbrains)]"><Crosshair className="w-5 h-5 inline mr-2 text-[#22c55e]" />The Paradigm Shift — Day 1 Complete</h3>
       <p className="text-[#c8d0db] text-sm leading-[1.9] mb-4">
         By fully absorbing that the computer is merely a vast, linear street of electrical switches executing deterministic, sequential instructions <strong className="text-white">without an ounce of context</strong>, you have fundamentally shifted your perspective. You are no longer attempting to &quot;speak&quot; to a machine — you are <strong className="text-white">architecting a flawless sequence of logical abstractions</strong>.
       </p>
@@ -764,7 +1155,7 @@ int main(void) {      // THE entry point - OS starts execution here
         This mental model — bridging the massive gap between a high-level <code className="text-[#22c55e]">printf</code> statement and the microscopic electrical voltages firing inside the CPU&apos;s contiguous memory caches — is the <strong className="text-white">exact foundational mindset required to excel at the highest echelons of software engineering</strong>.
       </p>
 
-      <h4 className="text-white font-bold text-sm mb-3">✅ Concepts Mastered Today:</h4>
+      <h4 className="text-white font-bold text-sm mb-3 font-[family-name:var(--font-jetbrains)]"><CheckCircle2 className="w-4 h-4 inline mr-1.5 text-[#22c55e]" /> Concepts Mastered Today:</h4>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
         {[
           'Fixed vs Programmable Machines', 'Deterministic Behavior', 'IPOS Model',
@@ -781,7 +1172,7 @@ int main(void) {      // THE entry point - OS starts execution here
             viewport={{ once: true }}
             transition={{ delay: i * 0.04 }}
             className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06]">
-            <span className="text-[#22c55e] text-xs">✓</span>
+            <CheckCircle2 className="w-3 h-3 text-[#22c55e] flex-shrink-0" />
             <span className="text-[11px] text-[#c8d0db]">{concept}</span>
           </motion.div>
         ))}
@@ -794,6 +1185,11 @@ int main(void) {      // THE entry point - OS starts execution here
       </div>
     </div>
   </motion.div>
+
+  {/* Quiz Section for Part 10 */}
+  <div className="mt-8">
+    <QuizSection data={DAY1_QUIZ_DATA[9]} />
+  </div>
 </section></RevealOnScroll>
 
           {/* ═══ Navigation ═══ */}

@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { ChevronDown, ChevronUp, Zap, Code2 } from 'lucide-react';
+import { ChevronDown, Zap, Code2 } from 'lucide-react';
 
 export const PHASE_COLOR = '#22c55e';
 
@@ -57,14 +57,16 @@ export function Card3D({ children, className = '', glowColor = PHASE_COLOR }: {
 }) {
   return (
     <motion.div
-      whileHover={{ rotateX: -2, rotateY: 3, scale: 1.02, transition: { duration: 0.3 } }}
-      style={{ perspective: 1000, transformStyle: 'preserve-3d' }}
-      className={`rounded-2xl border border-white/[0.07] bg-gradient-to-br from-white/[0.04] to-white/[0.01] backdrop-blur-sm
-        p-5 sm:p-6 hover:border-white/[0.15] transition-all duration-300 hover:shadow-[0_8px_32px_rgba(0,0,0,0.3)]
+      whileHover={{ rotateX: -2, rotateY: 3, scale: 1.02, transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] } }}
+      style={{ perspective: 1200, transformStyle: 'preserve-3d' }}
+      className={`group rounded-2xl border border-white/[0.07] bg-gradient-to-br from-white/[0.04] to-white/[0.01] backdrop-blur-sm
+        p-5 sm:p-6 hover:border-white/[0.15] transition-all duration-300
         relative overflow-hidden ${className}`}
     >
-      <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full blur-[60px] opacity-0 group-hover:opacity-[0.08] transition-opacity"
+      <div className="absolute -top-24 -right-24 w-48 h-48 rounded-full blur-[70px] opacity-0 group-hover:opacity-[0.1] transition-opacity duration-500"
         style={{ backgroundColor: glowColor }} />
+      <div className="absolute bottom-0 left-0 right-0 h-[1px] opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+        style={{ background: `linear-gradient(90deg, transparent, ${glowColor}30, transparent)` }} />
       {children}
     </motion.div>
   );
@@ -73,22 +75,26 @@ export function Card3D({ children, className = '', glowColor = PHASE_COLOR }: {
 /* ─── Section Badge ─── */
 export function SectionBadge({ number, title }: { number: number; title: string }) {
   return (
-    <motion.div className="flex items-center gap-3 mb-6"
-      initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true }} transition={{ duration: 0.5 }}>
+    <motion.div className="flex items-center gap-4 mb-8"
+      initial={{ opacity: 0, x: -30, filter: 'blur(8px)' }} whileInView={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+      viewport={{ once: true }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
       <div className="relative">
-        <div className="w-12 h-12 rounded-xl flex items-center justify-center text-sm font-black"
-          style={{ background: `${PHASE_COLOR}18`, color: PHASE_COLOR, border: `1px solid ${PHASE_COLOR}30` }}>
-          {number}
+        <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-base font-black"
+          style={{ background: `linear-gradient(135deg, ${PHASE_COLOR}1a, ${PHASE_COLOR}08)`, color: PHASE_COLOR, border: `1px solid ${PHASE_COLOR}30`, boxShadow: `0 0 30px ${PHASE_COLOR}12, inset 0 1px 0 ${PHASE_COLOR}15`, fontFamily: 'inherit' }}>
+          {String(number).padStart(2, '0')}
         </div>
-        <motion.div className="absolute inset-0 rounded-xl" style={{ border: `2px solid ${PHASE_COLOR}` }}
-          animate={{ opacity: [0.3, 0, 0.3], scale: [1, 1.3, 1] }}
+        <motion.div className="absolute inset-0 rounded-2xl" style={{ border: `2px solid ${PHASE_COLOR}` }}
+          animate={{ opacity: [0.4, 0, 0.4], scale: [1, 1.35, 1] }}
           transition={{ duration: 2.5, repeat: Infinity }} />
+        <motion.div className="absolute -inset-1 rounded-2xl opacity-30" style={{ background: `radial-gradient(circle, ${PHASE_COLOR}20, transparent 70%)` }}
+          animate={{ scale: [1, 1.15, 1], opacity: [0.2, 0.35, 0.2] }}
+          transition={{ duration: 3, repeat: Infinity }} />
       </div>
-      <div>
-        <span className="text-xs font-bold uppercase tracking-[0.15em] block" style={{ color: PHASE_COLOR }}>Part {number}</span>
-        <span className="text-[10px] text-[#64748b] uppercase tracking-wider">{title}</span>
+      <div className="flex flex-col gap-1">
+        <span className="text-xs font-black uppercase tracking-[0.22em] block" style={{ color: PHASE_COLOR, fontFamily: 'inherit' }}>Part_{String(number).padStart(2, '0')}</span>
+        <span className="text-[11px] text-[#64748b] uppercase tracking-[0.15em] font-medium" style={{ fontFamily: 'inherit' }}>{title}</span>
       </div>
+      <div className="flex-1 h-px ml-4" style={{ background: `linear-gradient(90deg, ${PHASE_COLOR}25, transparent)` }} />
     </motion.div>
   );
 }
@@ -100,14 +106,17 @@ export function InfoCard({ icon: Icon, title, children, color = PHASE_COLOR }: {
 }) {
   return (
     <Card3D glowColor={color}>
-      <div className="flex items-center gap-3 mb-4">
-        <div className="w-10 h-10 rounded-xl flex items-center justify-center"
-          style={{ background: `${color}14`, border: `1px solid ${color}25` }}>
-          <Icon className="w-5 h-5" style={{ color }} />
-        </div>
-        <h4 className="text-white font-bold text-base">{title}</h4>
+      <div className="flex items-center gap-3.5 mb-5">
+        <motion.div
+          whileHover={{ rotate: 12, scale: 1.15 }}
+          transition={{ type: 'spring', stiffness: 300 }}
+          className="w-11 h-11 rounded-xl flex items-center justify-center"
+          style={{ background: `linear-gradient(135deg, ${color}18, ${color}08)`, border: `1px solid ${color}25`, boxShadow: `0 0 20px ${color}10` }}>
+          <Icon className="w-5 h-5" style={{ color, filter: `drop-shadow(0 0 4px ${color}40)` }} />
+        </motion.div>
+        <h4 className="text-white font-bold text-base tracking-wide" style={{ fontFamily: 'inherit' }}>{title}</h4>
       </div>
-      <div className="text-[#b0bec5] text-sm leading-[1.8] space-y-3">{children}</div>
+      <div className="text-[#b0bec5] text-sm leading-[1.85] space-y-3" style={{ fontFamily: 'inherit' }}>{children}</div>
     </Card3D>
   );
 }
@@ -118,15 +127,19 @@ export function Collapsible({ title, children, defaultOpen = false }: {
 }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <motion.div layout className="rounded-xl border border-white/[0.07] bg-white/[0.02] overflow-hidden backdrop-blur-sm">
+    <motion.div layout className="rounded-xl overflow-hidden backdrop-blur-sm relative"
+      style={{ border: `1px solid ${open ? 'rgba(34,197,94,0.12)' : 'rgba(255,255,255,0.07)'}`, background: open ? 'rgba(34,197,94,0.02)' : 'rgba(255,255,255,0.02)', transition: 'border-color 0.3s, background 0.3s' }}>
+      {open && <div className="absolute left-0 top-0 bottom-0 w-[2px]" style={{ background: `linear-gradient(180deg, ${PHASE_COLOR}, ${PHASE_COLOR}40)` }} />}
       <button onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between p-4 text-left hover:bg-white/[0.03] transition-colors">
-        <span className="text-white font-semibold text-sm">{title}</span>
-        {open ? <ChevronUp className="w-4 h-4 text-[#64748b]" /> : <ChevronDown className="w-4 h-4 text-[#64748b]" />}
+        className="w-full flex items-center justify-between p-5 text-left hover:bg-white/[0.03] transition-all duration-300">
+        <span className="text-white font-bold text-sm tracking-wide" style={{ fontFamily: 'inherit' }}>{title}</span>
+        <motion.div animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}>
+          <ChevronDown className="w-4 h-4" style={{ color: open ? PHASE_COLOR : '#64748b', transition: 'color 0.3s' }} />
+        </motion.div>
       </button>
       <motion.div initial={false} animate={{ height: open ? 'auto' : 0, opacity: open ? 1 : 0 }}
-        transition={{ duration: 0.3 }} className="overflow-hidden">
-        <div className="px-4 pb-5 text-[#94a3b8] text-sm leading-[1.8]">{children}</div>
+        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }} className="overflow-hidden">
+        <div className="px-5 pb-6 text-[#94a3b8] text-sm leading-[1.85]" style={{ fontFamily: 'inherit' }}>{children}</div>
       </motion.div>
     </motion.div>
   );
@@ -135,10 +148,17 @@ export function Collapsible({ title, children, defaultOpen = false }: {
 /* ─── Key Point Callout ─── */
 export function KeyPoint({ children }: { children: React.ReactNode }) {
   return (
-    <motion.div whileHover={{ scale: 1.01 }}
-      className="flex items-start gap-3 p-4 rounded-xl bg-[#22c55e]/[0.06] border border-[#22c55e]/[0.15] backdrop-blur-sm">
-      <Zap className="w-4 h-4 mt-0.5 flex-shrink-0 text-[#22c55e]" />
-      <span className="text-sm text-[#c8d0db] leading-[1.8]">{children}</span>
+    <motion.div whileHover={{ scale: 1.01, x: 2 }}
+      className="relative flex items-start gap-3 p-5 rounded-xl backdrop-blur-sm overflow-hidden"
+      style={{ background: 'linear-gradient(135deg, rgba(34,197,94,0.07), rgba(34,197,94,0.03))', border: '1px solid rgba(34,197,94,0.15)' }}>
+      <motion.div className="absolute inset-0 opacity-20" style={{ background: 'radial-gradient(ellipse at 10% 50%, rgba(34,197,94,0.15), transparent 60%)' }}
+        animate={{ opacity: [0.15, 0.25, 0.15] }}
+        transition={{ duration: 3, repeat: Infinity }} />
+      <div className="absolute left-0 top-0 bottom-0 w-[3px] rounded-full" style={{ background: 'linear-gradient(180deg, #22c55e, #22c55e80)' }} />
+      <motion.div animate={{ rotate: [0, 15, -15, 0] }} transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }} className="relative z-10">
+        <Zap className="w-4 h-4 mt-0.5 flex-shrink-0 text-[#22c55e]" style={{ filter: 'drop-shadow(0 0 6px rgba(34,197,94,0.5))' }} />
+      </motion.div>
+      <span className="text-sm text-[#c8d0db] leading-[1.85] relative z-10" style={{ fontFamily: 'inherit' }}>{children}</span>
     </motion.div>
   );
 }
@@ -146,11 +166,15 @@ export function KeyPoint({ children }: { children: React.ReactNode }) {
 /* ─── Warning/Important Callout ─── */
 export function ImportantNote({ children, color = '#f59e0b' }: { children: React.ReactNode; color?: string }) {
   return (
-    <div className="flex items-start gap-3 p-4 rounded-xl border backdrop-blur-sm"
-      style={{ background: `${color}08`, borderColor: `${color}20` }}>
-      <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 text-xs font-bold"
-        style={{ background: `${color}20`, color }}>!</div>
-      <span className="text-sm text-[#c8d0db] leading-[1.8]">{children}</span>
+    <div className="relative flex items-start gap-3 p-5 rounded-xl border backdrop-blur-sm overflow-hidden"
+      style={{ background: `linear-gradient(135deg, ${color}0a, ${color}04)`, borderColor: `${color}20` }}>
+      <div className="absolute left-0 top-0 bottom-0 w-[3px] rounded-full" style={{ background: `linear-gradient(180deg, ${color}, ${color}60)` }} />
+      <motion.div
+        animate={{ scale: [1, 1.2, 1] }}
+        transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2 }}
+        className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 text-xs font-black"
+        style={{ background: `${color}20`, color, fontFamily: 'inherit', boxShadow: `0 0 12px ${color}20` }}>!</motion.div>
+      <span className="text-sm text-[#c8d0db] leading-[1.85]" style={{ fontFamily: 'inherit' }}>{children}</span>
     </div>
   );
 }
@@ -159,20 +183,23 @@ export function ImportantNote({ children, color = '#f59e0b' }: { children: React
 export function CodeBlock({ code, title }: { code: string; title?: string }) {
   return (
     <motion.div whileHover={{ scale: 1.005 }}
-      className="rounded-xl overflow-hidden border border-white/[0.08] shadow-lg">
+      className="rounded-xl overflow-hidden shadow-lg"
+      style={{ border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 4px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04)' }}>
       {title && (
-        <div className="px-4 py-2.5 bg-[#1e1e2e] border-b border-white/[0.06] flex items-center gap-2">
-          <div className="flex gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-[#ff5f57]" />
-            <div className="w-3 h-3 rounded-full bg-[#febc2e]" />
-            <div className="w-3 h-3 rounded-full bg-[#28c840]" />
+        <div className="px-4 py-3 border-b border-white/[0.06] flex items-center gap-2" style={{ background: 'linear-gradient(180deg, #1c1c2e, #181826)' }}>
+          <div className="flex gap-2">
+            <motion.div className="w-3 h-3 rounded-full bg-[#ff5f57]" whileHover={{ scale: 1.3 }} style={{ boxShadow: '0 0 6px #ff5f5740' }} />
+            <motion.div className="w-3 h-3 rounded-full bg-[#febc2e]" whileHover={{ scale: 1.3 }} style={{ boxShadow: '0 0 6px #febc2e40' }} />
+            <motion.div className="w-3 h-3 rounded-full bg-[#28c840]" whileHover={{ scale: 1.3 }} style={{ boxShadow: '0 0 6px #28c84040' }} />
           </div>
-          <Code2 className="w-3.5 h-3.5 text-[#22c55e] ml-2" />
-          <span className="text-xs font-medium text-[#94a3b8]">{title}</span>
+          <Code2 className="w-3.5 h-3.5 text-[#22c55e] ml-2" style={{ filter: 'drop-shadow(0 0 4px rgba(34,197,94,0.3))' }} />
+          <span className="text-xs font-semibold text-[#8b95a8] tracking-wide" style={{ fontFamily: 'inherit' }}>{title}</span>
         </div>
       )}
       <SyntaxHighlighter language="c" style={vscDarkPlus}
-        customStyle={{ margin: 0, padding: '1.25rem', background: '#0d1117', fontSize: '13px', lineHeight: '1.7' }}>
+        customStyle={{ margin: 0, padding: '1.25rem', background: '#0a0e17', fontSize: '13px', lineHeight: '1.75', fontFamily: 'inherit' }}
+        showLineNumbers={true}
+        lineNumberStyle={{ color: '#2a3040', fontSize: '11px', paddingRight: '1em', minWidth: '2.5em', userSelect: 'none' }}>
         {code}
       </SyntaxHighlighter>
     </motion.div>
@@ -182,22 +209,28 @@ export function CodeBlock({ code, title }: { code: string; title?: string }) {
 /* ─── Data Table ─── */
 export function DataTable({ headers, rows }: { headers: string[]; rows: string[][] }) {
   return (
-    <div className="overflow-x-auto rounded-xl border border-white/[0.08] shadow-lg">
-      <table className="w-full text-sm">
+    <div className="overflow-x-auto rounded-xl shadow-lg" style={{ border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 4px 24px rgba(0,0,0,0.25)' }}>
+      <table className="w-full text-sm" style={{ fontFamily: 'inherit' }}>
         <thead>
-          <tr className="bg-gradient-to-r from-white/[0.05] to-white/[0.02]">
+          <tr style={{ background: 'linear-gradient(90deg, rgba(34,197,94,0.06), rgba(59,130,246,0.04), rgba(255,255,255,0.03))' }}>
             {headers.map((h, i) => (
-              <th key={i} className="px-4 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-[#94a3b8] border-b border-white/[0.08]">{h}</th>
+              <th key={i} className="px-4 py-4 text-left text-[10px] font-black uppercase tracking-[0.15em] border-b border-white/[0.08]" style={{ color: i === 0 ? PHASE_COLOR : '#8b95a8', fontFamily: 'inherit' }}>{h}</th>
             ))}
           </tr>
         </thead>
         <tbody>
           {rows.map((row, i) => (
-            <tr key={i} className="border-b border-white/[0.04] hover:bg-white/[0.03] transition-colors">
+            <motion.tr key={i}
+              initial={{ opacity: 0, x: -10 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.03 }}
+              className="border-b border-white/[0.04] hover:bg-white/[0.04] transition-all duration-200"
+              style={{ background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.015)' }}>
               {row.map((cell, j) => (
-                <td key={j} className={`px-4 py-3.5 leading-relaxed ${j === 0 ? 'text-white font-semibold' : 'text-[#b0bec5]'}`}>{cell}</td>
+                <td key={j} className={`px-4 py-3.5 leading-[1.7] ${j === 0 ? 'text-white font-bold' : 'text-[#b0bec5]'}`} style={{ fontFamily: 'inherit', fontSize: '13px' }}>{cell}</td>
               ))}
-            </tr>
+            </motion.tr>
           ))}
         </tbody>
       </table>
@@ -385,7 +418,7 @@ export function InteractiveBinaryConverter() {
       className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-[#22c55e]/[0.04] to-[#3b82f6]/[0.03] p-6 backdrop-blur-sm">
       <h4 className="text-white font-bold text-sm mb-4 flex items-center gap-2">
         <motion.span animate={{ rotate: [0, 360] }} transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
-          className="inline-block">⚡</motion.span>
+          className="inline-block text-[#22c55e]">{'>'}</motion.span>
         Interactive ASCII → Binary Converter
       </h4>
       <div className="flex flex-col sm:flex-row items-center gap-6">
@@ -441,8 +474,8 @@ export function VoltageThresholdDiagram() {
   return (
     <motion.div whileHover={{ scale: 1.005 }}
       className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.03] to-transparent p-6 backdrop-blur-sm">
-      <h4 className="text-white font-bold text-sm mb-3 flex items-center gap-2">
-        <span>🔌</span> Why Binary Works — Voltage Threshold Visualization
+      <h4 className="text-white font-bold text-sm mb-3 flex items-center gap-2 font-[family-name:var(--font-jetbrains)]">
+        <Zap className="w-4 h-4 text-[#f59e0b]" /> Why Binary Works — Voltage Threshold Visualization
       </h4>
       <p className="text-xs text-[#94a3b8] mb-5 leading-relaxed">
         Drag the slider to see how binary is noise-resistant. Even severely degraded signals are correctly interpreted.
@@ -508,8 +541,8 @@ export function DeterminismDemo() {
   return (
     <motion.div whileHover={{ scale: 1.005 }}
       className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-[#3b82f6]/[0.04] to-transparent p-6 backdrop-blur-sm">
-      <h4 className="text-white font-bold text-sm mb-2 flex items-center gap-2">
-        <span>🎯</span> Determinism in Action — The Domino Effect
+      <h4 className="text-white font-bold text-sm mb-2 flex items-center gap-2 font-[family-name:var(--font-jetbrains)]">
+        <Code2 className="w-4 h-4 text-[#3b82f6]" /> Determinism in Action — The Domino Effect
       </h4>
       <p className="text-xs text-[#94a3b8] mb-4 leading-relaxed">
         Click to compute 2 + 3 ten times. Watch: the result is <strong className="text-white">always 5</strong> — no deviation, no hesitation, no error. This is deterministic behavior.
@@ -534,8 +567,8 @@ export function DeterminismDemo() {
       </div>
       {results.length === 10 && (
         <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-          className="text-xs text-[#22c55e] mt-3 font-semibold">
-          ✅ 10/10 identical results. Zero deviation. This is why computers are reliable — pure determinism.
+          className="text-xs text-[#22c55e] mt-3 font-semibold font-[family-name:var(--font-jetbrains)]">
+          [PASS] 10/10 identical results. Zero deviation. This is why computers are reliable — pure determinism.
         </motion.p>
       )}
     </motion.div>
@@ -547,13 +580,13 @@ export function CPUCacheVisual() {
   const [hoveredType, setHoveredType] = useState<'array' | 'linked' | null>(null);
   return (
     <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.03] to-transparent p-6 backdrop-blur-sm">
-      <h4 className="text-white font-bold text-sm mb-4">🚀 CPU Cache Hit vs Miss — Visual Comparison</h4>
+      <h4 className="text-white font-bold text-sm mb-4 font-[family-name:var(--font-jetbrains)]">CPU Cache Hit vs Miss — Visual Comparison</h4>
       <div className="grid md:grid-cols-2 gap-6">
         <motion.div
           onHoverStart={() => setHoveredType('array')}
           onHoverEnd={() => setHoveredType(null)}
           className="rounded-xl border border-[#22c55e]/20 bg-[#22c55e]/[0.04] p-4">
-          <h5 className="text-[#22c55e] font-bold text-sm mb-3">✅ Array (Contiguous Memory)</h5>
+          <h5 className="text-[#22c55e] font-bold text-sm mb-3 font-[family-name:var(--font-jetbrains)]">[PASS] Array (Contiguous Memory)</h5>
           <div className="flex gap-0.5 mb-3 flex-wrap">
             {Array.from({ length: 8 }).map((_, i) => (
               <motion.div key={i}
@@ -584,7 +617,7 @@ export function CPUCacheVisual() {
           onHoverStart={() => setHoveredType('linked')}
           onHoverEnd={() => setHoveredType(null)}
           className="rounded-xl border border-[#ef4444]/20 bg-[#ef4444]/[0.04] p-4">
-          <h5 className="text-[#ef4444] font-bold text-sm mb-3">❌ Linked List (Scattered Memory)</h5>
+          <h5 className="text-[#ef4444] font-bold text-sm mb-3 font-[family-name:var(--font-jetbrains)]">[FAIL] Linked List (Scattered Memory)</h5>
           <div className="flex gap-0.5 mb-3 flex-wrap">
             {Array.from({ length: 8 }).map((_, i) => (
               <motion.div key={i}
@@ -621,7 +654,7 @@ export function MusicBoxVsComputer() {
   const [flipped, setFlipped] = useState(false);
   return (
     <div className="cursor-pointer select-none" onClick={() => setFlipped(!flipped)}>
-      <p className="text-xs text-[#64748b] mb-2 text-center">👆 Click to flip and compare</p>
+      <p className="text-xs text-[#64748b] mb-2 text-center font-[family-name:var(--font-jetbrains)]">[click to flip and compare]</p>
       <div className="relative h-52 rounded-2xl" style={{ perspective: 1200 }}>
         <motion.div
           animate={{ rotateY: flipped ? 180 : 0 }}
@@ -631,7 +664,7 @@ export function MusicBoxVsComputer() {
           {/* Front - Music Box */}
           <div className="absolute inset-0 rounded-2xl border border-[#f59e0b]/20 bg-gradient-to-br from-[#f59e0b]/[0.08] to-transparent p-6 flex flex-col justify-center"
             style={{ backfaceVisibility: 'hidden' }}>
-            <h4 className="text-2xl font-bold text-[#f59e0b] mb-2">🎵 Fixed-Function Machine</h4>
+            <h4 className="text-2xl font-bold text-[#f59e0b] mb-2 font-[family-name:var(--font-jetbrains)]">// Fixed-Function Machine</h4>
             <h5 className="text-white font-semibold mb-3">The Mechanical Music Box</h5>
             <p className="text-sm text-[#b0bec5] leading-relaxed">
               Internal brass cylinder with unalterable metal pins. Plays ONE predefined melody. To hear a different song?
@@ -642,7 +675,7 @@ export function MusicBoxVsComputer() {
           {/* Back - Computer */}
           <div className="absolute inset-0 rounded-2xl border border-[#22c55e]/20 bg-gradient-to-br from-[#22c55e]/[0.08] to-transparent p-6 flex flex-col justify-center"
             style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
-            <h4 className="text-2xl font-bold text-[#22c55e] mb-2">💻 Programmable Machine</h4>
+            <h4 className="text-2xl font-bold text-[#22c55e] mb-2 font-[family-name:var(--font-jetbrains)]">// Programmable Machine</h4>
             <h5 className="text-white font-semibold mb-3">The Modern Computer</h5>
             <p className="text-sm text-[#b0bec5] leading-relaxed">
               Same physical silicon chip acts as TV, GPS, trading terminal, communication device, and game console.
@@ -744,8 +777,8 @@ export function TransistorAnimation() {
   return (
     <motion.div whileHover={{ scale: 1.005 }}
       className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-[#a855f7]/[0.04] to-transparent p-6 backdrop-blur-sm">
-      <h4 className="text-white font-bold text-sm mb-2 flex items-center gap-2">
-        <span>⚡</span> Transistor — The Microscopic Switch (Billions Inside Your CPU)
+      <h4 className="text-white font-bold text-sm mb-2 flex items-center gap-2 font-[family-name:var(--font-jetbrains)]">
+        <Zap className="w-4 h-4 text-[#a855f7]" /> Transistor — The Microscopic Switch (Billions Inside Your CPU)
       </h4>
       <p className="text-xs text-[#94a3b8] mb-5 leading-relaxed">
         A transistor is an incredibly tiny electronic switch. It has only two states: <strong className="text-white">ON</strong> (electricity flows = 1) and <strong className="text-white">OFF</strong> (electricity blocked = 0). Click to toggle the transistor and watch the electricity flow.
@@ -820,17 +853,17 @@ export function TransistorAnimation() {
 export function UniversalTuringMachine() {
   const [activeApp, setActiveApp] = useState(0);
   const apps = [
-    { name: 'Calculator', icon: '🔢', desc: 'Arithmetic operations on numbers', output: '5 + 3 = 8' },
-    { name: 'Music Player', icon: '🎵', desc: 'Decode audio files, drive speakers', output: '♫ Playing: Beethoven' },
-    { name: 'Camera', icon: '📷', desc: 'Capture light, process pixels', output: '📸 Photo saved!' },
-    { name: 'GPS Navigator', icon: '🗺️', desc: 'Triangulate satellite signals', output: '→ Turn left in 200m' },
-    { name: 'Video Game', icon: '🎮', desc: 'Real-time 3D rendering + physics', output: '🏆 Score: 1500' },
+    { name: 'Calculator', icon: '(+)', desc: 'Arithmetic operations on numbers', output: '5 + 3 = 8' },
+    { name: 'Music Player', icon: '|>>', desc: 'Decode audio files, drive speakers', output: 'Playing: Beethoven' },
+    { name: 'Camera', icon: '[o]', desc: 'Capture light, process pixels', output: 'Photo saved!' },
+    { name: 'GPS Navigator', icon: '<*>', desc: 'Triangulate satellite signals', output: '-> Turn left in 200m' },
+    { name: 'Video Game', icon: '/_\\', desc: 'Real-time 3D rendering + physics', output: 'Score: 1500' },
   ];
   return (
     <motion.div whileHover={{ scale: 1.003 }}
       className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-[#3b82f6]/[0.05] to-[#a855f7]/[0.03] p-6 backdrop-blur-sm">
-      <h4 className="text-white font-bold text-sm mb-2 flex items-center gap-2">
-        <span>🖥️</span> Universal Turing Machine — Same Hardware, Infinite Functions
+      <h4 className="text-white font-bold text-sm mb-2 flex items-center gap-2 font-[family-name:var(--font-jetbrains)]">
+        <Code2 className="w-4 h-4 text-[#3b82f6]" /> Universal Turing Machine — Same Hardware, Infinite Functions
       </h4>
       <p className="text-xs text-[#94a3b8] mb-4 leading-relaxed">
         A computer is a <strong className="text-white">Universal Turing Machine</strong> — given enough time and memory, it can simulate any other machine. Click each app to see the <strong className="text-white">same silicon chip</strong> perform completely different tasks.
@@ -884,12 +917,12 @@ export function UniversalTuringMachine() {
 /* ─── Human vs Machine Comparison Table (Animated) ─── */
 export function HumanVsMachineTable() {
   const rows = [
-    { attribute: 'Instruction Interpretation', human: 'Contextual and intuitive — fills missing details using common sense', machine: 'Literal and absolute — executes exactly what is written, nothing more', humanIcon: '🧠', machineIcon: '🤖' },
-    { attribute: 'Error Handling', human: 'Adapts to ambiguity — reads misspelled words and understands intent', machine: 'Fails completely — even slight syntax deviation causes total failure', humanIcon: '🔄', machineIcon: '💥' },
-    { attribute: 'Consistency', human: 'Prone to fatigue, emotions, cognitive bias causing variable outputs', machine: 'Flawless consistency over infinite repetitions — deterministic', humanIcon: '😓', machineIcon: '✅' },
-    { attribute: 'Learning', human: 'Generalizes broad concepts from few examples effortlessly', machine: 'Requires billions of data points and explicit brute-force programming', humanIcon: '💡', machineIcon: '📊' },
-    { attribute: 'Speed', human: 'Processes ~50 bits/sec consciously — slow but highly creative', machine: 'Processes billions of operations/sec — fast but zero creativity', humanIcon: '🐢', machineIcon: '⚡' },
-    { attribute: 'Context', human: 'Massive implicit background knowledge from life experience', machine: 'Zero background knowledge — only knows what it is explicitly told', humanIcon: '🌍', machineIcon: '📋' },
+    { attribute: 'Instruction Interpretation', human: 'Contextual and intuitive — fills missing details using common sense', machine: 'Literal and absolute — executes exactly what is written, nothing more', humanIcon: '~', machineIcon: '>' },
+    { attribute: 'Error Handling', human: 'Adapts to ambiguity — reads misspelled words and understands intent', machine: 'Fails completely — even slight syntax deviation causes total failure', humanIcon: '?', machineIcon: '!' },
+    { attribute: 'Consistency', human: 'Prone to fatigue, emotions, cognitive bias causing variable outputs', machine: 'Flawless consistency over infinite repetitions — deterministic', humanIcon: '~', machineIcon: '=' },
+    { attribute: 'Learning', human: 'Generalizes broad concepts from few examples effortlessly', machine: 'Requires billions of data points and explicit brute-force programming', humanIcon: '+', machineIcon: '#' },
+    { attribute: 'Speed', human: 'Processes ~50 bits/sec consciously — slow but highly creative', machine: 'Processes billions of operations/sec — fast but zero creativity', humanIcon: '.', machineIcon: '>' },
+    { attribute: 'Context', human: 'Massive implicit background knowledge from life experience', machine: 'Zero background knowledge — only knows what it is explicitly told', humanIcon: '*', machineIcon: '0' },
   ];
   return (
     <div className="rounded-2xl border border-white/[0.08] overflow-hidden backdrop-blur-sm">
@@ -903,8 +936,8 @@ export function HumanVsMachineTable() {
           <thead>
             <tr className="bg-white/[0.03]">
               <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-[#94a3b8] border-b border-white/[0.06]">Attribute</th>
-              <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-[#3b82f6] border-b border-white/[0.06]">🧠 Human</th>
-              <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-[#ef4444] border-b border-white/[0.06]">🤖 Machine</th>
+              <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-[#3b82f6] border-b border-white/[0.06] font-[family-name:var(--font-jetbrains)]">// Human</th>
+              <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-[#ef4444] border-b border-white/[0.06] font-[family-name:var(--font-jetbrains)]">// Machine</th>
             </tr>
           </thead>
           <tbody>
@@ -934,18 +967,18 @@ export function HumanVsMachineTable() {
 /* ─── Memory Segment Diagram ─── */
 export function MemorySegmentDiagram() {
   const segments = [
-    { name: 'Stack', desc: 'Function calls, local variables, return addresses. Grows downward. LIFO order. Automatically managed.', color: '#22c55e', size: '15%', icon: '📚' },
-    { name: '↓ Free Space ↑', desc: 'Unallocated memory between Stack and Heap. Grows/shrinks as stack and heap expand.', color: '#475569', size: '30%', icon: '🔲' },
-    { name: 'Heap', desc: 'Dynamic memory (malloc/free). Grows upward. Manually managed by the programmer. Memory leaks happen here.', color: '#f59e0b', size: '20%', icon: '🏗️' },
-    { name: 'BSS Segment', desc: 'Uninitialized global/static variables. Automatically zeroed by the OS at program start.', color: '#a855f7', size: '10%', icon: '0️⃣' },
-    { name: 'Data Segment', desc: 'Initialized global/static variables. Values set at compile time. Read-write segment.', color: '#3b82f6', size: '10%', icon: '📦' },
-    { name: 'Text Segment', desc: 'Compiled machine code instructions (the actual program). Read-only — CPU executes from here.', color: '#ef4444', size: '15%', icon: '📜' },
+    { name: 'Stack', desc: 'Function calls, local variables, return addresses. Grows downward. LIFO order. Automatically managed.', color: '#22c55e', size: '15%', icon: '[ ]' },
+    { name: '↓ Free Space ↑', desc: 'Unallocated memory between Stack and Heap. Grows/shrinks as stack and heap expand.', color: '#475569', size: '30%', icon: '...' },
+    { name: 'Heap', desc: 'Dynamic memory (malloc/free). Grows upward. Manually managed by the programmer. Memory leaks happen here.', color: '#f59e0b', size: '20%', icon: '{ }' },
+    { name: 'BSS Segment', desc: 'Uninitialized global/static variables. Automatically zeroed by the OS at program start.', color: '#a855f7', size: '10%', icon: '0x0' },
+    { name: 'Data Segment', desc: 'Initialized global/static variables. Values set at compile time. Read-write segment.', color: '#3b82f6', size: '10%', icon: '=42' },
+    { name: 'Text Segment', desc: 'Compiled machine code instructions (the actual program). Read-only — CPU executes from here.', color: '#ef4444', size: '15%', icon: '>>>' },
   ];
   return (
     <motion.div whileHover={{ scale: 1.003 }}
       className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.03] to-transparent p-6 backdrop-blur-sm">
-      <h4 className="text-white font-bold text-sm mb-2 flex items-center gap-2">
-        <span>🧱</span> Program Memory Layout — How RAM is Organized for Your C Program
+      <h4 className="text-white font-bold text-sm mb-2 flex items-center gap-2 font-[family-name:var(--font-jetbrains)]">
+        <Code2 className="w-4 h-4 text-[#a855f7]" /> Program Memory Layout — How RAM is Organized for Your C Program
       </h4>
       <p className="text-xs text-[#94a3b8] mb-5 leading-relaxed">
         When the OS Loader places your program into RAM, it organizes memory into strict segments. Understanding this layout is critical for debugging <strong className="text-white">segmentation faults</strong> and <strong className="text-white">memory leaks</strong>.

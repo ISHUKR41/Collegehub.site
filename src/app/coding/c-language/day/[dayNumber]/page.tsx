@@ -35,12 +35,31 @@ export async function generateMetadata({
   const result = findDay(numericDay);
 
   if (!result) {
-    return { title: 'Day Not Found | C Mastery' };
+    return { title: 'Day Not Found | C Mastery Blueprint — CollegeHub' };
   }
 
+  const title = `Day ${numericDay} — ${result.day.title} | C Mastery Blueprint`;
+  const description = numericDay === 1
+    ? 'Master computational thinking foundations: how computers think, binary systems, memory architecture, variables, C program structure, compilation process. Interactive simulations, 100+ practice questions, and FAANG-level explanations.'
+    : `${result.phase.name}: ${result.day.topics.slice(0, 6).join(', ')}. Master C programming with interactive simulations, detailed explanations, and hands-on coding practice.`;
+
   return {
-    title: `Day ${numericDay} - ${result.day.title} | C Mastery`,
-    description: `${result.phase.name}: ${result.day.topics.slice(0, 4).join(', ')}. Learn and practice with in-browser coding.`,
+    title,
+    description,
+    keywords: numericDay === 1
+      ? ['C programming', 'computational thinking', 'binary system', 'memory architecture', 'compilation process', 'variables in C', 'how computer works', 'FAANG interview prep', 'C language tutorial', 'programming fundamentals']
+      : ['C programming', result.day.title, ...result.day.topics.slice(0, 5)],
+    openGraph: {
+      title,
+      description,
+      type: 'article',
+      siteName: 'CollegeHub — C Mastery Blueprint',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
   };
 }
 

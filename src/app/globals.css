@@ -58,8 +58,8 @@
   --color-glass-hover: rgba(255, 255, 255, 0.08);
 
   /* Font family — Inter for clean, professional typography */
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-jetbrains), "JetBrains Mono", "Fira Code", monospace;
 
   /* Font sizes — typographic scale */
   --font-size-xs: 0.75rem;
@@ -100,7 +100,6 @@
   --z-modal: 400;
   --z-toast: 500;
 }
-
 
 /* ===================================================================
    BASE STYLES — Applied to all elements globally
@@ -155,14 +154,18 @@ body {
   color: var(--color-text-primary);
 }
 
-
 /* ===================================================================
    TYPOGRAPHY UTILITIES
    =================================================================== */
 
 /* Gradient text — used for headings and accent text */
 .text-gradient {
-  background: linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-secondary), var(--color-accent-tertiary));
+  background: linear-gradient(
+    135deg,
+    var(--color-accent-primary),
+    var(--color-accent-secondary),
+    var(--color-accent-tertiary)
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -183,7 +186,6 @@ body {
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
-
 
 /* ===================================================================
    GLASS MORPHISM COMPONENTS
@@ -217,40 +219,67 @@ body {
   border: 1px solid var(--color-border);
 }
 
-
 /* ===================================================================
    GRADIENT BACKGROUNDS
    Used for sections, cards, and decorative elements
    =================================================================== */
 
 .bg-gradient-main {
-  background: linear-gradient(180deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 50%, var(--color-bg-tertiary) 100%);
+  background: linear-gradient(
+    180deg,
+    var(--color-bg-primary) 0%,
+    var(--color-bg-secondary) 50%,
+    var(--color-bg-tertiary) 100%
+  );
 }
 
 .bg-gradient-radial {
-  background: radial-gradient(ellipse at 50% 0%, rgba(99, 102, 241, 0.08) 0%, transparent 60%);
+  background: radial-gradient(
+    ellipse at 50% 0%,
+    rgba(99, 102, 241, 0.08) 0%,
+    transparent 60%
+  );
 }
 
 .bg-gradient-accent {
-  background: linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-secondary));
+  background: linear-gradient(
+    135deg,
+    var(--color-accent-primary),
+    var(--color-accent-secondary)
+  );
 }
 
 /* Mesh gradient — for hero sections */
 .bg-mesh {
-  background: 
-    radial-gradient(ellipse at 20% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.06) 0%, transparent 50%),
-    radial-gradient(ellipse at 40% 80%, rgba(34, 197, 94, 0.04) 0%, transparent 50%),
+  background:
+    radial-gradient(
+      ellipse at 20% 50%,
+      rgba(99, 102, 241, 0.08) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse at 80% 20%,
+      rgba(139, 92, 246, 0.06) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse at 40% 80%,
+      rgba(34, 197, 94, 0.04) 0%,
+      transparent 50%
+    ),
     var(--color-bg-primary);
 }
-
 
 /* ===================================================================
    BUTTON STYLES
    =================================================================== */
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-secondary));
+  background: linear-gradient(
+    135deg,
+    var(--color-accent-primary),
+    var(--color-accent-secondary)
+  );
   color: white;
   padding: 0.75rem 2rem;
   border-radius: var(--radius-lg);
@@ -267,10 +296,14 @@ body {
 }
 
 .btn-primary::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, var(--color-accent-secondary), var(--color-accent-primary));
+  background: linear-gradient(
+    135deg,
+    var(--color-accent-secondary),
+    var(--color-accent-primary)
+  );
   opacity: 0;
   transition: opacity var(--duration-normal) ease;
 }
@@ -310,77 +343,145 @@ body {
   transform: translateY(-2px);
 }
 
-
 /* ===================================================================
    KEYFRAME ANIMATIONS
    All animations are GPU-accelerated (transform/opacity only)
    =================================================================== */
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes fadeInDown {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes slideInLeft {
-  from { opacity: 0; transform: translateX(-30px); }
-  to { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @keyframes slideInRight {
-  from { opacity: 0; transform: translateX(30px); }
-  to { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 15px rgba(99, 102, 241, 0.15); }
-  50% { box-shadow: 0 0 30px rgba(99, 102, 241, 0.3); }
+  0%,
+  100% {
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
+  }
 }
 
 @keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 @keyframes gradient-shift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 /* Utility animation classes */
-.animate-fade-in { animation: fadeIn 0.5s ease forwards; }
-.animate-fade-in-up { animation: fadeInUp 0.6s ease forwards; }
-.animate-fade-in-down { animation: fadeInDown 0.6s ease forwards; }
-.animate-slide-left { animation: slideInLeft 0.5s ease forwards; }
-.animate-slide-right { animation: slideInRight 0.5s ease forwards; }
-.animate-scale-in { animation: scaleIn 0.4s ease forwards; }
-.animate-float { animation: float 3s ease-in-out infinite; }
-.animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
-.animate-gradient { 
-  background-size: 200% 200%;
-  animation: gradient-shift 4s ease infinite; 
+.animate-fade-in {
+  animation: fadeIn 0.5s ease forwards;
 }
-
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease forwards;
+}
+.animate-fade-in-down {
+  animation: fadeInDown 0.6s ease forwards;
+}
+.animate-slide-left {
+  animation: slideInLeft 0.5s ease forwards;
+}
+.animate-slide-right {
+  animation: slideInRight 0.5s ease forwards;
+}
+.animate-scale-in {
+  animation: scaleIn 0.4s ease forwards;
+}
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 4s ease infinite;
+}
 
 /* ===================================================================
    SECTION SPACING — Consistent vertical rhythm
@@ -396,7 +497,6 @@ body {
     padding-bottom: 8rem;
   }
 }
-
 
 /* ===================================================================
    CONTAINER — Responsive max-width wrapper
@@ -417,7 +517,6 @@ body {
   }
 }
 
-
 /* ===================================================================
    CODE BLOCK STYLES — For coding section previews
    =================================================================== */
@@ -434,23 +533,39 @@ body {
 }
 
 .code-block::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, var(--color-accent-primary), var(--color-accent-secondary), transparent);
+  background: linear-gradient(
+    90deg,
+    var(--color-accent-primary),
+    var(--color-accent-secondary),
+    transparent
+  );
 }
 
 /* Syntax highlight colors */
-.code-keyword { color: #c792ea; }
-.code-string { color: #c3e88d; }
-.code-function { color: #82aaff; }
-.code-comment { color: #546e7a; }
-.code-number { color: #f78c6c; }
-.code-type { color: #ffcb6b; }
-
+.code-keyword {
+  color: #c792ea;
+}
+.code-string {
+  color: #c3e88d;
+}
+.code-function {
+  color: #82aaff;
+}
+.code-comment {
+  color: #546e7a;
+}
+.code-number {
+  color: #f78c6c;
+}
+.code-type {
+  color: #ffcb6b;
+}
 
 /* ===================================================================
    LINE CLAMP — Truncate multi-line text
@@ -469,7 +584,6 @@ body {
   overflow: hidden;
 }
 
-
 /* ===================================================================
    DECORATIVE ELEMENTS
    =================================================================== */
@@ -480,26 +594,32 @@ body {
   height: 6px;
   border-radius: 50%;
   background: var(--color-accent-primary);
-  box-shadow: 0 0 10px var(--color-accent-primary), 0 0 20px rgba(99, 102, 241, 0.3);
+  box-shadow:
+    0 0 10px var(--color-accent-primary),
+    0 0 20px rgba(99, 102, 241, 0.3);
 }
 
 /* Divider line with gradient */
 .divider-gradient {
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--color-border), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-border),
+    transparent
+  );
   border: none;
 }
 
 /* Noise texture overlay — adds subtle texture to backgrounds */
 .noise-overlay::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.02'/%3E%3C/svg%3E");
   pointer-events: none;
   z-index: 0;
 }
-
 
 /* ===================================================================
    RESPONSIVE TYPOGRAPHY — Scales headings down on small screens
@@ -516,7 +636,6 @@ body {
   }
 }
 
-
 /* ===================================================================
    SCROLL PADDING — Offset anchors below sticky navbar (~ 80px)
    =================================================================== */
@@ -524,14 +643,17 @@ html {
   scroll-padding-top: 5rem;
 }
 
-
 /* ===================================================================
    TOUCH OPTIMIZATION — Removes 300ms tap delay on mobile devices
    =================================================================== */
-a, button, [role="button"], input, select, textarea {
+a,
+button,
+[role="button"],
+input,
+select,
+textarea {
   touch-action: manipulation;
 }
-
 
 /* ===================================================================
    REDUCED MOTION — Respects user accessibility preferences
@@ -549,7 +671,6 @@ a, button, [role="button"], input, select, textarea {
   }
 }
 
-
 /* ===================================================================
    RESPONSIVE GLASS CARD PADDING — Tighter padding on small screens
    =================================================================== */
@@ -563,7 +684,6 @@ a, button, [role="button"], input, select, textarea {
     padding-bottom: 4rem;
   }
 }
-
 
 /* ===================================================================
    MICRO-INTERACTIONS — Professional hover and active states
@@ -602,10 +722,14 @@ a, button, [role="button"], input, select, textarea {
 }
 
 .glow-on-hover::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(99, 102, 241, 0.1) 0%, transparent 50%);
+  background: radial-gradient(
+    circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(99, 102, 241, 0.1) 0%,
+    transparent 50%
+  );
   opacity: 0;
   transition: opacity var(--duration-normal) ease;
   pointer-events: none;
@@ -614,7 +738,6 @@ a, button, [role="button"], input, select, textarea {
 .glow-on-hover:hover::before {
   opacity: 1;
 }
-
 
 /* ===================================================================
    RESPONSIVE UTILITIES — Show/hide at different breakpoints
@@ -651,7 +774,6 @@ a, button, [role="button"], input, select, textarea {
   }
 }
 
-
 /* ===================================================================
    FOCUS INDICATORS — Enhanced accessibility
    =================================================================== */
@@ -663,7 +785,6 @@ a, button, [role="button"], input, select, textarea {
   outline: none;
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5);
 }
-
 
 /* ===================================================================
    LOADING STATES — Pulse and shimmer effects
@@ -683,18 +804,24 @@ a, button, [role="button"], input, select, textarea {
 }
 
 .shimmer::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.05),
+    transparent
+  );
   animation: shimmer-wave 2s infinite;
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -705,7 +832,6 @@ a, button, [role="button"], input, select, textarea {
 .pulse {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
-
 
 /* ===================================================================
    SMOOTH SCROLLING FOR MOBILE
