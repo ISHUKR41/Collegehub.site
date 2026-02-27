@@ -1,31 +1,43 @@
 /**
  * Navbar.tsx — Ultra-premium coder-aesthetic navigation bar.
  *
+ * This is the main navigation component shown at the top of every page.
+ * It uses a terminal / IDE inspired design with the JetBrains Mono font.
+ *
  * Features:
  * - IDE/Terminal-inspired layout with JetBrains Mono font
- * - Animated gradient accent line & hover effects
- * - Glassmorphism + subtle green glow on scroll
- * - Animated hamburger → X mobile toggle
- * - Right-slide mobile drawer with terminal chrome
- * - Auth-aware login/logout
+ * - Animated gradient accent line at the top
+ * - Glassmorphism effect when user scrolls down
+ * - Animated hamburger → X toggle for mobile
+ * - Right-slide mobile drawer styled like a terminal window
+ * - Auth-aware: shows login/logout buttons based on user state
  * - All animations CSS-driven for zero-lag performance
+ * - Responsive: desktop links hidden on mobile, drawer shown instead
  */
 
 'use client';
 
+/* ─── React hooks for state, effects, and memoization ─── */
 import { useEffect, useState, useCallback } from 'react';
+/* ─── Next.js Link for client-side navigation ─── */
 import Link from 'next/link';
+/* ─── Next.js hooks for reading the current URL and programmatic navigation ─── */
 import { usePathname, useRouter } from 'next/navigation';
+/* ─── Framer Motion for smooth enter/exit animations ─── */
 import { motion, AnimatePresence } from 'framer-motion';
+/* ─── Lucide icons — professional, consistent icon set ─── */
 import {
   ArrowRight, LogOut, Terminal, Code2, Home,
   GraduationCap, LayoutDashboard, BookOpen, MessageSquare, Info,
 } from 'lucide-react';
+/* ─── App-wide constants: navigation link data ─── */
 import { NAV_LINKS } from '@/lib/constants';
+/* ─── Auth utilities: check if user is logged in ─── */
 import { AUTH_STATE_EVENT, getAccessToken } from '@/lib/api-client';
+/* ─── Auth service: handle logout flow ─── */
 import { logout as logoutSession } from '@/services/auth-service';
 
-/* ─── Icon mapping ─── */
+/* ─── Icon mapping: maps each route path to its Lucide icon component ─── */
 const NAV_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   '/': Home,
   '/school': BookOpen,
@@ -35,33 +47,54 @@ const NAV_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   '/contact': MessageSquare,
 };
 
-/* ─── Mono font shorthand ─── */
+/* ─── Shorthand CSS class for using JetBrains Mono font ─── */
 const MONO = 'font-[family-name:var(--font-jetbrains)]';
 
+/**
+ * Navbar — The main navigation component.
+ *
+ * Renders a fixed-position header with:
+ * 1. Desktop: horizontal links with active indicator
+ * 2. Mobile: hamburger button → slide-in drawer
+ * 3. Auth buttons: login/register or logout
+ */
 export default function Navbar() {
+  /* ─── State: is the mobile drawer open? ─── */
   const [isOpen, setIsOpen] = useState(false);
+  /* ─── State: has the user scrolled past 20px? (triggers glassmorphism) ─── */
   const [scrolled, setScrolled] = useState(false);
+  /* ─── State: is the user currently logged in? ─── */
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  /* ─── State: is logout in progress? (prevents double-clicks) ─── */
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
+  /* ─── Read the current URL path (e.g. "/coding") ─── */
   const pathname = usePathname();
+  /* ─── Router for programmatic navigation after logout ─── */
   const router = useRouter();
 
+  /**
+   * syncAuthState — Checks localStorage for an access token
+   * and updates the isAuthenticated state accordingly.
+   */
   const syncAuthState = useCallback(() => {
     setIsAuthenticated(Boolean(getAccessToken()));
   }, []);
 
+  /* ─── Effect: Listen for scroll events to toggle the glassmorphism style ─── */
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  /* ─── Effect: Prevent body scroll when mobile drawer is open ─── */
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
 
+  /* ─── Effect: Sync auth state on mount and listen for auth changes ─── */
   useEffect(() => {
     syncAuthState();
     const handler = () => syncAuthState();
@@ -69,8 +102,13 @@ export default function Navbar() {
     return () => window.removeEventListener(AUTH_STATE_EVENT, handler);
   }, [syncAuthState]);
 
+  /* ─── Effect: Re-check auth when the page route changes ─── */
   useEffect(() => { syncAuthState(); }, [pathname, syncAuthState]);
 
+  /**
+   * handleLogout — Calls the auth service to log out,
+   * clears state, closes drawer, and navigates to /login.
+   */
   const handleLogout = async () => {
     if (isLoggingOut) return;
     setIsLoggingOut(true);
@@ -92,7 +130,7 @@ export default function Navbar() {
           : 'bg-[#0a0a12]/70 backdrop-blur-xl'
       }`}
     >
-      {/* ─── Animated top accent gradient line ─── */}
+      {/* ─── Animated top accent gradient line — CSS gradient animation ─── */}
       <div className="absolute top-0 left-0 right-0 h-[2px] overflow-hidden">
         <motion.div
           className="h-full w-full"
@@ -105,28 +143,31 @@ export default function Navbar() {
         />
       </div>
 
+      {/* ─── Main nav container ─── */}
       <nav className="container-custom" aria-label="Main navigation">
         <div className="flex items-center justify-between h-[4.5rem] lg:h-[5.25rem]">
 
-          {/* ════════ Logo ════════ */}
+          {/* ════════════════════════════════════════════════
+              Logo — Terminal icon badge + "{ CollegeHub }" text
+              ════════════════════════════════════════════════ */}
           <Link href="/" className="flex items-center gap-3.5 group select-none" aria-label="CollegeHub Home">
-            {/* Icon badge */}
+            {/* Icon badge with gradient border */}
             <div className="relative w-11 h-11 lg:w-12 lg:h-12 rounded-xl flex items-center justify-center overflow-hidden group-hover:scale-105 transition-transform duration-300">
-              {/* Gradient border */}
+              {/* Gradient border ring */}
               <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-[#22c55e] via-[#6366f1] to-[#22c55e] p-[1.5px]">
                 <div className="w-full h-full rounded-xl bg-[#0a0a12] flex items-center justify-center">
                   <Terminal className="w-5 h-5 lg:w-[22px] lg:h-[22px] text-[#22c55e]" strokeWidth={2.5} />
                 </div>
               </div>
-              {/* Glow */}
+              {/* Subtle green glow behind the badge */}
               <div
                 className="absolute inset-0 rounded-xl opacity-40 group-hover:opacity-70 transition-opacity duration-500"
                 style={{ boxShadow: '0 0 28px rgba(34,197,94,0.3)' }}
               />
             </div>
 
-            {/* Brand text */}
-            <div className="flex items-center gap-1">
+            {/* Brand text: { CollegeHub } — styled like a code block */}
+            <div className="flex items-center gap-1.5">
               <span className={`text-[#22c55e]/40 ${MONO} text-base lg:text-lg group-hover:text-[#22c55e]/60 transition-colors duration-300`}>{`{`}</span>
               <span className={`text-[1.2rem] lg:text-[1.35rem] font-bold ${MONO} tracking-tight`}>
                 <span className="text-[#22c55e]">College</span>
@@ -136,21 +177,27 @@ export default function Navbar() {
             </div>
           </Link>
 
-          {/* ════════ Desktop Nav Links ════════ */}
-          <div className="hidden md:flex items-center gap-1 lg:gap-1.5">
+          {/* ════════════════════════════════════════════════
+              Desktop Nav Links — Hidden on mobile (< md)
+              Each link has an icon, label, active underline, and hover glow
+              ════════════════════════════════════════════════ */}
+          <div className="hidden md:flex items-center gap-2 lg:gap-3 xl:gap-4">
             {NAV_LINKS.map((link) => {
+              /* ─── Check if this link matches the current page ─── */
               const isActive = pathname === link.href;
+              /* ─── Get the icon component for this route ─── */
               const IconComp = NAV_ICONS[link.href];
               return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`relative px-4 lg:px-5 xl:px-6 py-2.5 lg:py-3 rounded-xl text-[13px] lg:text-[14px] font-semibold ${MONO} tracking-[0.03em] transition-all duration-250 flex items-center gap-2 lg:gap-2.5 group/link ${
+                  className={`relative px-4 lg:px-5 xl:px-6 py-2.5 lg:py-3 rounded-xl text-[13px] lg:text-[14px] font-semibold ${MONO} tracking-[0.04em] transition-all duration-250 flex items-center gap-2.5 lg:gap-3 group/link ${
                     isActive
                       ? 'text-[#22c55e]'
                       : 'text-[#64748b] hover:text-[#94a3b8]'
                   }`}
                 >
+                  {/* Link icon */}
                   {IconComp && (
                     <IconComp
                       className={`w-[15px] h-[15px] lg:w-4 lg:h-4 transition-all duration-250 ${
@@ -158,9 +205,10 @@ export default function Navbar() {
                       }`}
                     />
                   )}
+                  {/* Link label text */}
                   {link.label}
 
-                  {/* Active indicator — animated underline */}
+                  {/* Active indicator — animated green underline that follows active link */}
                   {isActive && (
                     <motion.div
                       layoutId="nav-active"
@@ -173,7 +221,7 @@ export default function Navbar() {
                     />
                   )}
 
-                  {/* Hover glow background */}
+                  {/* Hover glow — subtle white overlay on hover */}
                   {!isActive && (
                     <span className="absolute inset-0 rounded-xl bg-white/[0.03] opacity-0 group-hover/link:opacity-100 transition-opacity duration-250" />
                   )}
@@ -182,15 +230,18 @@ export default function Navbar() {
             })}
           </div>
 
-          {/* ════════ Right side actions ════════ */}
-          <div className="flex items-center gap-3 lg:gap-4">
-            {/* Terminal cursor blink */}
+          {/* ════════════════════════════════════════════════
+              Right side actions — cursor blink + auth button + hamburger
+              ════════════════════════════════════════════════ */}
+          <div className="flex items-center gap-4 lg:gap-5">
+            {/* Terminal cursor blink — purely decorative */}
             <motion.span
               className="hidden lg:inline-block w-[3px] h-5 bg-[#22c55e]/70 rounded-[1px]"
               animate={{ opacity: [1, 0, 1] }}
               transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
             />
 
+            {/* Auth button — shows logout if authenticated, or register if not */}
             {isAuthenticated ? (
               <button
                 type="button"
@@ -212,7 +263,8 @@ export default function Navbar() {
               </Link>
             )}
 
-            {/* ──── Mobile hamburger ──── */}
+            {/* ──── Mobile hamburger button ────
+                 Three lines that animate into an X when clicked. */}
             <button
               onClick={() => setIsOpen((v) => !v)}
               className="md:hidden p-3 rounded-xl text-[#64748b] hover:text-[#22c55e] hover:bg-[#22c55e]/5 transition-all duration-200 active:scale-95"
@@ -220,16 +272,19 @@ export default function Navbar() {
               aria-expanded={isOpen}
             >
               <div className="w-6 h-5 flex flex-col justify-between relative">
+                {/* Top line — rotates 45° when open */}
                 <motion.span
                   className="w-full h-[2px] bg-current rounded-full origin-left"
                   animate={isOpen ? { rotate: 45, x: 2 } : { rotate: 0, x: 0 }}
                   transition={{ duration: 0.3 }}
                 />
+                {/* Middle line — fades and slides left when open */}
                 <motion.span
                   className="w-4 h-[2px] bg-current rounded-full"
                   animate={isOpen ? { opacity: 0, x: -10 } : { opacity: 1, x: 0 }}
                   transition={{ duration: 0.2 }}
                 />
+                {/* Bottom line — rotates -45° when open */}
                 <motion.span
                   className="w-full h-[2px] bg-current rounded-full origin-left"
                   animate={isOpen ? { rotate: -45, x: 2 } : { rotate: 0, x: 0 }}
@@ -241,11 +296,14 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* ════════ Mobile Drawer ════════ */}
+      {/* ════════════════════════════════════════════════
+          Mobile Drawer — Slides in from the right side
+          Styled like a terminal window with red/yellow/green dots
+          ════════════════════════════════════════════════ */}
       <AnimatePresence>
         {isOpen && (
           <>
-            {/* Backdrop */}
+            {/* Backdrop overlay — fades in, closes drawer on click */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -254,7 +312,7 @@ export default function Navbar() {
               onClick={() => setIsOpen(false)}
             />
 
-            {/* Drawer panel */}
+            {/* Drawer panel — slides in from right */}
             <motion.div
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
@@ -262,7 +320,7 @@ export default function Navbar() {
               transition={{ type: 'spring', damping: 26, stiffness: 220 }}
               className="fixed top-0 right-0 h-full w-[320px] max-w-[85vw] bg-[#0a0a12] border-l border-[#22c55e]/12 md:hidden z-50 overflow-y-auto"
             >
-              {/* Terminal chrome header */}
+              {/* Terminal chrome header — red/yellow/green dots + file name */}
               <div className="px-6 pt-6 pb-4 border-b border-white/[0.06]">
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-3 h-3 rounded-full bg-[#ef4444]" />
@@ -275,8 +333,9 @@ export default function Navbar() {
                 </p>
               </div>
 
-              {/* Navigation links */}
+              {/* Navigation links list */}
               <div className="flex flex-col gap-1.5 p-5 pt-6">
+                {/* Section label — styled like a code comment */}
                 <p className={`text-[10px] ${MONO} text-[#334155] uppercase tracking-[0.15em] mb-2.5 px-3`}>
                   {'// navigation'}
                 </p>
@@ -305,6 +364,7 @@ export default function Navbar() {
                           />
                         )}
                         <span>{link.label}</span>
+                        {/* Show "← active" label for the current page */}
                         {isActive && (
                           <span className={`ml-auto text-[9px] text-[#22c55e]/60 ${MONO}`}>
                             ← active
@@ -315,12 +375,15 @@ export default function Navbar() {
                   );
                 })}
 
+                {/* Divider line */}
                 <div className="h-px bg-white/[0.06] my-5" />
 
+                {/* Actions section label */}
                 <p className={`text-[10px] ${MONO} text-[#334155] uppercase tracking-[0.15em] mb-2.5 px-3`}>
                   {'// actions'}
                 </p>
 
+                {/* Auth actions — login/register or logout */}
                 {!isAuthenticated ? (
                   <>
                     <Link
@@ -353,7 +416,7 @@ export default function Navbar() {
                 )}
               </div>
 
-              {/* Bottom terminal decoration */}
+              {/* Bottom terminal decoration — shows version with blinking cursor */}
               <div className="absolute bottom-0 left-0 right-0 p-5 border-t border-white/[0.06]">
                 <p className={`text-[11px] ${MONO} text-[#334155] flex items-center gap-1.5`}>
                   <span className="text-[#22c55e]">$</span>

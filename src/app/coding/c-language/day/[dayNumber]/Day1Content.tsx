@@ -1,17 +1,59 @@
+/**
+ * Day1Content.tsx — Main content component for C Language Day 1.
+ *
+ * This is the heart of the Day 1 learning page. It renders all 10 parts
+ * of the "How Computer Thinks" lesson, including:
+ *   - Interactive simulations (Binary converter, Memory visualizer, etc.)
+ *   - Animated components (FloatingParticles, BinaryStream, etc.)
+ *   - Quiz sections (MCQ, Short Answer, Long Format)
+ *   - Detailed explanations with collapsible sections
+ *   - Code blocks with syntax highlighting
+ *
+ * The file is organized as:
+ *   1. Imports (React hooks, UI libraries, custom components)
+ *   2. PARTS array (navigation labels for the 10 sections)
+ *   3. Day1Content function (the main component)
+ *      - Scroll tracking logic
+ *      - Sub-navbar with breadcrumbs and progress ring
+ *      - Hero section with stats
+ *      - 10 content sections (Part 1 through Part 10)
+ *      - Navigation links to previous/next day
+ *
+ * For beginners: 'use client' tells Next.js this component runs in the
+ * browser (not on the server), because it uses interactive features like
+ * useState and scroll event listeners.
+ */
+
 'use client';
+
+/* ─── React Hooks ───
+ * useState: lets us store and update values (like scroll position)
+ * useEffect: runs code when the component loads or updates
+ * useCallback: remembers a function so it doesn't get recreated every render
+ */
 import { useState, useEffect, useCallback } from 'react';
+
+/* ─── Next.js Link — for navigation between pages without full reload ─── */
 import Link from 'next/link';
+
+/* ─── Framer Motion — animation library for smooth enter/exit effects ─── */
 import { motion, AnimatePresence } from 'framer-motion';
+
+/* ─── Lucide Icons — professional, consistent icon set (no stars!) ─── */
 import {
   ChevronRight, ChevronLeft, ArrowLeft, Cpu, HardDrive, MemoryStick, Monitor,
   Brain, Cog, Play, Target, Server, Code2, BookOpen, Lightbulb, AlertTriangle,
   Shield, Layers, Clock, HelpCircle, FlaskConical, Calculator, Zap, Crosshair,
   Bot, Hash, Globe2, Binary, FileCode, FolderOpen, FileText, Rocket, ScrollText,
   TriangleAlert, XCircle, CheckCircle2, Search, MapPin, Package, Smartphone,
-  CreditCard, Pen, PlugZap, Terminal, Braces, Menu, X, Home, GraduationCap,
+  CreditCard, Pen, PlugZap, Terminal, Menu, X, Home, GraduationCap,
   ChevronDown,
 } from 'lucide-react';
+
+/* ─── RevealOnScroll — makes content fade in as user scrolls to it ─── */
 import RevealOnScroll from '@/components/ui/RevealOnScroll';
+
+/* ─── Custom Components — all the interactive cards, animations, and visualizations ─── */
 import {
   PHASE_COLOR, FloatingParticles, BinaryStream, SectionBadge, InfoCard, Collapsible, KeyPoint,
   ImportantNote, CodeBlock, DataTable, MemoryBoxes, IPOSFlow, AbstractionLayers,
@@ -25,35 +67,85 @@ import {
   IPOSRealWorldSimulator, BinaryMathAnimator, MemoryAllocationSim,
   EscapeSequencePlayground, LogicalSequencingDrill,
 } from './day1-components';
+
+/* ─── Quiz Components — MCQ, Short Answer, and Long Format sections ─── */
 import { QuizSection } from './day1-quiz-components';
+
+/* ─── Quiz Data — all the questions, answers, and explanations ─── */
 import { DAY1_QUIZ_DATA } from './day1-quiz-data';
+
+/* ─── Advanced Components — deeper interactive tools and simulators ─── */
 import {
   StackHeapVisualizer, BitManipulationPlayground, ASCIITableExplorer,
   CPUPipelineSimulator, CompilerOutputSimulator, NumberSystemConverter,
   FunFactCard, WhereCRunsToday, MemoryLeakDemo,
 } from './day1-advanced-components';
 
-/* ─── PARTS NAV ─── */
-const PARTS = ['What Is a Machine?','Computer Anatomy','How Computer Understands','What Is Programming?','Why C Language?','Memory Architecture','Variables','C Program Structure','Compilation Process','First Safe Code'];
+/* ─── PARTS NAV — Labels for the 10 sections of Day 1 ───
+ * These labels appear in the sub-navbar dropdown and the hero section
+ * quick-nav chips. Each label corresponds to a section id like "part-1", "part-2", etc.
+ */
+const PARTS = [
+  'What Is a Machine?',      // Part 1 — Fixed vs Programmable machines
+  'Computer Anatomy',         // Part 2 — IPOS model, CPU/RAM/Storage
+  'How Computer Understands', // Part 3 — Binary, ASCII, Abstraction
+  'What Is Programming?',     // Part 4 — Algorithms, sequential execution
+  'Why C Language?',          // Part 5 — Mid-level, compilation, FAANG
+  'Memory Architecture',      // Part 6 — Linear address space, bytes
+  'Variables',                // Part 7 — Name/Address/Value/Type
+  'C Program Structure',      // Part 8 — #include, main(), syntax
+  'Compilation Process',      // Part 9 — Preprocessing → Linking
+  'First Safe Code',          // Part 10 — Hello World, error types
+];
 
+/**
+ * Day1Content — The main React component for Day 1.
+ *
+ * This component manages:
+ * - scrollProgress: 0-100 percentage of how far user has scrolled
+ * - mobileMenuOpen: whether the mobile parts dropdown is visible
+ * - activeSection: which of the 10 PARTS is currently in view
+ */
 export default function Day1Content() {
-  /* ── Scroll Progress ── */
+  /* ── State Variables ──
+   * scrollProgress: tracks how far down the page the user has scrolled (0% to 100%)
+   * mobileMenuOpen: controls visibility of the mobile navigation dropdown
+   * activeSection: index of the currently visible section (0-9)
+   */
   const [scrollProgress, setScrollProgress] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState(0);
 
+  /**
+   * handleScroll — Runs every time the user scrolls.
+   *
+   * It does two things:
+   * 1. Calculates scroll percentage (0% at top, 100% at bottom)
+   * 2. Detects which section is currently visible on screen
+   *    by checking which section's top edge is closest to the viewport
+   */
   const handleScroll = useCallback(() => {
+    /* How many pixels the user has scrolled from the top */
     const scrollTop = window.scrollY || window.pageYOffset;
+    /* Total height of the entire page */
     const docHeight = document.documentElement.scrollHeight;
+    /* Height of the visible browser window */
     const winHeight = window.innerHeight;
+    /* Maximum scrollable distance = total page height minus visible area */
     const totalScrollable = docHeight - winHeight;
     if (totalScrollable > 0) {
+      /* Calculate percentage: (current scroll / max scroll) × 100 */
       const progress = Math.min(Math.round((scrollTop / totalScrollable) * 100), 100);
       setScrollProgress(progress);
     } else {
       setScrollProgress(0);
     }
-    // detect active section
+
+    /* ── Detect which section is active ──
+     * We loop backwards (from Part 10 to Part 1) and find the first
+     * section whose top edge is above 180px from the viewport top.
+     * This gives us the section the user is currently reading.
+     */
     let found = false;
     for (let i = PARTS.length - 1; i >= 0; i--) {
       const el = document.getElementById(`part-${i + 1}`);
@@ -65,6 +157,12 @@ export default function Day1Content() {
     if (!found) setActiveSection(0);
   }, []);
 
+  /* ── Effect: Set up scroll listener with requestAnimationFrame for performance ──
+   * requestAnimationFrame ensures we only calculate scroll position once per
+   * screen refresh (typically 60fps), preventing janky/laggy scrolling.
+   * The multiple setTimeout calls at 50ms, 200ms, and 500ms ensure the
+   * initial calculation is correct even during Next.js hydration.
+   */
   useEffect(() => {
     let rafId: number;
     const onScroll = () => {
@@ -72,11 +170,12 @@ export default function Day1Content() {
       rafId = requestAnimationFrame(handleScroll);
     };
     window.addEventListener('scroll', onScroll, { passive: true });
-    // Run after layout settles — multiple delays to catch hydration
+    /* Run immediately and with delays to catch hydration edge cases */
     handleScroll();
     const t1 = setTimeout(handleScroll, 50);
     const t2 = setTimeout(handleScroll, 200);
     const t3 = setTimeout(handleScroll, 500);
+    /* Cleanup: remove listeners when component unmounts */
     return () => {
       window.removeEventListener('scroll', onScroll);
       cancelAnimationFrame(rafId);
@@ -412,7 +511,12 @@ export default function Day1Content() {
           </div>
         </section>
 
-        {/* ─── Content ─── */}
+        {/* ═══════════════════════════════════════════════════════════════
+            MAIN CONTENT AREA — All 10 Parts rendered below
+            Each part is wrapped in <RevealOnScroll> for fade-in animation
+            and has an id like "part-1", "part-2" for anchor navigation.
+            Each part ends with a <QuizSection> using data from day1-quiz-data.ts
+            ═══════════════════════════════════════════════════════════════ */}
         <div className="max-w-5xl mx-auto px-4 sm:px-6 pb-20 space-y-20">
 
 {/* ════════════════════ PART 1 ════════════════════ */}
