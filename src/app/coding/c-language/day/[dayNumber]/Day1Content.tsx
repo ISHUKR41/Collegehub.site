@@ -43,12 +43,15 @@ export default function Day1Content() {
   const [activeSection, setActiveSection] = useState(0);
 
   const handleScroll = useCallback(() => {
-    const docEl = document.documentElement;
-    const scrollTop = window.scrollY || docEl.scrollTop;
-    const totalHeight = docEl.scrollHeight - docEl.clientHeight;
-    if (totalHeight > 0) {
-      const progress = Math.min(Math.round((scrollTop / totalHeight) * 100), 100);
+    const scrollTop = window.scrollY || window.pageYOffset;
+    const docHeight = document.documentElement.scrollHeight;
+    const winHeight = window.innerHeight;
+    const totalScrollable = docHeight - winHeight;
+    if (totalScrollable > 0) {
+      const progress = Math.min(Math.round((scrollTop / totalScrollable) * 100), 100);
       setScrollProgress(progress);
+    } else {
+      setScrollProgress(0);
     }
     // detect active section
     let found = false;
@@ -56,7 +59,7 @@ export default function Day1Content() {
       const el = document.getElementById(`part-${i + 1}`);
       if (el) {
         const rect = el.getBoundingClientRect();
-        if (rect.top <= 150) { setActiveSection(i); found = true; break; }
+        if (rect.top <= 180) { setActiveSection(i); found = true; break; }
       }
     }
     if (!found) setActiveSection(0);
@@ -69,13 +72,17 @@ export default function Day1Content() {
       rafId = requestAnimationFrame(handleScroll);
     };
     window.addEventListener('scroll', onScroll, { passive: true });
-    // Run after layout settles
-    const t = setTimeout(handleScroll, 100);
+    // Run after layout settles — multiple delays to catch hydration
     handleScroll();
+    const t1 = setTimeout(handleScroll, 50);
+    const t2 = setTimeout(handleScroll, 200);
+    const t3 = setTimeout(handleScroll, 500);
     return () => {
       window.removeEventListener('scroll', onScroll);
       cancelAnimationFrame(rafId);
-      clearTimeout(t);
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
     };
   }, [handleScroll]);
 
@@ -105,32 +112,32 @@ export default function Day1Content() {
                 </Link>
 
                 {/* Breadcrumb Segments — with proper gaps */}
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <Link href="/coding/c-language" className="group hidden sm:flex items-center gap-2.5 px-3.5 py-2 rounded-xl hover:bg-white/[0.05] transition-all duration-300">
-                    <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-white/[0.04] group-hover:bg-[#22c55e]/[0.1] transition-all duration-300">
-                      <Code2 className="w-3.5 h-3.5 text-[#4a5568] group-hover:text-[#22c55e] transition-colors duration-300" />
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <Link href="/coding/c-language" className="group hidden sm:flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-white/[0.05] transition-all duration-300">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-white/[0.04] group-hover:bg-[#22c55e]/[0.1] transition-all duration-300">
+                      <Code2 className="w-4 h-4 text-[#4a5568] group-hover:text-[#22c55e] transition-colors duration-300" />
                     </div>
-                    <span className="text-[11px] font-bold tracking-[0.12em] uppercase text-[#536378] group-hover:text-[#94a3b8] transition-colors duration-300" style={{ fontFamily: 'inherit' }}>C_Mastery</span>
+                    <span className="text-[12px] font-bold tracking-[0.1em] uppercase text-[#536378] group-hover:text-[#94a3b8] transition-colors duration-300" style={{ fontFamily: 'inherit' }}>C_Mastery</span>
                   </Link>
 
-                  <span className="text-[#1a1f2e] select-none text-xs tracking-wider hidden sm:inline">›</span>
+                  <span className="text-[#2a3040] select-none text-sm tracking-wider hidden sm:inline font-bold">/</span>
 
                   <div
-                    className="flex items-center gap-2.5 px-3.5 py-2 rounded-xl cursor-default"
+                    className="flex items-center gap-3 px-4 py-2.5 rounded-xl cursor-default"
                     style={{
                       background: `linear-gradient(135deg, ${PHASE_COLOR}0a, ${PHASE_COLOR}03)`,
-                      border: `1px solid ${PHASE_COLOR}12`,
+                      border: `1px solid ${PHASE_COLOR}15`,
                     }}
                   >
-                    <Brain className="w-4 h-4 sm:w-[18px] sm:h-[18px]" style={{ color: PHASE_COLOR }} />
-                    <span className="text-[10px] sm:text-[11px] font-bold tracking-[0.14em] uppercase" style={{ color: PHASE_COLOR, fontFamily: 'inherit' }}>Brain_Reset</span>
+                    <Brain className="w-[18px] h-[18px] sm:w-5 sm:h-5" style={{ color: PHASE_COLOR }} />
+                    <span className="text-[11px] sm:text-[12px] font-bold tracking-[0.1em] uppercase" style={{ color: PHASE_COLOR, fontFamily: 'inherit' }}>Brain_Reset</span>
                   </div>
 
-                  <span className="text-[#1a1f2e] select-none text-xs tracking-wider">›</span>
+                  <span className="text-[#2a3040] select-none text-sm tracking-wider font-bold">/</span>
 
-                  <div className="flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-white/[0.07] border border-white/[0.1]" style={{ boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05), 0 0 20px rgba(255,255,255,0.02)' }}>
-                    <Terminal className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-white/90" />
-                    <span className="text-[10px] sm:text-[11px] font-black tracking-[0.14em] uppercase text-white/95" style={{ fontFamily: 'inherit' }}>Day_01</span>
+                  <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white/[0.07] border border-white/[0.12]" style={{ boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06), 0 0 24px rgba(255,255,255,0.02)' }}>
+                    <Terminal className="w-[18px] h-[18px] sm:w-5 sm:h-5 text-white/90" />
+                    <span className="text-[11px] sm:text-[12px] font-black tracking-[0.1em] uppercase text-white/95" style={{ fontFamily: 'inherit' }}>Day_01</span>
                   </div>
                 </div>
               </div>

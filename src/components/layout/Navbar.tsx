@@ -1,5 +1,5 @@
 /**
- * Navbar.tsx — Coder-aesthetic navigation with terminal-inspired design.
+ * Navbar.tsx — Premium coder-aesthetic navigation bar.
  *
  * Features:
  * - Terminal/IDE-inspired look with monospace fonts
@@ -7,6 +7,7 @@
  * - Glassmorphism with green terminal glow
  * - Smooth animated mobile drawer
  * - Auth-aware actions (login/logout)
+ * - Better spacing, premium typography, responsive
  */
 
 'use client';
@@ -16,7 +17,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  ArrowRight, LogOut, Terminal, Code2, Braces, Home,
+  ArrowRight, LogOut, Terminal, Code2, Home,
   GraduationCap, LayoutDashboard, BookOpen, MessageSquare, Info,
 } from 'lucide-react';
 import { NAV_LINKS } from '@/lib/constants';
@@ -83,8 +84,8 @@ export default function Navbar() {
     <header
       className={`fixed top-0 left-0 right-0 z-[500] transition-all duration-500 ${
         scrolled
-          ? 'bg-[#0a0a12]/90 backdrop-blur-2xl shadow-[0_1px_40px_rgba(34,197,94,0.06)] border-b border-[#22c55e]/10'
-          : 'bg-transparent'
+          ? 'bg-[#0a0a12]/92 backdrop-blur-2xl shadow-[0_2px_48px_rgba(34,197,94,0.06)] border-b border-[#22c55e]/10'
+          : 'bg-[#0a0a12]/60 backdrop-blur-xl'
       }`}
     >
       {/* Animated top accent line */}
@@ -92,51 +93,51 @@ export default function Navbar() {
         <motion.div
           className="h-full w-full"
           style={{
-            background: 'linear-gradient(90deg, transparent, #22c55e, #6366f1, #22c55e, transparent)',
+            background: 'linear-gradient(90deg, transparent 10%, #22c55e 30%, #6366f1 50%, #22c55e 70%, transparent 90%)',
             backgroundSize: '200% 100%',
           }}
           animate={{ backgroundPosition: ['0% 50%', '200% 50%'] }}
-          transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
+          transition={{ duration: 5, repeat: Infinity, ease: 'linear' }}
         />
       </div>
 
       <nav className="container-custom" aria-label="Main navigation">
-        <div className="flex items-center justify-between h-16 md:h-[4.5rem]">
+        <div className="flex items-center justify-between h-[4.25rem] md:h-[5rem]">
 
           {/* ─── Logo ─── */}
-          <Link href="/" className="flex items-center gap-2.5 group" aria-label="CollegeHub Home">
+          <Link href="/" className="flex items-center gap-3 group" aria-label="CollegeHub Home">
             <motion.div
               whileHover={{ rotateY: 180 }}
               transition={{ duration: 0.6 }}
               style={{ perspective: 600 }}
-              className="relative w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden"
+              className="relative w-11 h-11 rounded-xl flex items-center justify-center overflow-hidden"
             >
               {/* Animated gradient border */}
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-[#22c55e] via-[#6366f1] to-[#22c55e] p-[1px]">
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-[#22c55e] via-[#6366f1] to-[#22c55e] p-[1.5px]">
                 <div className="w-full h-full rounded-xl bg-[#0a0a12] flex items-center justify-center">
                   <Terminal className="w-5 h-5 text-[#22c55e]" strokeWidth={2.5} />
                 </div>
               </div>
-              {/* Glow pulse */ }
+              {/* Glow pulse */}
               <motion.div
                 className="absolute inset-0 rounded-xl"
-                style={{ boxShadow: '0 0 20px rgba(34,197,94,0.3)' }}
+                style={{ boxShadow: '0 0 24px rgba(34,197,94,0.25)' }}
                 animate={{ opacity: [0.3, 0.6, 0.3] }}
-                transition={{ duration: 2, repeat: Infinity }}
+                transition={{ duration: 2.5, repeat: Infinity }}
               />
             </motion.div>
-            <div className="flex items-center gap-0">
-              <Braces className="w-4 h-4 text-[#22c55e]/60 group-hover:text-[#22c55e] transition-colors duration-300" />
-              <span className="text-lg font-bold font-[family-name:var(--font-jetbrains)] tracking-tight">
+            <div className="flex items-center gap-0.5">
+              <span className="text-[#22c55e]/50 font-[family-name:var(--font-jetbrains)] text-sm group-hover:text-[#22c55e]/70 transition-colors duration-300">{`{`}</span>
+              <span className="text-[1.15rem] font-bold font-[family-name:var(--font-jetbrains)] tracking-tight">
                 <span className="text-[#22c55e]">College</span>
                 <span className="text-white">Hub</span>
               </span>
-              <span className="text-[#22c55e]/60 group-hover:text-[#22c55e] transition-colors duration-300 font-[family-name:var(--font-jetbrains)] text-sm">()</span>
+              <span className="text-[#22c55e]/50 font-[family-name:var(--font-jetbrains)] text-sm group-hover:text-[#22c55e]/70 transition-colors duration-300">{`}`}</span>
             </div>
           </Link>
 
           {/* ─── Desktop Nav Links ─── */}
-          <div className="hidden md:flex items-center gap-0.5">
+          <div className="hidden md:flex items-center gap-1">
             {NAV_LINKS.map((link) => {
               const isActive = pathname === link.href;
               const IconComp = NAV_ICONS[link.href];
@@ -144,7 +145,7 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`relative px-3 lg:px-4 py-2 rounded-lg text-[13px] font-semibold font-[family-name:var(--font-jetbrains)] transition-all duration-200 flex items-center gap-1.5 group/link ${
+                  className={`relative px-4 lg:px-5 py-2.5 rounded-xl text-[13px] font-semibold font-[family-name:var(--font-jetbrains)] tracking-[0.02em] transition-all duration-200 flex items-center gap-2 group/link ${
                     isActive
                       ? 'text-[#22c55e]'
                       : 'text-[#64748b] hover:text-[#94a3b8]'
@@ -152,7 +153,7 @@ export default function Navbar() {
                 >
                   {IconComp && (
                     <IconComp
-                      className={`w-3.5 h-3.5 transition-all duration-200 ${
+                      className={`w-[15px] h-[15px] transition-all duration-200 ${
                         isActive ? 'text-[#22c55e]' : 'text-[#475569] group-hover/link:text-[#64748b]'
                       }`}
                     />
@@ -162,17 +163,17 @@ export default function Navbar() {
                   {isActive && (
                     <motion.div
                       layoutId="nav-active"
-                      className="absolute -bottom-0.5 left-3 right-3 h-[2px] rounded-full"
+                      className="absolute -bottom-0.5 left-4 right-4 h-[2.5px] rounded-full"
                       style={{
                         background: 'linear-gradient(90deg, #22c55e, #22c55e80)',
-                        boxShadow: '0 0 8px rgba(34,197,94,0.4)',
+                        boxShadow: '0 0 12px rgba(34,197,94,0.4)',
                       }}
                       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                     />
                   )}
                   {/* Hover background */}
                   {!isActive && (
-                    <span className="absolute inset-0 rounded-lg bg-white/[0.03] opacity-0 group-hover/link:opacity-100 transition-opacity duration-200" />
+                    <span className="absolute inset-0 rounded-xl bg-white/[0.03] opacity-0 group-hover/link:opacity-100 transition-opacity duration-200" />
                   )}
                 </Link>
               );
@@ -180,10 +181,10 @@ export default function Navbar() {
           </div>
 
           {/* ─── Right side actions ─── */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             {/* Terminal cursor blink */}
             <motion.span
-              className="hidden lg:inline-block w-2 h-5 bg-[#22c55e]/80 rounded-[1px]"
+              className="hidden lg:inline-block w-[3px] h-5 bg-[#22c55e]/70 rounded-[1px]"
               animate={{ opacity: [1, 0, 1] }}
               transition={{ duration: 1, repeat: Infinity }}
             />
@@ -193,7 +194,7 @@ export default function Navbar() {
                 type="button"
                 onClick={handleLogout}
                 disabled={isLoggingOut}
-                className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[#ef4444]/20 bg-[#ef4444]/5 text-[#ef4444] text-[13px] font-semibold font-[family-name:var(--font-jetbrains)] hover:bg-[#ef4444]/10 hover:border-[#ef4444]/30 transition-all duration-200 disabled:opacity-50"
+                className="hidden sm:inline-flex items-center gap-2.5 px-5 py-2.5 rounded-xl border border-[#ef4444]/20 bg-[#ef4444]/5 text-[#ef4444] text-[13px] font-semibold font-[family-name:var(--font-jetbrains)] tracking-[0.02em] hover:bg-[#ef4444]/10 hover:border-[#ef4444]/30 transition-all duration-200 disabled:opacity-50"
               >
                 <span>{isLoggingOut ? 'exit()...' : 'logout()'}</span>
                 <LogOut className="w-3.5 h-3.5" />
@@ -201,18 +202,18 @@ export default function Navbar() {
             ) : (
               <Link
                 href="/register"
-                className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#22c55e]/10 border border-[#22c55e]/25 text-[#22c55e] text-[13px] font-semibold font-[family-name:var(--font-jetbrains)] hover:bg-[#22c55e]/20 hover:border-[#22c55e]/40 hover:shadow-[0_0_20px_rgba(34,197,94,0.15)] transition-all duration-300"
+                className="hidden sm:inline-flex items-center gap-2.5 px-5 py-2.5 rounded-xl bg-[#22c55e]/10 border border-[#22c55e]/25 text-[#22c55e] text-[13px] font-semibold font-[family-name:var(--font-jetbrains)] tracking-[0.02em] hover:bg-[#22c55e]/20 hover:border-[#22c55e]/40 hover:shadow-[0_0_24px_rgba(34,197,94,0.15)] transition-all duration-300"
               >
-                <Code2 className="w-3.5 h-3.5" />
+                <Code2 className="w-4 h-4" />
                 <span>start()</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             )}
 
-            {/* Mobile hamburger — animated terminal icon */}
+            {/* Mobile hamburger */}
             <button
               onClick={() => setIsOpen((v) => !v)}
-              className="md:hidden p-2 rounded-lg text-[#64748b] hover:text-[#22c55e] hover:bg-[#22c55e]/5 transition-all duration-200"
+              className="md:hidden p-2.5 rounded-xl text-[#64748b] hover:text-[#22c55e] hover:bg-[#22c55e]/5 transition-all duration-200"
               aria-label={isOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={isOpen}
             >
@@ -257,23 +258,23 @@ export default function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 h-full w-[280px] bg-[#0a0a12] border-l border-[#22c55e]/10 md:hidden z-50 overflow-y-auto"
+              className="fixed top-0 right-0 h-full w-[300px] bg-[#0a0a12] border-l border-[#22c55e]/10 md:hidden z-50 overflow-y-auto"
             >
               {/* Terminal header decoration */}
-              <div className="px-5 pt-5 pb-3 border-b border-white/[0.06]">
-                <div className="flex items-center gap-1.5 mb-2">
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#ef4444]" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#f59e0b]" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#22c55e]" />
+              <div className="px-6 pt-6 pb-4 border-b border-white/[0.06]">
+                <div className="flex items-center gap-2 mb-2.5">
+                  <div className="w-3 h-3 rounded-full bg-[#ef4444]" />
+                  <div className="w-3 h-3 rounded-full bg-[#f59e0b]" />
+                  <div className="w-3 h-3 rounded-full bg-[#22c55e]" />
                 </div>
-                <p className="text-[10px] font-[family-name:var(--font-jetbrains)] text-[#475569]">
+                <p className="text-[11px] font-[family-name:var(--font-jetbrains)] text-[#475569] tracking-wide">
                   ~/collegehub/nav
                 </p>
               </div>
 
               {/* Nav links */}
-              <div className="flex flex-col gap-1 p-4 pt-5">
-                <p className="text-[10px] font-[family-name:var(--font-jetbrains)] text-[#334155] uppercase tracking-wider mb-2 px-3">
+              <div className="flex flex-col gap-1.5 p-5 pt-6">
+                <p className="text-[10px] font-[family-name:var(--font-jetbrains)] text-[#334155] uppercase tracking-[0.15em] mb-2 px-3">
                   // navigation
                 </p>
                 {NAV_LINKS.map((link, i) => {
@@ -284,12 +285,12 @@ export default function Navbar() {
                       key={link.href}
                       initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.05 }}
+                      transition={{ delay: i * 0.06 }}
                     >
                       <Link
                         href={link.href}
                         onClick={() => setIsOpen(false)}
-                        className={`flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-semibold font-[family-name:var(--font-jetbrains)] transition-all duration-200 ${
+                        className={`flex items-center gap-3.5 px-4 py-3.5 rounded-xl text-[14px] font-semibold font-[family-name:var(--font-jetbrains)] tracking-[0.02em] transition-all duration-200 ${
                           isActive
                             ? 'text-[#22c55e] bg-[#22c55e]/8 border border-[#22c55e]/15'
                             : 'text-[#94a3b8] hover:text-white hover:bg-white/[0.04]'
@@ -297,7 +298,7 @@ export default function Navbar() {
                       >
                         {IconComp && (
                           <IconComp
-                            className={`w-4 h-4 ${isActive ? 'text-[#22c55e]' : 'text-[#475569]'}`}
+                            className={`w-[18px] h-[18px] ${isActive ? 'text-[#22c55e]' : 'text-[#475569]'}`}
                           />
                         )}
                         <span>{link.label}</span>
@@ -311,9 +312,9 @@ export default function Navbar() {
                   );
                 })}
 
-                <div className="h-px bg-white/[0.06] my-4" />
+                <div className="h-px bg-white/[0.06] my-5" />
 
-                <p className="text-[10px] font-[family-name:var(--font-jetbrains)] text-[#334155] uppercase tracking-wider mb-2 px-3">
+                <p className="text-[10px] font-[family-name:var(--font-jetbrains)] text-[#334155] uppercase tracking-[0.15em] mb-2 px-3">
                   // actions
                 </p>
 
@@ -322,7 +323,7 @@ export default function Navbar() {
                     <Link
                       href="/login"
                       onClick={() => setIsOpen(false)}
-                      className="flex items-center justify-center gap-2 px-4 py-3 rounded-lg border border-white/10 bg-white/[0.03] text-white text-sm font-semibold font-[family-name:var(--font-jetbrains)]"
+                      className="flex items-center justify-center gap-2.5 px-5 py-3.5 rounded-xl border border-white/10 bg-white/[0.03] text-white text-[14px] font-semibold font-[family-name:var(--font-jetbrains)] tracking-[0.02em]"
                     >
                       <Terminal className="w-4 h-4 text-[#64748b]" />
                       <span>login()</span>
@@ -330,7 +331,7 @@ export default function Navbar() {
                     <Link
                       href="/register"
                       onClick={() => setIsOpen(false)}
-                      className="flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-[#22c55e]/10 border border-[#22c55e]/25 text-[#22c55e] text-sm font-semibold font-[family-name:var(--font-jetbrains)] mt-1"
+                      className="flex items-center justify-center gap-2.5 px-5 py-3.5 rounded-xl bg-[#22c55e]/10 border border-[#22c55e]/25 text-[#22c55e] text-[14px] font-semibold font-[family-name:var(--font-jetbrains)] tracking-[0.02em] mt-1.5"
                     >
                       <Code2 className="w-4 h-4" />
                       <span>createAccount()</span>
@@ -341,7 +342,7 @@ export default function Navbar() {
                     type="button"
                     onClick={handleLogout}
                     disabled={isLoggingOut}
-                    className="flex items-center justify-center gap-2 px-4 py-3 rounded-lg border border-[#ef4444]/20 bg-[#ef4444]/5 text-[#ef4444] text-sm font-semibold font-[family-name:var(--font-jetbrains)] disabled:opacity-50"
+                    className="flex items-center justify-center gap-2.5 px-5 py-3.5 rounded-xl border border-[#ef4444]/20 bg-[#ef4444]/5 text-[#ef4444] text-[14px] font-semibold font-[family-name:var(--font-jetbrains)] tracking-[0.02em] disabled:opacity-50"
                   >
                     <LogOut className="w-4 h-4" />
                     <span>{isLoggingOut ? 'exit()...' : 'logout()'}</span>
@@ -350,12 +351,12 @@ export default function Navbar() {
               </div>
 
               {/* Bottom terminal decoration */}
-              <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/[0.06]">
-                <p className="text-[10px] font-[family-name:var(--font-jetbrains)] text-[#334155] flex items-center gap-1">
+              <div className="absolute bottom-0 left-0 right-0 p-5 border-t border-white/[0.06]">
+                <p className="text-[11px] font-[family-name:var(--font-jetbrains)] text-[#334155] flex items-center gap-1.5">
                   <span className="text-[#22c55e]">$</span>
                   <span>CollegeHub v2.0</span>
                   <motion.span
-                    className="inline-block w-1.5 h-3 bg-[#22c55e]/60 ml-1"
+                    className="inline-block w-2 h-3.5 bg-[#22c55e]/60 ml-1"
                     animate={{ opacity: [1, 0, 1] }}
                     transition={{ duration: 1, repeat: Infinity }}
                   />

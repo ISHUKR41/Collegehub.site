@@ -152,6 +152,12 @@ export default function RootLayout({
                     description: 'Master HTML, CSS, JavaScript, React, Node.js, and deployment',
                     provider: { '@type': 'Organization', name: SITE_CONFIG.name },
                   },
+                  {
+                    '@type': 'Course',
+                    name: '40-Day C Mastery Blueprint',
+                    description: 'Master C programming from computational thinking to advanced systems programming with interactive simulations and FAANG-level preparation',
+                    provider: { '@type': 'Organization', name: SITE_CONFIG.name },
+                  },
                 ],
               },
             }),

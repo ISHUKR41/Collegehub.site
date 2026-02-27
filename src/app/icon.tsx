@@ -13,26 +13,45 @@ export default function Icon() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'linear-gradient(135deg, #0b1220 0%, #1e293b 55%, #16a34a 100%)',
-          borderRadius: '8px',
+          background: 'linear-gradient(135deg, #0a0a14 0%, #0d1117 50%, #0a0a14 100%)',
+          borderRadius: '7px',
           boxSizing: 'border-box',
-          border: '1px solid rgba(255,255,255,0.25)',
+          border: '1.5px solid rgba(34,197,94,0.4)',
+          position: 'relative',
+          overflow: 'hidden',
         }}
       >
+        {/* Green glow effect */}
+        <div
+          style={{
+            position: 'absolute',
+            top: '-4px',
+            left: '-4px',
+            right: '-4px',
+            bottom: '-4px',
+            background: 'radial-gradient(circle at center, rgba(34,197,94,0.12) 0%, transparent 70%)',
+            display: 'flex',
+          }}
+        />
+        {/* Braces + CH text */}
         <span
           style={{
-            fontSize: '14px',
-            fontWeight: 800,
-            color: '#f8fafc',
-            letterSpacing: '-0.4px',
-            fontFamily: 'ui-sans-serif',
+            fontSize: '10px',
+            fontWeight: 900,
+            color: '#22c55e',
+            letterSpacing: '-0.3px',
+            fontFamily: 'monospace',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0px',
           }}
         >
-          CH
+          <span style={{ color: '#22c55e', opacity: 0.7, fontSize: '12px' }}>{`{`}</span>
+          <span style={{ color: '#f0fdf4', fontSize: '11px', fontWeight: 900 }}>CH</span>
+          <span style={{ color: '#22c55e', opacity: 0.7, fontSize: '12px' }}>{`}`}</span>
         </span>
       </div>
     ),
     { ...size }
   );
 }
-
