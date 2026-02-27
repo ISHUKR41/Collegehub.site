@@ -1,14 +1,12 @@
 /**
  * About page metadata and server wrapper.
  *
- * Why this file exists:
- * - Publishes About-page metadata.
- * - Injects AboutPage JSON-LD schema.
- * - Keeps interactive visuals in a separate client component.
+ * Publishes About-page metadata, JSON-LD, and breadcrumb schema.
  */
 
 import type { Metadata } from 'next';
 import JsonLd from '@/components/seo/JsonLd';
+import BreadcrumbJsonLd from '@/components/seo/BreadcrumbJsonLd';
 import { SITE_CONFIG } from '@/lib/constants';
 import AboutPageContent from './AboutPageContent';
 
@@ -25,11 +23,20 @@ export const metadata: Metadata = {
     'EdTech startup India',
     'student learning platform',
   ],
+  alternates: {
+    canonical: `${SITE_CONFIG.url}/about`,
+  },
   openGraph: {
     title: 'About CollegeHub - Mission, Vision, and Team',
     description:
       'How CollegeHub is building a secure, data-driven learning platform for school and coding students.',
     url: `${SITE_CONFIG.url}/about`,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'About CollegeHub - Mission, Vision, and Team',
+    description:
+      'How CollegeHub is building a secure, data-driven learning platform for school and coding students.',
   },
 };
 
@@ -53,6 +60,12 @@ export default function AboutPage() {
   return (
     <>
       <JsonLd data={schema} />
+      <BreadcrumbJsonLd
+        items={[
+          { name: 'Home', href: '/' },
+          { name: 'About', href: '/about' },
+        ]}
+      />
       <AboutPageContent />
     </>
   );

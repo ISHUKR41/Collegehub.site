@@ -1,14 +1,12 @@
 /**
  * Coding page metadata and server wrapper.
  *
- * Why this file exists:
- * - Exports route-level SEO metadata.
- * - Adds JSON-LD schema for coding catalog indexing.
- * - Renders interactive coding UI from a client component.
+ * Exports route-level SEO metadata, JSON-LD, and breadcrumb schema.
  */
 
 import type { Metadata } from 'next';
 import JsonLd from '@/components/seo/JsonLd';
+import BreadcrumbJsonLd from '@/components/seo/BreadcrumbJsonLd';
 import { SITE_CONFIG } from '@/lib/constants';
 import CodingPageContent from './CodingPageContent';
 
@@ -38,11 +36,20 @@ export const metadata: Metadata = {
     'programming languages for beginners',
     'best online coding platform India',
   ],
+  alternates: {
+    canonical: `${SITE_CONFIG.url}/coding`,
+  },
   openGraph: {
     title: 'Coding - Learn C, C++, Java, Python & Web Development | CollegeHub',
     description:
       'Practice-first coding tracks with progressive unlock, evaluation tests, and dashboard insights.',
     url: `${SITE_CONFIG.url}/coding`,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Coding - Learn C, C++, Java, Python & Web Development | CollegeHub',
+    description:
+      'Practice-first coding tracks with progressive unlock, evaluation tests, and dashboard insights.',
   },
 };
 
@@ -53,7 +60,7 @@ export default function CodingPage() {
     name: 'CollegeHub Coding Section',
     url: `${SITE_CONFIG.url}/coding`,
     description:
-      'Coding courses in C++, Java, Python, and Web Development with assessments and analytics.',
+      'Coding courses in C, C++, Java, Python, and Web Development with assessments and analytics.',
     isPartOf: {
       '@type': 'WebSite',
       name: SITE_CONFIG.name,
@@ -72,6 +79,12 @@ export default function CodingPage() {
   return (
     <>
       <JsonLd data={schema} />
+      <BreadcrumbJsonLd
+        items={[
+          { name: 'Home', href: '/' },
+          { name: 'Coding', href: '/coding' },
+        ]}
+      />
       <CodingPageContent />
     </>
   );

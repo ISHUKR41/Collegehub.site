@@ -1,14 +1,12 @@
 /**
  * School page metadata and server wrapper.
  *
- * Why this file exists:
- * - Exports route-level SEO metadata.
- * - Injects structured data for search engines.
- * - Keeps interactive UI in a separate client component.
+ * Exports route-level SEO metadata, JSON-LD, and breadcrumb schema.
  */
 
 import type { Metadata } from 'next';
 import JsonLd from '@/components/seo/JsonLd';
+import BreadcrumbJsonLd from '@/components/seo/BreadcrumbJsonLd';
 import { SITE_CONFIG } from '@/lib/constants';
 import SchoolPageContent from './SchoolPageContent';
 
@@ -38,11 +36,20 @@ export const metadata: Metadata = {
     'Social Science CBSE notes',
     'computer science class 10 CBSE',
   ],
+  alternates: {
+    canonical: `${SITE_CONFIG.url}/school`,
+  },
   openGraph: {
     title: 'School - Class 9 and Class 10 CBSE Study Material | CollegeHub',
     description:
       'Chapter-level learning with tests, lock-flow progression, and performance tracking for CBSE Class 9 & 10 students.',
     url: `${SITE_CONFIG.url}/school`,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'School - Class 9 and Class 10 CBSE Study Material | CollegeHub',
+    description:
+      'Chapter-level learning with tests, lock-flow progression, and performance tracking for CBSE Class 9 & 10 students.',
   },
 };
 
@@ -72,6 +79,12 @@ export default function SchoolPage() {
   return (
     <>
       <JsonLd data={schema} />
+      <BreadcrumbJsonLd
+        items={[
+          { name: 'Home', href: '/' },
+          { name: 'School', href: '/school' },
+        ]}
+      />
       <SchoolPageContent />
     </>
   );

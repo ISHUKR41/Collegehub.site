@@ -1,12 +1,15 @@
 /**
- * sitemap.ts - Dynamic sitemap generation from public course catalog.
+ * sitemap.ts - Dynamic sitemap generation.
  *
- * Fetches published courses from backend API to emit canonical
- * /courses/:id routes for search engines.
+ * Emits URLs for all public pages including:
+ * - Static pages (home, school, coding, about, contact)
+ * - C language course pages (40 days)
+ * - Dynamic course pages from backend API
  */
 
 import { MetadataRoute } from 'next';
 import { SITE_CONFIG } from '@/lib/constants';
+import { C_MASTERY_PHASES } from '@/lib/c-mastery-data';
 
 const SITE_URL = SITE_CONFIG.url;
 const API_BASE_URL =
@@ -64,6 +67,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     {
+      url: `${SITE_URL}/coding/c-language`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.85,
+    },
+    {
       url: `${SITE_URL}/about`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
@@ -89,6 +98,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
+  /* ── C Language Day Pages (1–40) ─────────────────────────── */
+  const cLanguageDayPages: MetadataRoute.Sitemap = C_MASTERY_PHASES.flatMap(
+    (phase) =>
+      phase.days.map((day) => ({
+        url: `${SITE_URL}/coding/c-language/day/${day.day}`,
+        lastModified: new Date(),
+        changeFrequency: 'monthly' as const,
+        priority: 0.75,
+      }))
+  );
+
+  /* ── Dynamic Course Pages from API ───────────────────────── */
   const courses = await fetchPublishedCourses();
 
   const dynamicCoursePages: MetadataRoute.Sitemap = courses.map((course) => ({
@@ -98,5 +119,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  return [...staticPages, ...dynamicCoursePages];
+  return [...staticPages, ...cLanguageDayPages, ...dynamicCoursePages];
 }

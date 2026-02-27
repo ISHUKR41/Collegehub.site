@@ -1,25 +1,8 @@
 /**
  * page.tsx - Landing page (Home)
  *
- * The main entry point of CollegeHub. This is the longest and most
- * detailed page, composed of multiple section components:
- *
- * 1.  Hero - Animated gradient with CTA
- * 2.  Stats - Animated counters
- * 3.  Features - Why Choose Us grid
- * 4.  How It Works - 5-step timeline
- * 5.  Learning Path - Timeline showing the learning journey
- * 6.  School Preview - Class 9 and Class 10 subjects
- * 7.  Coding Preview - Programming languages and code snippet
- * 8.  Testimonials - Student reviews
- * 9.  Partners - Trust signals and partner badges
- * 10. FAQ - Accordion questions
- * 11. Newsletter - Email signup CTA
- *
- * Why: Everything is a separate component for maintainability.
- * The page itself just composes them in order.
- *
- * To extend: Add more sections (Blog, Live Classes, Pricing).
+ * The main entry point of CollegeHub. Composed of multiple section components.
+ * Includes WebSite and FAQPage JSON-LD schemas for rich search results.
  */
 
 import type { Metadata } from 'next';
@@ -35,7 +18,7 @@ import PartnersSection from '@/components/sections/PartnersSection';
 import FAQ from '@/components/sections/FAQ';
 import Newsletter from '@/components/sections/Newsletter';
 import JsonLd from '@/components/seo/JsonLd';
-import { SITE_CONFIG } from '@/lib/constants';
+import { SITE_CONFIG, FAQ_ITEMS } from '@/lib/constants';
 
 export const metadata: Metadata = {
   title: 'Home - School and Coding Learning Platform',
@@ -49,11 +32,20 @@ export const metadata: Metadata = {
     'cpp java python web development',
     'learning analytics dashboard',
   ],
+  alternates: {
+    canonical: SITE_CONFIG.url,
+  },
   openGraph: {
     title: 'CollegeHub - School and Coding Learning Platform',
     description:
       'Structured school and coding learning paths with test analytics and resume tracking.',
     url: SITE_CONFIG.url,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'CollegeHub - School and Coding Learning Platform',
+    description:
+      'Structured school and coding learning paths with test analytics and resume tracking.',
   },
 };
 
@@ -72,9 +64,23 @@ export default function HomePage() {
     },
   };
 
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: FAQ_ITEMS.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.answer,
+      },
+    })),
+  };
+
   return (
     <>
       <JsonLd data={websiteSchema} />
+      <JsonLd data={faqSchema} />
 
       {/* Hero - First impression, animated gradient plus CTAs */}
       <Hero />

@@ -1,14 +1,12 @@
 /**
  * Contact page metadata and server wrapper.
  *
- * Why this file exists:
- * - Adds route-level metadata for support/contact queries.
- * - Injects ContactPage JSON-LD schema.
- * - Renders the interactive contact client component.
+ * Adds route-level metadata, JSON-LD, and breadcrumb schema.
  */
 
 import type { Metadata } from 'next';
 import JsonLd from '@/components/seo/JsonLd';
+import BreadcrumbJsonLd from '@/components/seo/BreadcrumbJsonLd';
 import { SITE_CONFIG } from '@/lib/constants';
 import ContactPageContent from './ContactPageContent';
 
@@ -23,11 +21,20 @@ export const metadata: Metadata = {
     'CollegeHub feedback',
     'education platform contact India',
   ],
+  alternates: {
+    canonical: `${SITE_CONFIG.url}/contact`,
+  },
   openGraph: {
     title: 'Contact CollegeHub - Support and Queries',
     description:
       'Reach the CollegeHub team for support requests, feature suggestions, and partnership discussions.',
     url: `${SITE_CONFIG.url}/contact`,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Contact CollegeHub - Support and Queries',
+    description:
+      'Reach the CollegeHub team for support requests, feature suggestions, and partnership discussions.',
   },
 };
 
@@ -54,6 +61,12 @@ export default function ContactPage() {
   return (
     <>
       <JsonLd data={schema} />
+      <BreadcrumbJsonLd
+        items={[
+          { name: 'Home', href: '/' },
+          { name: 'Contact', href: '/contact' },
+        ]}
+      />
       <ContactPageContent />
     </>
   );

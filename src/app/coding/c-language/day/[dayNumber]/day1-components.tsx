@@ -7,47 +7,51 @@ import { ChevronDown, Zap, Code2 } from 'lucide-react';
 
 export const PHASE_COLOR = '#22c55e';
 
-/* ─── Floating Particles Background ─── */
+/* ─── Floating Particles Background — Pure CSS for zero lag ─── */
 export function FloatingParticles() {
   return (
-    <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-      {[...Array(20)].map((_, i) => (
-        <motion.div key={i}
-          className="absolute rounded-full"
-          style={{
-            width: Math.random() * 4 + 2, height: Math.random() * 4 + 2,
-            left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%`,
-            background: i % 3 === 0 ? '#22c55e' : i % 3 === 1 ? '#3b82f6' : '#a855f7',
-            opacity: 0.15,
-          }}
-          animate={{
-            y: [0, -30, 0], x: [0, Math.random() * 20 - 10, 0],
-            opacity: [0.1, 0.3, 0.1],
-          }}
-          transition={{ duration: 4 + Math.random() * 4, repeat: Infinity, delay: Math.random() * 3 }}
-        />
-      ))}
-      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full blur-[160px] opacity-[0.06]" style={{ backgroundColor: PHASE_COLOR }} />
-      <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full bg-[#6366f1]/[0.04] blur-[140px]" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[#3b82f6]/[0.03] blur-[180px]" />
-    </div>
+    <>
+      <style>{`
+        @keyframes float-particle {
+          0%, 100% { transform: translateY(0) translateX(0); opacity: 0.1; }
+          50% { transform: translateY(-30px) translateX(10px); opacity: 0.3; }
+        }
+        .fp-dot { position: absolute; border-radius: 50%; will-change: transform, opacity; animation: float-particle var(--dur) ease-in-out var(--delay) infinite; }
+      `}</style>
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        {/* 12 CSS-only particles — GPU accelerated, no JS per frame */}
+        <div className="fp-dot" style={{ '--dur': '5s', '--delay': '0s', width: 3, height: 3, left: '10%', top: '15%', background: '#22c55e', opacity: 0.15 } as React.CSSProperties} />
+        <div className="fp-dot" style={{ '--dur': '6s', '--delay': '0.5s', width: 4, height: 4, left: '25%', top: '30%', background: '#3b82f6', opacity: 0.12 } as React.CSSProperties} />
+        <div className="fp-dot" style={{ '--dur': '7s', '--delay': '1s', width: 3, height: 3, left: '40%', top: '10%', background: '#a855f7', opacity: 0.15 } as React.CSSProperties} />
+        <div className="fp-dot" style={{ '--dur': '5.5s', '--delay': '1.5s', width: 5, height: 5, left: '55%', top: '60%', background: '#22c55e', opacity: 0.1 } as React.CSSProperties} />
+        <div className="fp-dot" style={{ '--dur': '6.5s', '--delay': '2s', width: 3, height: 3, left: '70%', top: '25%', background: '#3b82f6', opacity: 0.15 } as React.CSSProperties} />
+        <div className="fp-dot" style={{ '--dur': '8s', '--delay': '0.3s', width: 4, height: 4, left: '85%', top: '45%', background: '#a855f7', opacity: 0.12 } as React.CSSProperties} />
+        <div className="fp-dot" style={{ '--dur': '5s', '--delay': '2.5s', width: 3, height: 3, left: '15%', top: '70%', background: '#22c55e', opacity: 0.15 } as React.CSSProperties} />
+        <div className="fp-dot" style={{ '--dur': '7s', '--delay': '1.2s', width: 4, height: 4, left: '35%', top: '80%', background: '#3b82f6', opacity: 0.1 } as React.CSSProperties} />
+        <div className="fp-dot" style={{ '--dur': '6s', '--delay': '0.8s', width: 3, height: 3, left: '60%', top: '85%', background: '#a855f7', opacity: 0.15 } as React.CSSProperties} />
+        <div className="fp-dot" style={{ '--dur': '5.5s', '--delay': '1.8s', width: 5, height: 5, left: '80%', top: '70%', background: '#22c55e', opacity: 0.12 } as React.CSSProperties} />
+        <div className="fp-dot" style={{ '--dur': '7.5s', '--delay': '0.4s', width: 3, height: 3, left: '45%', top: '40%', background: '#3b82f6', opacity: 0.15 } as React.CSSProperties} />
+        <div className="fp-dot" style={{ '--dur': '6.5s', '--delay': '2.2s', width: 4, height: 4, left: '92%', top: '12%', background: '#a855f7', opacity: 0.1 } as React.CSSProperties} />
+        {/* Ambient gradient orbs */}
+        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full blur-[160px] opacity-[0.06]" style={{ backgroundColor: PHASE_COLOR }} />
+        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full bg-[#6366f1]/[0.04] blur-[140px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[#3b82f6]/[0.03] blur-[180px]" />
+      </div>
+    </>
   );
 }
 
-/* ─── Animated Binary Stream ─── */
+/* ─── Animated Binary Stream — CSS driven, no JS re-renders ─── */
 export function BinaryStream() {
-  const [bits, setBits] = useState('01001000 01100101 01101100 01101100 01101111');
-  useEffect(() => {
-    const id = setInterval(() => {
-      setBits(Array.from({ length: 40 }, () => Math.random() > 0.5 ? '1' : '0')
-        .reduce((s, b, i) => s + b + (i % 8 === 7 && i < 39 ? ' ' : ''), ''));
-    }, 150);
-    return () => clearInterval(id);
-  }, []);
   return (
-    <div className="font-mono text-xs text-[#22c55e]/60 overflow-hidden whitespace-nowrap tracking-widest">
-      {bits}
-    </div>
+    <>
+      <style>{`@keyframes binary-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }`}</style>
+      <div className="font-mono text-xs text-[#22c55e]/50 overflow-hidden whitespace-nowrap tracking-widest">
+        <div style={{ display: 'inline-block', animation: 'binary-scroll 20s linear infinite', willChange: 'transform' }}>
+          {'01001000 01100101 01101100 01101100 01101111 00100000 01010111 01101111 01110010 01101100 01100100 01001000 01100101 01101100 01101100 01101111 00100000 01010111 01101111 01110010 01101100 01100100 '}
+        </div>
+      </div>
+    </>
   );
 }
 

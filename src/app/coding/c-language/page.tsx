@@ -4,6 +4,7 @@
 
 import type { Metadata } from 'next';
 import JsonLd from '@/components/seo/JsonLd';
+import BreadcrumbJsonLd from '@/components/seo/BreadcrumbJsonLd';
 import { SITE_CONFIG } from '@/lib/constants';
 import CLangPageContent from './CLangPageContent';
 
@@ -21,10 +22,18 @@ export const metadata: Metadata = {
     'online C compiler',
     'C interview preparation',
   ],
+  alternates: {
+    canonical: `${SITE_CONFIG.url}/coding/c-language`,
+  },
   openGraph: {
     title: 'Learn C Language - 40-Day Mastery Blueprint | CollegeHub',
     description: 'From zero to system-level programmer in 40 days. Practice code directly in browser.',
     url: `${SITE_CONFIG.url}/coding/c-language`,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Learn C Language - 40-Day Mastery Blueprint | CollegeHub',
+    description: 'From zero to system-level programmer in 40 days. Practice code directly in browser.',
   },
 };
 
@@ -46,11 +55,24 @@ export default function CLangPage() {
     timeRequired: 'P40D',
     inLanguage: 'en',
     isAccessibleForFree: true,
+    numberOfCredits: 40,
+    hasCourseInstance: {
+      '@type': 'CourseInstance',
+      courseMode: 'online',
+      courseWorkload: 'P40D',
+    },
   };
 
   return (
     <>
       <JsonLd data={schema} />
+      <BreadcrumbJsonLd
+        items={[
+          { name: 'Home', href: '/' },
+          { name: 'Coding', href: '/coding' },
+          { name: 'C Language', href: '/coding/c-language' },
+        ]}
+      />
       <CLangPageContent />
     </>
   );

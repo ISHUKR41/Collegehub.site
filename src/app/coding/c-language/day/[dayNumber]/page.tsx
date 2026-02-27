@@ -1,10 +1,16 @@
 /**
  * Route: /coding/c-language/day/[dayNumber]
+ *
+ * Dynamic day page with full SEO: canonical URL, breadcrumbs,
+ * and Course JSON-LD for each day lesson.
  */
 
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { C_MASTERY_PHASES } from '@/lib/c-mastery-data';
+import { SITE_CONFIG } from '@/lib/constants';
+import JsonLd from '@/components/seo/JsonLd';
+import BreadcrumbJsonLd from '@/components/seo/BreadcrumbJsonLd';
 import DayPageContent from './DayPageContent';
 import Day1Content from './Day1Content';
 
@@ -49,11 +55,15 @@ export async function generateMetadata({
     keywords: numericDay === 1
       ? ['C programming', 'computational thinking', 'binary system', 'memory architecture', 'compilation process', 'variables in C', 'how computer works', 'FAANG interview prep', 'C language tutorial', 'programming fundamentals']
       : ['C programming', result.day.title, ...result.day.topics.slice(0, 5)],
+    alternates: {
+      canonical: `${SITE_CONFIG.url}/coding/c-language/day/${numericDay}`,
+    },
     openGraph: {
       title,
       description,
       type: 'article',
       siteName: 'CollegeHub — C Mastery Blueprint',
+      url: `${SITE_CONFIG.url}/coding/c-language/day/${numericDay}`,
     },
     twitter: {
       card: 'summary_large_image',
@@ -82,9 +92,58 @@ export default async function DayPage({
 
   const totalDays = C_MASTERY_PHASES.reduce((sum, phase) => sum + phase.days.length, 0);
 
+  const daySchema = {
+    '@context': 'https://schema.org',
+    '@type': 'LearningResource',
+    name: `Day ${numericDay} — ${result.day.title}`,
+    description: `${result.phase.name}: ${result.day.topics.join(', ')}`,
+    url: `${SITE_CONFIG.url}/coding/c-language/day/${numericDay}`,
+    learningResourceType: 'lesson',
+    educationalLevel: 'Beginner to Advanced',
+    inLanguage: 'en',
+    isAccessibleForFree: true,
+    isPartOf: {
+      '@type': 'Course',
+      name: '40-Day C Mastery Blueprint',
+      url: `${SITE_CONFIG.url}/coding/c-language`,
+      provider: {
+        '@type': 'Organization',
+        name: SITE_CONFIG.name,
+      },
+    },
+    teaches: result.day.topics,
+    position: numericDay,
+  };
+
   if (numericDay === 1) {
-    return <Day1Content />;
+    return (
+      <>
+        <JsonLd data={daySchema} />
+        <BreadcrumbJsonLd
+          items={[
+            { name: 'Home', href: '/' },
+            { name: 'Coding', href: '/coding' },
+            { name: 'C Language', href: '/coding/c-language' },
+            { name: `Day ${numericDay}`, href: `/coding/c-language/day/${numericDay}` },
+          ]}
+        />
+        <Day1Content />
+      </>
+    );
   }
 
-  return <DayPageContent day={result.day} phase={result.phase} totalDays={totalDays} />;
+  return (
+    <>
+      <JsonLd data={daySchema} />
+      <BreadcrumbJsonLd
+        items={[
+          { name: 'Home', href: '/' },
+          { name: 'Coding', href: '/coding' },
+          { name: 'C Language', href: '/coding/c-language' },
+          { name: `Day ${numericDay}`, href: `/coding/c-language/day/${numericDay}` },
+        ]}
+      />
+      <DayPageContent day={result.day} phase={result.phase} totalDays={totalDays} />
+    </>
+  );
 }

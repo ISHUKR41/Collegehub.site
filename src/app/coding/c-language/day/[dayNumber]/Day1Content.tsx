@@ -87,98 +87,96 @@ export default function Day1Content() {
       <div className="relative z-10">
         {/* ═══ ULTRA-PREMIUM NAVBAR ═══ */}
         <nav className="sticky top-0 z-50" role="navigation" aria-label="Day 1 Navigation" style={{
-          background: 'linear-gradient(180deg, rgba(2,2,8,0.98) 0%, rgba(5,5,12,0.96) 100%)',
-          backdropFilter: 'blur(48px) saturate(250%)',
-          WebkitBackdropFilter: 'blur(48px) saturate(250%)',
+          background: 'linear-gradient(180deg, rgba(2,2,8,0.97) 0%, rgba(6,6,16,0.96) 100%)',
+          backdropFilter: 'blur(40px) saturate(200%)',
+          WebkitBackdropFilter: 'blur(40px) saturate(200%)',
+          borderBottom: '1px solid rgba(255,255,255,0.04)',
         }}>
-          <div className="max-w-7xl mx-auto px-3 sm:px-5 lg:px-8">
-            <div className="flex items-center justify-between h-[56px] sm:h-[64px]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
+            <div className="flex items-center justify-between h-[60px] sm:h-[68px]">
 
               {/* ── Left: Premium Breadcrumb Path ── */}
-              <div className="flex items-center gap-0 min-w-0">
+              <div className="flex items-center min-w-0">
                 {/* Back Arrow */}
-                <Link href="/coding/c-language" className="group flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl hover:bg-white/[0.06] border border-transparent hover:border-white/[0.06] transition-all duration-300 mr-2 sm:mr-3" aria-label="Back to C Mastery Blueprint">
+                <Link href="/coding/c-language" className="group flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-xl hover:bg-white/[0.06] border border-transparent hover:border-white/[0.08] transition-all duration-300 mr-3 sm:mr-5" aria-label="Back to C Mastery Blueprint">
                   <motion.div whileHover={{ x: -3 }} transition={{ type: 'spring', stiffness: 400 }}>
-                    <ArrowLeft className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-[#3e4a5c] group-hover:text-[#22c55e] transition-colors duration-300" />
+                    <ArrowLeft className="w-[18px] h-[18px] text-[#3e4a5c] group-hover:text-[#22c55e] transition-colors duration-300" />
                   </motion.div>
                 </Link>
 
-                {/* Breadcrumb Segments */}
-                <div className="flex items-center gap-1 sm:gap-1.5">
-                  <Link href="/coding/c-language" className="group hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-white/[0.05] transition-all duration-300">
-                    <div className="w-6 h-6 rounded-lg flex items-center justify-center bg-white/[0.03] group-hover:bg-[#22c55e]/[0.08] transition-all duration-300">
-                      <Code2 className="w-3 h-3 text-[#4a5568] group-hover:text-[#22c55e] transition-colors duration-300" />
+                {/* Breadcrumb Segments — with proper gaps */}
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <Link href="/coding/c-language" className="group hidden sm:flex items-center gap-2.5 px-3.5 py-2 rounded-xl hover:bg-white/[0.05] transition-all duration-300">
+                    <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-white/[0.04] group-hover:bg-[#22c55e]/[0.1] transition-all duration-300">
+                      <Code2 className="w-3.5 h-3.5 text-[#4a5568] group-hover:text-[#22c55e] transition-colors duration-300" />
                     </div>
-                    <span className="text-[11px] font-bold tracking-[0.1em] uppercase text-[#536378] group-hover:text-[#94a3b8] transition-colors duration-300" style={{ fontFamily: 'inherit' }}>C_Mastery</span>
+                    <span className="text-[11px] font-bold tracking-[0.12em] uppercase text-[#536378] group-hover:text-[#94a3b8] transition-colors duration-300" style={{ fontFamily: 'inherit' }}>C_Mastery</span>
                   </Link>
 
-                  <span className="text-[#1e293b] select-none text-sm font-thin hidden sm:inline">/</span>
+                  <span className="text-[#1a1f2e] select-none text-xs tracking-wider hidden sm:inline">›</span>
 
-                  <motion.div
-                    whileHover={{ scale: 1.04, y: -1 }}
-                    transition={{ type: 'spring', stiffness: 400 }}
-                    className="flex items-center gap-2 px-3 py-2 rounded-xl cursor-default"
+                  <div
+                    className="flex items-center gap-2.5 px-3.5 py-2 rounded-xl cursor-default"
                     style={{
-                      background: `linear-gradient(135deg, ${PHASE_COLOR}0c, ${PHASE_COLOR}04)`,
-                      border: `1px solid ${PHASE_COLOR}15`,
-                      boxShadow: `0 0 20px ${PHASE_COLOR}06`,
+                      background: `linear-gradient(135deg, ${PHASE_COLOR}0a, ${PHASE_COLOR}03)`,
+                      border: `1px solid ${PHASE_COLOR}12`,
                     }}
                   >
-                    <Brain className="w-3.5 h-3.5 sm:w-4 sm:h-4" style={{ color: PHASE_COLOR }} />
-                    <span className="text-[10px] sm:text-[11px] font-bold tracking-[0.12em] uppercase" style={{ color: PHASE_COLOR, fontFamily: 'inherit' }}>Brain_Reset</span>
-                  </motion.div>
+                    <Brain className="w-4 h-4 sm:w-[18px] sm:h-[18px]" style={{ color: PHASE_COLOR }} />
+                    <span className="text-[10px] sm:text-[11px] font-bold tracking-[0.14em] uppercase" style={{ color: PHASE_COLOR, fontFamily: 'inherit' }}>Brain_Reset</span>
+                  </div>
 
-                  <span className="text-[#1e293b] select-none text-sm font-thin">/</span>
+                  <span className="text-[#1a1f2e] select-none text-xs tracking-wider">›</span>
 
-                  <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[0.06] border border-white/[0.08]" style={{ boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)' }}>
-                    <Terminal className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white/90" />
-                    <span className="text-[10px] sm:text-[11px] font-bold tracking-[0.12em] uppercase text-white/90" style={{ fontFamily: 'inherit' }}>Day_01</span>
+                  <div className="flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-white/[0.07] border border-white/[0.1]" style={{ boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05), 0 0 20px rgba(255,255,255,0.02)' }}>
+                    <Terminal className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-white/90" />
+                    <span className="text-[10px] sm:text-[11px] font-black tracking-[0.14em] uppercase text-white/95" style={{ fontFamily: 'inherit' }}>Day_01</span>
                   </div>
                 </div>
               </div>
 
               {/* ── Right: Navigation + Progress ── */}
-              <div className="flex items-center gap-2 sm:gap-3">
+              <div className="flex items-center gap-3 sm:gap-4">
                 {/* Desktop Nav Links */}
-                <div className="hidden lg:flex items-center gap-1">
-                  <Link href="/" className="group flex items-center gap-2 px-3.5 py-2 rounded-xl text-[#4a5568] hover:text-[#e2e8f0] hover:bg-white/[0.05] transition-all duration-300">
-                    <Home className="w-4 h-4 group-hover:text-[#22c55e] transition-colors duration-300" />
-                    <span className="text-[11px] font-bold tracking-[0.08em] uppercase" style={{ fontFamily: 'inherit' }}>Home</span>
+                <div className="hidden lg:flex items-center gap-1.5">
+                  <Link href="/" className="group flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-[#4a5568] hover:text-[#e2e8f0] hover:bg-white/[0.05] transition-all duration-300">
+                    <Home className="w-[18px] h-[18px] group-hover:text-[#22c55e] transition-colors duration-300" />
+                    <span className="text-[11px] font-bold tracking-[0.1em] uppercase" style={{ fontFamily: 'inherit' }}>Home</span>
                   </Link>
-                  <Link href="/coding" className="group flex items-center gap-2 px-3.5 py-2 rounded-xl text-[#4a5568] hover:text-[#e2e8f0] hover:bg-white/[0.05] transition-all duration-300">
-                    <GraduationCap className="w-4 h-4 group-hover:text-[#3b82f6] transition-colors duration-300" />
-                    <span className="text-[11px] font-bold tracking-[0.08em] uppercase" style={{ fontFamily: 'inherit' }}>School</span>
+                  <Link href="/coding" className="group flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-[#4a5568] hover:text-[#e2e8f0] hover:bg-white/[0.05] transition-all duration-300">
+                    <GraduationCap className="w-[18px] h-[18px] group-hover:text-[#3b82f6] transition-colors duration-300" />
+                    <span className="text-[11px] font-bold tracking-[0.1em] uppercase" style={{ fontFamily: 'inherit' }}>School</span>
                   </Link>
                 </div>
 
                 {/* Divider */}
-                <div className="hidden lg:block w-px h-8 bg-gradient-to-b from-transparent via-white/[0.08] to-transparent" />
+                <div className="hidden lg:block w-px h-9 bg-gradient-to-b from-transparent via-white/[0.1] to-transparent" />
 
                 {/* Parts Dropdown (Desktop) */}
                 <div className="hidden md:block relative group">
-                  <button className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-[#5a6577] hover:text-[#e2e8f0] hover:bg-white/[0.05] transition-all duration-300">
-                    <Layers className="w-4 h-4" />
-                    <span className="text-[11px] font-bold tracking-[0.08em] uppercase" style={{ fontFamily: 'inherit' }}>Part_{String(activeSection + 1).padStart(2, '0')}</span>
-                    <ChevronDown className="w-3 h-3 opacity-50 group-hover:opacity-80 transition-opacity" />
+                  <button className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-[#5a6577] hover:text-[#e2e8f0] hover:bg-white/[0.05] transition-all duration-300">
+                    <Layers className="w-[18px] h-[18px]" />
+                    <span className="text-[11px] font-bold tracking-[0.1em] uppercase" style={{ fontFamily: 'inherit' }}>Part_{String(activeSection + 1).padStart(2, '0')}</span>
+                    <ChevronDown className="w-3.5 h-3.5 opacity-50 group-hover:opacity-80 transition-opacity" />
                   </button>
-                  <div className="absolute right-0 top-full mt-2 w-72 rounded-2xl overflow-hidden opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-250 z-50"
+                  <div className="absolute right-0 top-full mt-2.5 w-80 rounded-2xl overflow-hidden opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-250 z-50"
                     style={{
                       background: 'linear-gradient(180deg, rgba(8,8,18,0.99), rgba(5,5,12,0.99))',
                       border: '1px solid rgba(255,255,255,0.08)',
                       boxShadow: '0 24px 80px rgba(0,0,0,0.7), 0 0 1px rgba(255,255,255,0.1)',
                       backdropFilter: 'blur(40px)',
                     }}>
-                    <div className="p-2 max-h-[55vh] overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: `${PHASE_COLOR}30 transparent` }}>
+                    <div className="p-2.5 max-h-[55vh] overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: `${PHASE_COLOR}30 transparent` }}>
                       <p className="px-3 py-2 text-[9px] font-bold tracking-[0.2em] uppercase text-[#3e4a5c]" style={{ fontFamily: 'inherit' }}>Jump_to_Section</p>
                       {PARTS.map((p, i) => (
                         <a key={i} href={`#part-${i + 1}`}
-                          className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-[12px] transition-all duration-200 ${activeSection === i ? 'bg-white/[0.07] text-white' : 'text-[#6b7588] hover:text-[#e2e8f0] hover:bg-white/[0.04]'}`}
+                          className={`flex items-center gap-3.5 px-3 py-3 rounded-xl text-[12px] transition-all duration-200 ${activeSection === i ? 'bg-white/[0.07] text-white' : 'text-[#6b7588] hover:text-[#e2e8f0] hover:bg-white/[0.04]'}`}
                           style={{ fontFamily: 'inherit' }}>
-                          <span className={`w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black flex-shrink-0 transition-all ${activeSection === i ? 'text-black' : 'text-[#5a6577]'}`}
+                          <span className={`w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-black flex-shrink-0 transition-all ${activeSection === i ? 'text-black' : 'text-[#5a6577]'}`}
                             style={activeSection === i ? { background: PHASE_COLOR, boxShadow: `0 0 12px ${PHASE_COLOR}60` } : { background: 'rgba(255,255,255,0.05)' }}>
                             {String(i + 1).padStart(2, '0')}
                           </span>
-                          <span className="font-semibold truncate">{p}</span>
+                          <span className="font-semibold truncate tracking-wide">{p}</span>
                           {activeSection === i && <span className="ml-auto w-2 h-2 rounded-full animate-pulse" style={{ background: PHASE_COLOR, boxShadow: `0 0 8px ${PHASE_COLOR}80` }} />}
                         </a>
                       ))}
@@ -187,22 +185,20 @@ export default function Day1Content() {
                 </div>
 
                 {/* Divider */}
-                <div className="hidden md:block w-px h-8 bg-gradient-to-b from-transparent via-white/[0.08] to-transparent" />
+                <div className="hidden md:block w-px h-9 bg-gradient-to-b from-transparent via-white/[0.1] to-transparent" />
 
-                {/* Progress Ring — Enhanced */}
-                <motion.div
-                  className="flex items-center gap-2.5 px-2 py-1 rounded-xl cursor-default"
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                {/* Progress Ring — Enhanced with proper spacing */}
+                <div
+                  className="flex items-center gap-3 px-2.5 py-1.5 rounded-xl cursor-default"
                   title={`${scrollProgress}% completed`}
                   style={{
-                    background: scrollProgress > 0 ? `linear-gradient(135deg, ${PHASE_COLOR}06, transparent)` : 'transparent',
-                    border: scrollProgress > 5 ? `1px solid ${PHASE_COLOR}10` : '1px solid transparent',
+                    background: scrollProgress > 0 ? `linear-gradient(135deg, ${PHASE_COLOR}08, transparent)` : 'transparent',
+                    border: scrollProgress > 5 ? `1px solid ${PHASE_COLOR}12` : '1px solid transparent',
                   }}
                 >
-                  <div className="relative w-11 h-11 sm:w-12 sm:h-12 flex-shrink-0">
+                  <div className="relative w-12 h-12 sm:w-[52px] sm:h-[52px] flex-shrink-0">
                     <svg className="w-full h-full -rotate-90" viewBox="0 0 44 44">
-                      <circle cx="22" cy="22" r="19" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="2.5" />
+                      <circle cx="22" cy="22" r="19" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="2.5" />
                       <circle cx="22" cy="22" r="19" fill="none"
                         stroke="url(#navProgressGrad)"
                         strokeWidth="3"
@@ -211,7 +207,7 @@ export default function Day1Content() {
                         strokeDashoffset={2 * Math.PI * 19 - (2 * Math.PI * 19 * scrollProgress / 100)}
                         style={{
                           transition: 'stroke-dashoffset 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                          filter: scrollProgress > 0 ? `drop-shadow(0 0 ${5 + scrollProgress / 12}px ${PHASE_COLOR}${scrollProgress > 60 ? 'b0' : '70'})` : 'none',
+                          filter: scrollProgress > 0 ? `drop-shadow(0 0 ${5 + scrollProgress / 10}px ${PHASE_COLOR}${scrollProgress > 60 ? 'b0' : '70'})` : 'none',
                         }}
                       />
                       <defs>
@@ -222,11 +218,11 @@ export default function Day1Content() {
                         </linearGradient>
                       </defs>
                     </svg>
-                    <span className="absolute inset-0 flex items-center justify-center text-[11px] sm:text-[12px] font-black tabular-nums" style={{ fontFamily: 'inherit', color: scrollProgress > 0 ? '#fff' : '#64748b' }}>
+                    <span className="absolute inset-0 flex items-center justify-center text-[12px] sm:text-[13px] font-black tabular-nums" style={{ fontFamily: 'inherit', color: scrollProgress > 0 ? '#fff' : '#64748b' }}>
                       {scrollProgress}<span className="text-[8px] opacity-40 ml-px">%</span>
                     </span>
                   </div>
-                  <div className="hidden sm:flex flex-col gap-0.5">
+                  <div className="hidden sm:flex flex-col gap-1">
                     <span className="text-[9px] tracking-[0.15em] uppercase font-bold leading-none transition-colors duration-500" style={{ fontFamily: 'inherit', color: scrollProgress >= 75 ? PHASE_COLOR : scrollProgress >= 50 ? '#3b82f6' : '#475569' }}>
                       {scrollProgress < 10 ? 'Start_' : scrollProgress < 35 ? 'Reading_' : scrollProgress < 60 ? 'Deep_Dive' : scrollProgress < 90 ? 'Almost_' : scrollProgress < 100 ? 'Finishing' : 'Complete!'}
                     </span>
@@ -234,23 +230,23 @@ export default function Day1Content() {
                       {scrollProgress < 100 ? 'progress' : 'mastered'}
                     </span>
                   </div>
-                </motion.div>
+                </div>
 
                 {/* Mobile Menu Toggle */}
                 <motion.button
                   whileTap={{ scale: 0.88, rotate: 90 }}
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="md:hidden flex items-center justify-center w-10 h-10 rounded-xl bg-white/[0.05] border border-white/[0.08] text-[#94a3b8] hover:text-white hover:bg-white/[0.08] transition-all duration-300"
+                  className="md:hidden flex items-center justify-center w-11 h-11 rounded-xl bg-white/[0.05] border border-white/[0.08] text-[#94a3b8] hover:text-white hover:bg-white/[0.08] transition-all duration-300"
                   aria-label="Toggle mobile menu"
                 >
                   <AnimatePresence mode="wait">
                     {mobileMenuOpen ? (
                       <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.15 }}>
-                        <X className="w-4.5 h-4.5" />
+                        <X className="w-5 h-5" />
                       </motion.div>
                     ) : (
                       <motion.div key="menu" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.15 }}>
-                        <Menu className="w-4.5 h-4.5" />
+                        <Menu className="w-5 h-5" />
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -268,9 +264,9 @@ export default function Day1Content() {
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
                 className="md:hidden overflow-hidden"
-                style={{ background: 'linear-gradient(180deg, rgba(2,2,8,0.99), rgba(5,5,12,0.99))', borderTop: '1px solid rgba(255,255,255,0.05)' }}
+                style={{ background: 'linear-gradient(180deg, rgba(2,2,8,0.99), rgba(5,5,12,0.99))', borderTop: '1px solid rgba(255,255,255,0.06)' }}
               >
-                <div className="px-3 py-4 space-y-1">
+                <div className="px-4 py-5 space-y-1.5">
                   {/* Nav links */}
                   {[
                     { href: '/', label: 'Home', icon: Home, color: '#22c55e' },
@@ -278,32 +274,32 @@ export default function Day1Content() {
                     { href: '/coding/c-language', label: 'C_Mastery_Blueprint', icon: BookOpen, color: PHASE_COLOR },
                   ].map((item, idx) => (
                     <motion.div key={item.href} initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: idx * 0.05 }}>
-                      <Link href={item.href} onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-xl text-[#8b95a8] hover:text-white hover:bg-white/[0.05] transition-all duration-300 border border-transparent hover:border-white/[0.06]">
-                        <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${item.color}0c`, border: `1px solid ${item.color}18` }}>
-                          <item.icon className="w-4 h-4" style={{ color: item.color }} />
+                      <Link href={item.href} onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-4 px-4 py-3.5 rounded-xl text-[#8b95a8] hover:text-white hover:bg-white/[0.05] transition-all duration-300 border border-transparent hover:border-white/[0.06]">
+                        <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: `${item.color}0c`, border: `1px solid ${item.color}18` }}>
+                          <item.icon className="w-[18px] h-[18px]" style={{ color: item.color }} />
                         </div>
-                        <span className="text-[12px] font-bold tracking-[0.08em] uppercase" style={{ fontFamily: 'inherit' }}>{item.label}</span>
+                        <span className="text-[12px] font-bold tracking-[0.1em] uppercase" style={{ fontFamily: 'inherit' }}>{item.label}</span>
                       </Link>
                     </motion.div>
                   ))}
 
                   {/* Divider */}
-                  <div className="h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent my-3 mx-3" />
+                  <div className="h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent my-4 mx-3" />
 
                   {/* Parts Navigation */}
-                  <p className="px-4 pt-1 pb-2 text-[9px] font-bold tracking-[0.2em] uppercase text-[#3e4a5c]" style={{ fontFamily: 'inherit' }}>Jump_to_Section</p>
-                  <div className="max-h-[40vh] overflow-y-auto rounded-xl space-y-0.5" style={{ scrollbarWidth: 'thin', scrollbarColor: `${PHASE_COLOR}30 transparent` }}>
+                  <p className="px-4 pt-1 pb-3 text-[9px] font-bold tracking-[0.2em] uppercase text-[#3e4a5c]" style={{ fontFamily: 'inherit' }}>Jump_to_Section</p>
+                  <div className="max-h-[40vh] overflow-y-auto rounded-xl space-y-1" style={{ scrollbarWidth: 'thin', scrollbarColor: `${PHASE_COLOR}30 transparent` }}>
                     {PARTS.map((p, i) => (
                       <motion.a key={i} href={`#part-${i + 1}`} onClick={() => setMobileMenuOpen(false)}
                         initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.15 + i * 0.03 }}
-                        className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-[12px] transition-all duration-200 ${activeSection === i ? 'bg-white/[0.07] text-white' : 'text-[#6b7588] hover:text-[#e2e8f0] hover:bg-white/[0.04]'}`}
+                        className={`flex items-center gap-3.5 px-4 py-3 rounded-xl text-[12px] transition-all duration-200 ${activeSection === i ? 'bg-white/[0.07] text-white' : 'text-[#6b7588] hover:text-[#e2e8f0] hover:bg-white/[0.04]'}`}
                         style={{ fontFamily: 'inherit' }}>
-                        <span className={`w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black flex-shrink-0 ${activeSection === i ? 'text-black' : 'text-[#5a6577]'}`}
+                        <span className={`w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-black flex-shrink-0 ${activeSection === i ? 'text-black' : 'text-[#5a6577]'}`}
                           style={activeSection === i ? { background: PHASE_COLOR, boxShadow: `0 0 10px ${PHASE_COLOR}50` } : { background: 'rgba(255,255,255,0.05)' }}>
                           {String(i + 1).padStart(2, '0')}
                         </span>
-                        <span className="font-semibold truncate">{p}</span>
-                        {activeSection === i && <span className="ml-auto w-2 h-2 rounded-full animate-pulse" style={{ background: PHASE_COLOR }} />}
+                        <span className="font-semibold truncate tracking-wide">{p}</span>
+                        {activeSection === i && <span className="ml-auto w-2.5 h-2.5 rounded-full animate-pulse" style={{ background: PHASE_COLOR }} />}
                       </motion.a>
                     ))}
                   </div>
@@ -314,23 +310,25 @@ export default function Day1Content() {
 
           {/* Animated sweep border */}
           <div className="h-[1px] relative overflow-hidden">
-            <motion.div
+            <div
               className="h-full absolute inset-0"
-              style={{ background: `linear-gradient(90deg, transparent, ${PHASE_COLOR}35, #3b82f640, #a855f735, transparent)` }}
-              animate={{ x: ['-100%', '100%'] }}
-              transition={{ duration: 4.5, repeat: Infinity, ease: 'linear' }}
+              style={{
+                background: `linear-gradient(90deg, transparent, ${PHASE_COLOR}30, #3b82f635, #a855f730, transparent)`,
+                animation: 'sweep-border 4.5s linear infinite',
+              }}
             />
+            <style>{`@keyframes sweep-border { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }`}</style>
           </div>
 
           {/* Progress bar — thicker and more vibrant */}
           <div className="h-[3px] bg-[#06060e] relative overflow-hidden">
-            <motion.div
+            <div
               className="h-full absolute left-0 top-0 rounded-r-full"
               style={{
                 width: `${scrollProgress}%`,
                 background: `linear-gradient(90deg, ${PHASE_COLOR}, #3b82f6, #8b5cf6, #a855f7)`,
                 boxShadow: scrollProgress > 0 ? `0 0 18px ${PHASE_COLOR}80, 0 0 6px #3b82f680, 0 2px 8px rgba(0,0,0,0.4)` : 'none',
-                transition: 'width 0.2s ease-out',
+                transition: 'width 0.25s ease-out',
               }}
             />
           </div>

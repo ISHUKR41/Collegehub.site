@@ -1,12 +1,13 @@
 /**
  * Dynamic course detail route.
  *
- * Uses route param as identifier. If it is a course ObjectId, metadata and
- * JSON-LD are fetched from backend for accurate course-level SEO.
+ * Uses route param as identifier. Metadata, JSON-LD, and breadcrumbs
+ * are generated dynamically for accurate course-level SEO.
  */
 
 import type { Metadata } from 'next';
 import JsonLd from '@/components/seo/JsonLd';
+import BreadcrumbJsonLd from '@/components/seo/BreadcrumbJsonLd';
 import { SITE_CONFIG } from '@/lib/constants';
 import CourseDetailContent from './CourseDetailContent';
 
@@ -83,11 +84,19 @@ export async function generateMetadata({
   return {
     title: `${seo.title} - Course Detail`,
     description: seo.description,
+    alternates: {
+      canonical: `${SITE_CONFIG.url}/courses/${id}`,
+    },
     openGraph: {
       title: `${seo.title} - Course Detail | CollegeHub`,
       description: seo.description,
       url: `${SITE_CONFIG.url}/courses/${id}`,
       type: 'article',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${seo.title} - Course Detail | CollegeHub`,
+      description: seo.description,
     },
   };
 }
@@ -114,11 +123,20 @@ export default async function CourseDetailPage({
     },
     educationalLevel: 'Beginner to Advanced',
     url: `${SITE_CONFIG.url}/courses/${id}`,
+    isAccessibleForFree: true,
+    inLanguage: 'en',
   };
 
   return (
     <>
       <JsonLd data={courseSchema} />
+      <BreadcrumbJsonLd
+        items={[
+          { name: 'Home', href: '/' },
+          { name: 'Courses', href: '/coding' },
+          { name: seo?.title || prettifySlug(id), href: `/courses/${id}` },
+        ]}
+      />
       <CourseDetailContent key={id} courseId={id} />
     </>
   );
